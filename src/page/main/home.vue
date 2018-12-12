@@ -43,11 +43,13 @@
     methods:{
       async goSys(param){
 //        this.$router.push('manage');
+        let origin = window.location.origin;
+        console.log("window.location--,--origin",window.location,origin)
         switch (param){
           case '1':
             break;
           case '2':
-            window.location.href = "http://localhost:9999/faXianShiShuXue.html#/home";
+            window.location.href = origin + "/faXianShiShuXue.html#/home";
             break;
           case '3':
             break;
