@@ -4,14 +4,14 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 // 导入相应的子组件
-import Home from './../page/faXianShiShuXue/door'
+import Door from './../page/manageCenter/door'
 
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: Home
+    name: 'door',
+    component: Door
   }
 ]
 export default new Router({

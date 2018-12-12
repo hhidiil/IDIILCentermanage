@@ -2,12 +2,12 @@
   <el-container>
     <el-header class="door">
       <el-row>
-        <el-col :span="4"><img src="../../static/images/logo.png"></el-col>
+        <el-col :span="4"><img src="../../../static/images/logo.png"></el-col>
         <el-col :span="20"><div class="loginButton"></div></el-col>
       </el-row>
     </el-header>
     <el-main>
-      <img src="../../static/images/homeBanner.jpg" class="HomeBanner" />
+      <img src="../../../static/images/homeBanner.jpg" class="HomeBanner" />
       <section class="form_contianer">
         <div class="senctionblock">
           <el-row>
@@ -36,11 +36,11 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {doLogin,doTestLogin,registerUser} from '../api/user'
-  import {getClassInfo} from '../api/classes'
-  import classData from '../data/classlist'
-  import {setStore,getStore,clearStore,setSession,getSession} from '../config/publicMethod'
-  import {filterWebUrl} from '../config/methods'
+  import {doLogin,doTestLogin,registerUser} from '../../api/user'
+  import {getClassInfo} from '../../api/classes'
+  import classData from '../../data/classlist'
+  import {setStore,getStore,clearStore,setSession,getSession} from '../../config/publicMethod'
+  import {filterWebUrl} from '../../config/methods'
   export default {
     name: 'door',
     data () {
@@ -115,21 +115,29 @@
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
             let userinfo = null;
-            let fromflag=false;//true为真实数据，false为本地数据
+            let fromflag = this.fromFlag;//true为真实数据，false为本地数据
+            console.log('55555555555555555555555555555555555555555555555',fromflag)
             if(fromflag){
               const result = await doLogin(this.ruleForm)//查询用户信息
               console.log("注册结果------->",result)
               if(result.code == 200){
                 if((result.data[0])){
-                  userinfo = {userId:result.data[0].userid, username: result.data[0].username};
+                  userinfo = {userId:result.data[0].userid, userName: result.data[0].username};
                   if(this.ruleForm.role == '1'){//学生登录
-                    const reslut = await getClassInfo();
-//                    console.warn("获取课堂数据:::::",data.studentNeedData)
-//                    let studentNeedData = data.studentNeedData;
-//                    studentNeedData.sStudentID = userinfo.userId;
-//                    let urlend = filterWebUrl(studentNeedData,"1");
-//                    console.warn("获取课堂地址:::::",urlend)
+                    const dataList = await getClassInfo();
+                    console.warn("获取课堂数据:::::",dataList)
+                    let dataParams={};
+                    dataParams.teacherId = dataList.classList.teacherId;
+                    dataParams.CenterID = dataList.CenterID;
+                    dataParams.CenterWeb = dataList.CenterWeb;
+                    dataParams.ClassID = dataList.ClassID;
+                    dataParams.CourseType = dataList.CourseType;
+                    dataParams.MainWeb = dataList.MainWeb;
+                    dataParams.StudentID = userinfo.userId;
+                    let urlend = filterWebUrl2(dataParams,"1");
+                    console.warn("获取课堂地址:::::",urlend)
 //                    window.open(urlend);
+                    return
                   }else {//教师登录
                     if(getStore("userInfo")){//已经有值
                       if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
@@ -141,9 +149,8 @@
                     }
                     setSession("accessToken",true);//设置登录状态的值
                     setStore("userInfo",JSON.stringify(userinfo))
-                    this.$router.replace({ name: 'manage', params: userinfo})
+                    this.$router.replace({ name: 'home', params: userinfo})
                   }
-                  this.$router.replace('manage')
                 }else {
                   alert("用户名或密码错误")
                 }
@@ -174,18 +181,19 @@
               }
               if(flag){
                 if(this.ruleForm.role == '1'){
-                  fetch('static/ClassUserList.json').then((response)=>{
-                    return response.json();
-                  }).then((data)=>{
-                    console.warn("获取课堂数据:::::",data.studentNeedData)
-                    let studentNeedData = data.studentNeedData;
-                    studentNeedData.sStudentID = userinfo.userId;
-                    let urlend = filterWebUrl(studentNeedData,"1");
-                    console.warn("获取课堂地址:::::",urlend)
-                    window.open(urlend);
-                  }).catch(()=>{
-                    console.error("获取课堂数据出错")
-                  })
+                  const dataList = await doTestLogin('/static/ClassUserList.json');
+                  console.warn("获取课堂数据:::::",dataList)
+                  let dataParams={};
+                  dataParams.teacherId = dataList.classList.teacherId;
+                  dataParams.CenterID = dataList.CenterID;
+                  dataParams.CenterWeb = dataList.CenterWeb;
+                  dataParams.ClassID = dataList.ClassID;
+                  dataParams.CourseType = dataList.CourseType;
+                  dataParams.MainWeb = dataList.MainWeb;
+                  dataParams.StudentID = userinfo.userId;
+                  let urlend = filterWebUrl2(dataParams,"1");
+                  console.warn("获取课堂地址:::::",urlend)
+                  window.open(urlend);
 
                 }else {//教师登录
                   if(getStore("userInfo")){//已经有值
@@ -228,7 +236,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less" type="text/less">
-  @import '../assets/mixin.less';
+  @import '../../assets/mixin.less';
   .door{
     background-color: #5c4241;
   }

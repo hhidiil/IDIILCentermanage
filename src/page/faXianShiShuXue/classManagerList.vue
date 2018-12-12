@@ -87,7 +87,7 @@
   import addClass from './addClass'
   import {setStore,getStore} from '../../config/publicMethod'
   import {toJson} from '../../config/methods'
-  import {writeFileJson,doTestLogin} from '../api/user'
+  import {writeFileJson,doTestLogin} from '../../api/user'
   import {getClassList,updateDoingClassInfo,deleteClassListInfo} from '../../api/classes'
   import classData from '../../data/classlist'
   export default {
@@ -109,9 +109,6 @@
     },
     activated() {
         //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
-//      let classList2 = JSON.parse(getStore("classList"));
-//      this.classList = classList2;
-//      this.tableData = classList2.length>0 ? classList2[this.currentindex] : classData.classList;
 //      this.getClassListInfo()
     },
     mounted(){
@@ -188,6 +185,9 @@
           type: 'warning'
         }).then(() => {
           this.deleteCourse(tableData,index);
+          //关闭修改弹框的之后重新加载一遍数据，刷新视图
+          this.currentindex = 0;
+          this.getClassListInfo()
         }).catch(() => {
           this.$message({type: 'info', message: '已取消删除'});
         });
@@ -210,7 +210,6 @@
     margin-bottom: 40px;
     .resoucelist{
       text-decoration: underline;
-      cursor: pointer;
       margin: 5px 0;
     }
     .righttable table{
@@ -225,11 +224,11 @@
     }
     .text {
       font-size: 14px;
-      cursor: pointer;
       text-align: left;
     }
     .classlist{
       padding: 7px 4px;
+      cursor: pointer;
       border-radius: 2px;
     }
     .item {

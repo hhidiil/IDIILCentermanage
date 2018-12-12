@@ -17,7 +17,7 @@
   export default {
     data(){
       return {
-        message:"管理页面首页"
+        message:"欢迎使用教师派课系统！"
       }
     },
     //引入的组件

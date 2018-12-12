@@ -26,10 +26,10 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import headHop from '../components/headTop'
-  import {doLogin,registerUser} from '../api/user'
-  import {getCurrentCourseInfo,getClassList} from '../api/classes'
-  import {getStore,setStore} from '../config/publicMethod'
+  import headHop from '../../components/headTop'
+  import {doLogin,registerUser} from '../../api/user'
+  import {getCurrentCourseInfo,getClassList} from '../../api/classes'
+  import {getStore,setStore} from '../../config/publicMethod'
   export default {
     data(){
       return {
@@ -47,7 +47,7 @@
           case '1':
             break;
           case '2':
-            window.location.href = "http://localhost:8888/dist/faXianShiShuXue.html#/home";
+            window.location.href = "http://localhost:9999/faXianShiShuXue.html#/home";
             break;
           case '3':
             break;
@@ -58,7 +58,7 @@
 </script>
 
 <style scoped lang="less" type="text/less">
-  @import '../assets/mixin.less';
+  @import '../../assets/mixin.less';
   .home_section{
     position: relative;
     height: 100%;
