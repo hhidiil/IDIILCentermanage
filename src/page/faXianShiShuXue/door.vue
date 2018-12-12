@@ -199,6 +199,7 @@
                   if(getStore("userInfo")){//已经有值
                     if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
                       clearStore();
+                      console.warn("清除 clearStore:::::")
                       //由于清除了所有的 所以现在在存一遍需要的
                       const dataUserList = await doTestLogin('/static/ClassUserList.json');
                       setStore("ClassUserList",dataUserList);

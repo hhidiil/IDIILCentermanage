@@ -180,33 +180,14 @@
                 })
               }
               if(flag){
+                setSession("accessToken",true);//设置登录状态的值
+                setStore("userInfo",JSON.stringify(userinfo))
                 if(this.ruleForm.role == '1'){
-                  const dataList = await doTestLogin('/static/ClassUserList.json');
-                  console.warn("获取课堂数据:::::",dataList)
-                  let dataParams={};
-                  dataParams.teacherId = dataList.classList.teacherId;
-                  dataParams.CenterID = dataList.CenterID;
-                  dataParams.CenterWeb = dataList.CenterWeb;
-                  dataParams.ClassID = dataList.ClassID;
-                  dataParams.CourseType = dataList.CourseType;
-                  dataParams.MainWeb = dataList.MainWeb;
-                  dataParams.StudentID = userinfo.userId;
-                  let urlend = filterWebUrl2(dataParams,"1");
-                  console.warn("获取课堂地址:::::",urlend)
-                  window.open(urlend);
-
-                }else {//教师登录
-                  if(getStore("userInfo")){//已经有值
-                    if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
-                      clearStore();
-                      //由于清除了所有的 所以现在在存一遍需要的
-                      const dataUserList = await doTestLogin('/static/ClassUserList.json');
-                      setStore("ClassUserList",dataUserList);
-                    }
-                  }
-                  setSession("accessToken",true);//设置登录状态的值
-                  setStore("userInfo",JSON.stringify(userinfo))
-                  this.$router.replace({ name: 'home', params: userinfo})
+                  this.$router.replace({ name: 'homeStudent', params: userinfo})
+                }else if(this.ruleForm.role == '2'){//教师登录
+                  this.$router.replace({ name: 'homeTeacher', params: userinfo})
+                }else {
+                  alert("跳转到管理员页面")
                 }
               }else {
                 alert("用户名或密码错误")

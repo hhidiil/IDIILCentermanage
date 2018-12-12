@@ -51,7 +51,15 @@
         console.log("getCurrentCourseInfo----->>>>>上课信息",result)
         if(result.code == 200){
           if(result.data.length>0){
-            console.log("调准到教师上课页面--------------------参数：",result.data)
+            console.log("调准到教师上课页面--------------------参数：",result.data[0])
+            let dataParams = {};
+            dataParams.teacherId = JSON.parse(getStore('userInfo')).userId;
+            dataParams.centerId = JSON.parse(getStore('ClassUserList')).CenterID;
+            dataParams.performanceID = result.data[0].courseId;//课程ID
+            let url = 'https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
+            console.warn("老师上课的地址url-->",url)
+            window.open(url);
+            return
           }else {
             this.$message({message: '派课已上完，请进入派课系统进行派课！',type:'warning'});
           }

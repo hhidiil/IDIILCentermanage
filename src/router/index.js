@@ -5,7 +5,8 @@ Vue.use(Router)
 
 // 导入相应的子组件
 import Door from './../page/main/door'
-import HomePage from './../page/main/home'
+import HomeTeacher from './../page/main/home_teacher.vue'
+import HomeStudent from './../page/main/home_student.vue'
 
 
 const routes = [
@@ -14,9 +15,13 @@ const routes = [
     name: 'door',
     component: Door
   },{
-    path: '/home',
-    name: 'home',
-    component:HomePage,
+    path: '/homeTeacher',
+    name: 'homeTeacher',
+    component:HomeTeacher,
+  },{
+    path: '/homeStudent',
+    name: 'homeStudent',
+    component:HomeStudent,
   }
 ]
 export default new Router({
