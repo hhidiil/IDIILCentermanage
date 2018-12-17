@@ -33,4 +33,12 @@ Manage.prototype.getInfoOfClass = function() {
   })
   return res
 }
+/*查询班级的所有学生*/
+Manage.prototype.getAllStudentOfClass = function() {
+  var _sql = `SELECT studentId,classId,username,centerId,grade from tblClass2Student t1,tblStudent t2 where t1.classid='${this.props.classId}' and t1.studentId = t2.userid`;
+  const res = query_db({sql: _sql, name: 'getAllStudentOfClass'}).catch((err)=>{
+    console.log("服务端查询出错了。。。",err)
+  })
+  return res
+}
 module.exports = Manage

@@ -17,7 +17,7 @@ export const getAllClassesOfCenter = (data) => {
   return fetch_requset(url,data,'POST')
 }
 /**
- * [查询某中心班级列表信息]
+ * [查询某班级学生列表信息]
  */
 export const getAllStudentOfClass = (data) => {
   const url = `${API_CONFIG}/getAllStudentOfClass`;

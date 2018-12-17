@@ -62,5 +62,24 @@ manageRouter.post('/getAllClassesOfCenter',async(req, res) => {
     })
   }
 })
+/*
+ * 查询某个班级所有学生信息
+ * */
+manageRouter.post('/getAllStudentOfClass',async(req, res) => {
+  let props = req.body;
+  let manage = new Manage({props: props});
+  const result = await manage.getAllStudentOfClass();
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据获取出错~~'
+    })
+  }
+})
 
 module.exports = manageRouter;

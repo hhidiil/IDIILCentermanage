@@ -103,7 +103,7 @@
 </template>
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
-  import {getAllManagerList,getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
+  import {getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
   import {getStore} from '../../config/publicMethod'
   export default{
     data(){
@@ -143,9 +143,6 @@
         if(result1.code == 200){
           this.classOptions = result1.data;
         }
-//        let result = await getAllStudentOfClass({classId:''});
-//        this.allData = result.data;
-//        this.currentData = this.allData.slice(0,this.pageSize);
         console.log("所有的中心列表",this.allData)
       },
       handleEdit(index, row) {
@@ -175,8 +172,10 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      selectChange(val){
+      async selectChange(val){
         console.log("选择的：：---》》》",val);
+        let result = await getAllStudentOfClass({classId:val});
+        console.log("返回学生列表：：---》》》",result);
       }
     }
   }
