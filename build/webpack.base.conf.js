@@ -24,6 +24,7 @@ module.exports = {
   entry: {
     indexApp: './src/index.js',
     faXianShiShuXue: './src/enter/faXianShiShuXue/index.js',
+    manage: './src/enter/manageCenter/index.js',
   },
   output: {
     path: config.build.assetsRoot,

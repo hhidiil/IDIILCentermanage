@@ -73,6 +73,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       inject: true,
       chunks:['faXianShiShuXue']
     }),
+    new HtmlWebpackPlugin({
+      filename: 'manage.html',
+      template: 'manage.html',
+      inject: true,
+      chunks:['manage']
+    }),
     new FriendlyErrorsPlugin(),
     //new webpack.HotModuleReplacementPlugin(),
     // copy custom static assets

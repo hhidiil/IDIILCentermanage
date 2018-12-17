@@ -6,7 +6,7 @@ import Vue from 'vue'
 import App from './App'
 import router from '../../router/manageCenter'
 import ElementUI from 'element-ui'
-import '../node_modules/element-ui/lib/theme-chalk/index.css'
+import '../../../node_modules/element-ui/lib/theme-chalk/index.css'
 import VueQuillEditor from 'vue-quill-editor'
 
 Vue.config.debug = true

@@ -1,7 +1,7 @@
 <template>
   <div class="fillcontain">
     <el-row class="header-css">
-      <el-col :span="12"><div class="header-left">线上派课系统</div></el-col>
+      <el-col :span="12"><div class="header-left">管理员系统</div></el-col>
       <el-col :span="12">
         <div class="header-right">
           <el-dropdown trigger="click" @command="handleCommand">
@@ -20,18 +20,15 @@
       <el-col :span="3"  style="min-height: 100%; background-color: #324057;">
         <el-menu default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
           <el-submenu index="1">
-            <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
-            <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
-            <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
+            <template slot="title"><i class="el-icon-menu"></i><span>中心管理</span></template>
+            <el-menu-item index="/home/teacherManage">班级管理</el-menu-item>
+            <el-menu-item index="/home/studentManage">学生管理</el-menu-item>
           </el-submenu>
-          <el-menu-item index="/manage/editor"><i class="el-icon-menu"></i>编辑器管理</el-menu-item>
+          <el-menu-item v-if="isTrue" index="/home/centerManage"><i class="el-icon-menu"></i>总中心管理</el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="21" style="height: 100%;overflow: hidden;">
         <router-view></router-view>
-        <!--<keep-alive>-->
-          <!---->
-        <!--</keep-alive>-->
       </el-col>
     </el-row>
   </div>
@@ -39,15 +36,20 @@
 
 <script type="text/ecmascript-6">
   import {setStore,getStore,clearStore,setSession,clearSession} from '../../config/publicMethod'
-  import {getClassList} from '../../api/classes'
   export default {
     //data中放入初始默认值
     data() {
-      return {}
+      return {
+        isTrue:false
+      }
     },
     computed: {
-      defaultActive: function(){
-        return this.$router.path.replace('/', '');
+    },
+    beforeMount(){
+      let userInfo = JSON.parse(getStore('manageUser'));
+      console.log('传过来的参数--1111》》',userInfo)
+      if(userInfo.permissionLevel == '1'){
+        this.isTrue = true;
       }
     },
     mounted(){
@@ -56,15 +58,7 @@
     },
     methods:{
       async getCourseList(){
-        let classList = [];
-        let userInfo = JSON.parse(getStore("userInfo"));
-        let result = await getClassList({teacherId:userInfo.userId});//数据库获取教师的派课列表
-        console.log("数据库获取教师的派课列表---classList----->>",result)
-        if(result.data.length>0){
-          setStore('classList',JSON.stringify(result.data));
-        }else {
-          setStore("classList",JSON.stringify(classList))
-        }
+        console.log("---getCourseList----->>")
       },
       handleCommand(command) {
         if(command == 'exit'){
@@ -85,15 +79,15 @@
     line-height: 50px;
     background-color: rgb(50, 64, 87);
     border-bottom: 1px solid hsla(0,0%,100%,.1);
-    .header-left{
-      float: left;
-      font-size: 18px;
-      margin-left: 40px;
-    }
-    .header-right{
-      float: right;
-      margin-right: 20px;
-    }
+  .header-left{
+    float: left;
+    font-size: 18px;
+    margin-left: 40px;
+  }
+  .header-right{
+    float: right;
+    margin-right: 20px;
+  }
   }
   .el-menu-item:hover{
     background-color: #232e3fa3 !important;

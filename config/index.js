@@ -58,6 +58,7 @@ module.exports = {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
     faXianShiShuXue: path.resolve(__dirname, '../dist/faXianShiShuXue.html'),
+    manage: path.resolve(__dirname, '../dist/manage.html'),
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),

@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style lang="less">
-  @import 'assets/common.less';
+  @import '../../assets/common.less';
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -34,5 +34,8 @@ export default {
   .el-dialog__body{
     max-height: 400px;
     overflow: auto;
+  }
+  .el-table__expanded-cell[class*=cell]{
+    background-color: #efffff;
   }
 </style>

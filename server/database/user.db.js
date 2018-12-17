@@ -19,6 +19,9 @@ User.prototype.getUser = function() {
   if(this.props.role == '2'){//教师
     _sql = `select userid,username from tblTeacher where username='${this.props.name}' and pwd='${this.props.pass}'`;
   }
+  if(this.props.role == '3'){//管理员
+    _sql = `select userId,userName,centerId,permissionLevel from tblManage where username='${this.props.name}' and pwd='${this.props.pass}'`;
+  }
   const res = query_db({sql: _sql, name: 'getUserAllItems'}).catch((err)=>{
     console.log("服务端查询出错了。。。",err)
   })
