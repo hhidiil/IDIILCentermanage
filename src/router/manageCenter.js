@@ -6,6 +6,7 @@ Vue.use(Router)
 // 导入相应的子组件
 import Door from '../page/manageCenter/door'
 import Home from '../page/manageCenter/home.vue'
+import RegisterPage from '../page/manageCenter/register.vue'
 import defaultPage from './../page/manageCenter/default'
 import TeacherManage from '../page/manageCenter/TeacherManage.vue'
 import StudentManage from '../page/manageCenter/StudentManage.vue'
@@ -17,6 +18,10 @@ const routes = [
     path: '/',
     name: 'door',
     component: Door
+  },{
+    path: '/register',
+    name: 'register',
+    component: RegisterPage
   },{
     path: '/home',
     component: Home,

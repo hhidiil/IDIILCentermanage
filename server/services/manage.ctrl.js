@@ -26,7 +26,7 @@ manageRouter.post('/getAllManagerList',async(req, res) => {
       message:'数据获取出错~~'
     })
   }
-})
+});
 /*
  * 查询某个中心的所有班级信息
  * */
@@ -61,7 +61,7 @@ manageRouter.post('/getAllClassesOfCenter',async(req, res) => {
       message:'数据获取出错~~'
     })
   }
-})
+});
 /*
  * 查询某个班级所有学生信息
  * */
@@ -80,6 +80,45 @@ manageRouter.post('/getAllStudentOfClass',async(req, res) => {
       message:'数据获取出错~~'
     })
   }
-})
+});
+/*
+ * 新增班级信息
+ * */
+manageRouter.post('/addClassInfo',async(req, res) => {
+  let props = req.body;
+  let manage = new Manage({props: props});
+  props.classId = Helper.randomString(false,4);
+  const result = await manage.addClass();
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据添加出错~~'
+    })
+  }
+});
+/*
+ * 删除某个班级所有信息
+ * */
+manageRouter.post('/deleteClassInfo',async(req, res) => {
+  let props = req.body;
+  let manage = new Manage({props: props});
+  const result = await manage.deleteClass();
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据删除出错~~'
+    })
+  }
+});
 
 module.exports = manageRouter;

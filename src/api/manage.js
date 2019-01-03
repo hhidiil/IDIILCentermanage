@@ -23,3 +23,17 @@ export const getAllStudentOfClass = (data) => {
   const url = `${API_CONFIG}/getAllStudentOfClass`;
   return fetch_requset(url,data,'POST')
 }
+/**
+ * [新增班级]
+ */
+export const addClassInfo = (data) => {
+  const url = `${API_CONFIG}/addClassInfo`;
+  return fetch_requset(url,data,'POST')
+}
+/**
+ * [删除班级]
+ */
+export const deleteClassInfo = (data) => {
+  const url = `${API_CONFIG}/deleteClassInfo`;
+  return fetch_requset(url,data,'POST')
+}

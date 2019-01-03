@@ -26,12 +26,11 @@ userRouter.post('/login',async(req, res) => {
       message:'数据获取出错~~'
     })
   }
-})
+});
 userRouter.get('/getAllUser',async(req, res) => {
       var props = {};
       var user = new User({props: props});
       const result = await user.getUserAllItems();
-      console.log("服务端返回的数据-------111111111111----->>",result)
       if(!result){
         res.json({
           code:200,
@@ -43,21 +42,38 @@ userRouter.get('/getAllUser',async(req, res) => {
           message:'数据获取出错~~'
         })
       }
-})
-userRouter.post('/registerUser',async(req, res) => {
+});
+userRouter.post('/addStudentUser',async(req, res) => {
   var props = req.body;
-  const num = ['0000001'];
-  const userid = 'IDIILMATH0000005';
-  if (num.length>0) {//有用户
-    props.idiilnumber = Helper.createUserId(userid);
-  } else {
-    props.idiilnumber = 'IDIILMATH0000001';//第一个用户
-  }
-  props.password = Helper.getMD5(req.body.pass);
   var user = new User({props: props});
-  const result = await user.getAddUser();
-  console.log("服务端返回的数据-------111111111111----->>",result)
-  if(!result){
+  const reslut1 = await user.getMaxUserId();
+  if (reslut1.length>0) {//有用户
+    props.userId = Helper.createUserId(reslut1[0].userId);
+  } else {
+    props.userId = '001';//第一个用户
+  }
+  const result2 = await user.getAddUser();//学生表中加入新的数据
+  console.log("服务端返回的数据-------111111111111----->>",result2);
+  const result3 = await user.getAddUserToClass();//往 班级和学生表中 加入数据
+  console.log("服务端返回的数据-------111111111111----->>",result3);
+  if(result3){
+    res.json({
+      code:200,
+      data:result3
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据出错~~'
+    })
+  }
+});
+userRouter.post('/updateStudentUser',async(req, res) => {
+  var props = req.body;
+  var user = new User({props: props});
+  const result = await user.updateStudentUser();//更新 班级和学生表中 加入数据
+  console.log("服务端返回的数据-------111111111111----->>",result);
+  if(result){
     res.json({
       code:200,
       data:result
@@ -65,10 +81,56 @@ userRouter.post('/registerUser',async(req, res) => {
   }else {
     res.json({
       code:500,
-      message:'数据获取出错~~'
+      message:'数据出错~~'
     })
   }
-})
+});
+userRouter.post('/deleteStudentUser',async(req, res) => {
+  var props = req.body;
+  var user = new User({props: props});
+  const result = await user.deleteStudentUser();//更新 班级和学生表中 加入数据
+  console.log("服务端返回的数据-------111111111111----->>",result);
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据出错~~'
+    })
+  }
+});
+userRouter.post('/registerUser',async(req, res) => {
+  var props = req.body;
+  var user = new User({props: props});
+  const reslut1 = await user.getMaxUserId();
+  if (reslut1.length>0) {//有用户
+    props.userId = Helper.createUserId(reslut1[0].userId);
+  } else {
+    if(req.body.role == '1'){
+      props.userId = '001';//第一个用户
+    }else if(req.body.role == '2'){
+      props.userId = '01';//第一个用户
+    }else {
+      props.userId = '0001';//第一个用户
+    }
+  }
+  //props.password = Helper.getMD5(req.body.pass);
+  const result = await user.getAddUser();
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据出错~~'
+    })
+  }
+});
 userRouter.get('/writeFileJson', function(req, res) {
   var param = req.query;
   var dir = path.join(__dirname, ''); //文件路径，__dirname为当前运行js文件的目录

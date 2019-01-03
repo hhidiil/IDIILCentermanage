@@ -124,6 +124,8 @@
                 if((result.data[0])){
                   userinfo = {userId:result.data[0].userid, userName: result.data[0].username};
                   if(this.ruleForm.role == '1'){//学生登录
+                    setSession("accessToken",true);//设置登录状态的值
+                    setStore("userInfo",JSON.stringify(userinfo))
                     const dataList = await getClassInfo();
                     console.warn("获取课堂数据:::::",dataList)
                     let dataParams={};
@@ -138,7 +140,7 @@
                     console.warn("获取课堂地址:::::",urlend)
 //                    window.open(urlend);
                     return
-                  }else {//教师登录
+                  }else if(this.ruleForm.role == '2'){//教师登录
                     if(getStore("userInfo")){//已经有值
                       if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
                         clearStore();
@@ -150,6 +152,12 @@
                     setSession("accessToken",true);//设置登录状态的值
                     setStore("userInfo",JSON.stringify(userinfo))
                     this.$router.replace({ name: 'home', params: userinfo})
+                  }else {
+                    setSession("accessToken",true);//设置登录状态的值
+                    console.log("555555555555555555555555555555555555555555555555555",result.data[0])
+                    setStore("manageUser",result.data[0])
+                    let origin = window.location.origin;
+                    window.location.href = origin + "/manage.html#/home";//跳转到数学派课系统
                   }
                 }else {
                   alert("用户名或密码错误")

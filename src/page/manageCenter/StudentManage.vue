@@ -5,7 +5,7 @@
       <header>
         <el-row>
           <el-col :span="12" class="grid-content titleSetion"><h2>学生管理</h2></el-col>
-          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addUser">新增用户</el-button></el-col>
+          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addHandle">新增用户</el-button></el-col>
         </el-row>
       </header>
       <section class="select_section">
@@ -47,13 +47,16 @@
             label="中心号">
           </el-table-column>
           <el-table-column
-            prop="userName"
-            label="中心管理员名">
+            prop="classId"
+            label="班级">
           </el-table-column>
           <el-table-column
-            prop="permissionLevel"
-            sortable
-            label="权限">
+            prop="userName"
+            label="姓名">
+          </el-table-column>
+          <el-table-column
+            prop="grade"
+            label="年级">
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -85,16 +88,32 @@
           </el-col>
         </el-row>
         <el-dialog
-          title="试题信息"
+          :title="alterFlag ? '添加用户':'修改信息' "
           :show-close="modalClickOther"
           :visible.sync="dialogVisible"
           :closeOnClickModal="modalClickOther"
-          width="70%">
-          <div class="questionStyle">
-          </div>
+          width="40%">
+          <el-form :model="ruleForm" status-icon :rules="rules" ref="alterForm" label-width="80px" class="demo-ruleForm">
+            <el-form-item label="中心号:" prop="centerId">
+              <el-input type="text" v-model="ruleForm.centerId" :value="centerId" :disabled="true"></el-input>
+            </el-form-item>
+            <el-form-item label="用户名:" prop="userName">
+              <el-input type="text" v-model="ruleForm.userName"></el-input>
+            </el-form-item>
+            <el-form-item label="班级:" prop="classId">
+              <el-select v-model="ruleForm.classId" placeholder="请选择" style="float: left;">
+                <el-option
+                  v-for="(item,index) in classOptions"
+                  :key="index"
+                  :label="item.className"
+                  :value="item.classId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
           <span slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="MakeSureHandle()">确 定</el-button>
+            <el-button type="primary" @click="MakeSureHandle(alterFlag)">确 定</el-button>
           </span>
         </el-dialog>
       </section>
@@ -104,6 +123,7 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import {getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
+  import {addStudentUser,updateStudentUser,deleteStudentUser} from '../../api/user'
   import {getStore} from '../../config/publicMethod'
   export default{
     data(){
@@ -118,18 +138,42 @@
         pageSize:10,
         allData:[],//所有的数据
         currentData:[],//当前页面展示的条数
+        currentClass:'',//当前的班级号
         multipleSelection: [],
         dialogVisible:false,
         modalClickOther:false,
         centerName:'上地中心',
+        centerId:'',
         classValue:'',
         classOptions:[],
+        alterFlag:false,//true为新增，false为修改
+        ruleForm: {
+          grade:'',
+          userName:'',
+          centerId:'',
+          classId:'',
+          role:'1'
+        },
+        rules: {
+          userName: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+          ],
+          centerId: [
+            { required: true, message: '请输入中心号', trigger: 'blur' },
+          ],
+          classId: [
+            {required: true,  message: '请输入班级', trigger: 'blur' }
+          ]
+        }
       }
     },
     components:{
       headTop
     },
     computed: {
+      dialogTitle(){
+        return this.alterFlag ? '':'';
+      }
     },
     mounted(){
       //进入首页的时候查询
@@ -138,6 +182,7 @@
     methods:{
       async getAllUserList(){
         let centerId= JSON.parse(getStore('manageUser')).centerId;//中心号
+        this.ruleForm.centerId = centerId;
         let result1 = await getAllClassesOfCenter({centerId:'002'});
         console.log("班级列表",result1)
         if(result1.code == 200){
@@ -147,24 +192,62 @@
       },
       handleEdit(index, row) {
         console.log(index, row);
-        this.dialogVisible = true
+        this.dialogVisible = true;
+        this.alterFlag = false;
+        this.ruleForm = {
+          grade: row.grade,
+          userId: row.studentId,
+          userName: row.userName,
+          centerId: row.centerId,
+          classId: row.classId,
+          role:'1',
+        }
       },
-      handleDelete(index, row) {
+      addHandle(){
+        this.dialogVisible = true;
+        this.alterFlag = true;
+        this.ruleForm.grade = '';
+        this.ruleForm.userName = '';
+        this.ruleForm.classId = '';
+      },
+      async handleDelete(index, row) {
         console.log(index, row);
-        alert("删除用户")
+        let result = await deleteStudentUser({userId:row.studentId});
+        if(result.code == 200){
+          this.$message({message: '删除成功！',type:'success'});
+        }
       },
       PageChange(page){
         console.log("PageChange",page)
         let num = this.pageSize;
         this.currentData = this.allData.slice( (page-1)*num,(page-1)*num+num)
       },
-      MakeSureHandle(){
-      },
-      addUser(){
-        alert("添加用户")
+      MakeSureHandle(flag){
+        console.log("弹框确定--》》》",flag);
+        this.$refs.alterForm.validate(async(valid) => {
+          if (valid) {
+            let params = this.ruleForm;
+            console.log("ruleForm结果------->",params)
+            if(flag){//添加用户
+              let result = await addStudentUser(params);
+              if(result.code == 200){
+                this.$message({message: '添加成功！',type:'success'});
+              }
+            }else {//修改用户
+              let result = await updateStudentUser(params);
+              if(result.code == 200){
+                this.$message({message: '修改成功！',type:'success'});
+              }
+            }
+          } else {
+            console.error('error register submit!!');
+            return false;
+          }
+        });
       },
       deleteSelection() {
         console.log("选择的行：：---》》》",this.$refs.multipleTable.selection);
+        console.log("多条删除还没做呢^----^");
       },
       cancelSelection(rows) {
         this.$refs.multipleTable.clearSelection();
@@ -174,8 +257,16 @@
       },
       async selectChange(val){
         console.log("选择的：：---》》》",val);
+        this.currentClass = val;
         let result = await getAllStudentOfClass({classId:val});
         console.log("返回学生列表：：---》》》",result);
+        if(result.code === 200){
+          this.allData = result.data;
+          this.currentData = result.data.slice( 0,this.pageSize)
+        }
+      },
+      selectChangeDialog(){
+
       }
     }
   }

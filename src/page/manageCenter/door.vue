@@ -21,6 +21,7 @@
               <el-input type="password" v-model="ruleForm.pass"></el-input>
             </el-form-item>
             <el-button @click="loginEnter('ruleForm')" class="enterButton">登 录</el-button>
+            <el-button @click="register()" class="registerButton">注 册</el-button>
           </el-form>
         </div>
       </section>
@@ -81,17 +82,8 @@
           }
         });
       },
-      registerSubmitForm(formName){
-        this.$refs[formName].validate(async(valid) => {
-          if (valid) {
-            console.log("角色------->",this.ruleForm)
-            const data = await registerUser(this.ruleForm)
-            console.log("注册结果------->",data)
-          } else {
-            console.error('error submit!!');
-            return false;
-          }
-        });
+      register(formName){
+        this.$router.push('register');
       }
     }
   }
@@ -141,6 +133,14 @@
       width: 100%;
       cursor: pointer;
       color: white;
+    }
+    .registerButton{
+      background-color: #7bbf10;
+      font-size: 20px;
+      width: 100%;
+      cursor: pointer;
+      color: white;
+      margin: 0 !important;
     }
   }
 </style>

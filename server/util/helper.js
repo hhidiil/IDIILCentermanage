@@ -95,16 +95,15 @@ var helper = {
   },
   //获取当前用户最大的id  'IDIILMATH0000001'
   createUserId: function(data){
-    let str1 = data.substr(9);
-    let num = parseInt(str1);
-    let len = 7;//固定八位
+    let len = data.length;
+    let num = parseInt(data);
     num = parseInt(num, 10) + 1;
     num = num.toString();
     while(num.length < len) {
       num = '0' + num;
     }
-    console.log("IDIILMATH"+num)
-    return "IDIILMATH"+num
+    console.log(num)
+    return num
   },
   syncGetData:function(){
     var list = [];

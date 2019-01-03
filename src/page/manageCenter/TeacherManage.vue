@@ -5,7 +5,7 @@
       <header>
         <el-row>
           <el-col :span="12" class="grid-content titleSetion"><h2>班级列表</h2></el-col>
-          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addUser">新增班级</el-button></el-col>
+          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addClass">新增班级</el-button></el-col>
         </el-row>
       </header>
       <section class="section_table">
@@ -24,7 +24,7 @@
               <el-row>
                 <span>中心：{{props.row.centerId}}</span>
               </el-row>
-              <el-form label-position="left" inline class="demo-table-expand" v-for=" (item,index) in props.row.otherInfo">
+              <el-form label-position="left" inline class="demo-table-expand" v-for=" (item,index) in props.row.otherInfo" :key="index">
                 <el-form-item>
                   <span>{{"科目" + (index+1) + "："}}</span><span>{{item.subjectId=='0' ? '数学':'英语'}}</span>
                 </el-form-item>
@@ -86,31 +86,26 @@
           </el-col>
         </el-row>
         <el-dialog
-          title="列表信息"
+          title="添加班级"
           :show-close="modalClickOther"
-          :visible.sync="dialogVisible"
+          :visible.sync="addDialogVisible"
           :closeOnClickModal="modalClickOther"
-          width="70%">
-          <div class="questionStyle">
-            <el-form label-position="right" label-width="80px"
-                     :inline="true"
-                     class="demo-form-inline">
-              <el-form-item label="班级编号:">
-                <el-input v-model="formLabelAlign.name"></el-input>
-              </el-form-item>
-              <el-form-item label="班级名:">
-                <el-input v-model="formLabelAlign.region"></el-input>
-              </el-form-item>
-              <el-form-item label="年级:">
-                <el-input v-model="formLabelAlign.type"></el-input>
-              </el-form-item>
-              <el-form-item label="科目:">
-                <el-input v-model="formLabelAlign.subject"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
+          width="30%">
+          <el-form label-position="right" label-width="80px"
+                   :inline="true"
+                   class="demo-form-inline"
+                   status-icon :rules="rules"
+                   :model="ruleForm"
+                   ref="classForm">
+            <el-form-item label="班级名:">
+              <el-input v-model="ruleForm.className"></el-input>
+            </el-form-item>
+            <el-form-item label="年级:">
+              <el-input v-model="ruleForm.grade"></el-input>
+            </el-form-item>
+          </el-form>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button @click="addDialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="MakeSureHandle()">确 定</el-button>
           </span>
         </el-dialog>
@@ -121,7 +116,7 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import {getStore} from '../../config/publicMethod'
-  import {getAllManagerList,getAllClassesOfCenter} from '../../api/manage'
+  import {getAllManagerList,getAllClassesOfCenter,addClassInfo,deleteClassInfo} from '../../api/manage'
   export default{
     data(){
       return{
@@ -136,13 +131,21 @@
         allData:[],//所有的数据
         currentData:[],//当前页面展示的条数
         multipleSelection: [],
-        dialogVisible:false,
+        addDialogVisible:false,
         modalClickOther:false,
-        formLabelAlign: {
-          name: '',
-          region: '',
-          type: '',
-          subject:''
+        ruleForm: {
+          centerId:'002',
+          classId:'',
+          className:'',
+          grade:'',
+        },
+        rules: {
+          className: [
+            { required: true, message: '请输入班级名称', trigger: 'blur' },
+          ],
+          grade: [
+            {required: true,  message: '请输入班级对应年级', trigger: 'blur' }
+          ]
         }
       }
     },
@@ -153,10 +156,10 @@
     },
     mounted(){
       //进入首页的时候查询
-      this.getAllUserList();
+      this.getAllClasses();
     },
     methods:{
-      async getAllUserList(){
+      async getAllClasses(){
         let userInfo = JSON.parse(getStore('manageUser'));
         let result = await getAllClassesOfCenter({centerId:'002'});
         this.allData = result.data;
@@ -165,11 +168,17 @@
       },
       handleEdit(index, row) {
         console.log(index, row);
-        this.dialogVisible = true
       },
-      handleDelete(index, row) {
+      async handleDelete(index, row) {
         console.log(index, row);
-        alert("删除用户")
+        let result = await deleteClassInfo(row);
+        if(result.code == 200){
+          this.$message({message: '删除成功！',type:'success'});
+          let _this = this;
+          setTimeout(()=>{
+            _this.getAllClasses();
+          },1500)
+        }
       },
       PageChange(page){
         console.log("PageChange",page)
@@ -177,9 +186,25 @@
         this.currentData = this.allData.slice( (page-1)*num,(page-1)*num+num)
       },
       MakeSureHandle(){
+        this.$refs.classForm.validate(async(valid) => {
+          if(valid){
+            let params = this.ruleForm;
+            console.log("确定按钮---》",params)
+            let result = await addClassInfo(params);
+            if(result.code == 200){
+              this.$message({message: '添加成功！',type:'success'});
+              this.getAllClasses();
+            }
+          }else {
+            console.error('error register submit!!');
+            return false;
+          }
+        })
       },
-      addUser(){
-        alert("添加用户")
+      addClass(){
+        this.addDialogVisible = true;
+        this.ruleForm.className = '';
+        this.ruleForm.grade = '';
       },
       deleteSelection() {
         console.log("选择的行：：---》》》",this.$refs.multipleTable.selection);
