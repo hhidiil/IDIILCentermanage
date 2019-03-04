@@ -7,7 +7,7 @@
       </el-row>
     </el-header>
     <el-main>
-      <img src="../../../static/images/homeBanner.jpg" class="HomeBanner" />
+      <img src="../../../static/images/idiilcenterbackground.jpg" class="HomeBanner" />
       <section class="form_contianer">
         <div class="senctionblock">
           <el-row>
@@ -37,7 +37,6 @@
 
 <script type="text/ecmascript-6">
   import {doLogin,doTestLogin,registerUser} from '../../api/user'
-  import {getClassInfo} from '../../api/classes'
   import classData from '../../data/classlist'
   import {setStore,getStore,clearStore,setSession,getSession} from '../../config/publicMethod'
   import {filterWebUrl,filterWebUrl2} from '../../config/methods'
@@ -122,28 +121,15 @@
               console.log("注册结果------->",result)
               if(result.code == 200){
                 if((result.data[0])){
-                  userinfo = {userId:result.data[0].userid, userName: result.data[0].username};
+                  userinfo = {
+                    userId:result.data[0].userId,
+                    userName: result.data[0].userName,
+                    centerId:result.data[0].centerId
+                  };
                   if(this.ruleForm.role == '1'){//学生登录
                     setSession("accessToken",true);//设置登录状态的值
                     setStore("userInfo",JSON.stringify(userinfo))
-                    const dataList1 = await getClassInfo({courseId:'00201MM201812001'});
-                    console.warn("获取课堂数据:::::",dataList1)
-                    if(dataList1.code === 200){
-                      let dataList = dataList1.data[0];
-                      let dataParams={};
-                      dataParams.teacherId = dataList.teacherId;
-                      dataParams.CenterID = dataList.centerId;
-                      dataParams.CenterWeb = "https://nwprodsub.idiil.com.cn";
-                      dataParams.MainWeb = "https://nwdev.idiil.com.cn";
-                      dataParams.ClassID = dataList.classId;
-                      dataParams.CourseType = dataList.courseType;
-                      dataParams.StudentID = userinfo.userId;
-                      let urlend = filterWebUrl2(dataParams,"1");
-                      console.warn("获取课堂地址:::::",urlend)
-//                      window.open(urlend);
-                      this.$router.replace({ name: 'homeStudent', params: dataParams})
-                      return
-                    }
+                    this.$router.replace({ name: 'homeStudent', params: userinfo})
                   }else if(this.ruleForm.role == '2'){//教师登录
                     if(getStore("userInfo")){//已经有值
                       if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
@@ -155,7 +141,6 @@
                     }
                     setSession("accessToken",true);//设置登录状态的值
                     setStore("userInfo",JSON.stringify(userinfo))
-//                    this.$router.replace({ name: 'home', params: userinfo})
                     this.$router.replace({ name: 'homeTeacher', params: userinfo})
                   }else {
                     setSession("accessToken",true);//设置登录状态的值

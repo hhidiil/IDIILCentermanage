@@ -4,6 +4,7 @@
  */
 const classData = {
   classList:{
+    classId:"",
     courseId:"",
     teacherId:"",
     teacherName:"",

@@ -11,6 +11,20 @@
       </el-dialog>
       <el-form :model="form">
         <el-row>
+          <el-col :span="24">
+            <el-form-item label="班级:" :label-width="formLabelWidth">
+              <el-select v-model="form.classId" placeholder="请选择" style="float: left;">
+                <el-option
+                  v-for="(item,index) in classOptions"
+                  :key="index"
+                  :label="item.className"
+                  :value="item.classId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="11">
             <el-form-item label="课程名:" :label-width="formLabelWidth">
               <el-input v-model="form.name"></el-input>
@@ -104,6 +118,7 @@
   import {setStore,getStore} from '../../config/publicMethod'
   import {uploadFile} from '../../api/upload'
   import {addClassListInfo,updateClassListInfo} from '../../api/classes'
+  import {getAllClassesOfCenter} from '../../api/manage'
   export default {
     props:['data','type','addFlag'],
     data(){
@@ -118,6 +133,7 @@
         formLabelWidth: '90px',
         addNewGroupName:'',
         form: JSON.parse(classData1).classList,
+        classOptions:[],
         sourceList:[],//idiil课件list
         fileList:[],
         uploadParam:{
@@ -154,7 +170,8 @@
     },
     mounted(){
       const Wh = $(window).height();
-      console.log('222222222222--->',this.data,this.type)
+      console.log('222222222222--->',this.data,this.type);
+      this.getclassesList();
       fetch('static/ClassUserList.json').then((response)=>{
         return response.json();
       }).then((res)=>{
@@ -168,6 +185,7 @@
           this.form.target = this.data.target;//之前的上传文件
           this.form.commits = this.data.commits;//之前的上传文件
           this.form.courseId = this.data.courseId;//之前的上传文件
+          this.form.classId = this.data.classId;//之前的上传文件
         }else {
           this.studentData = res.StudentList;
           this.studentAllData = res.StudentList;
@@ -178,6 +196,13 @@
       })
     },
     methods: {
+      async getclassesList(){
+        let result1 = await getAllClassesOfCenter({centerId:'002'});
+        console.log("班级列表--------------------->",result1)
+        if(result1.code == 200){
+          this.classOptions = result1.data;
+        }
+      },
       handleChange(value, direction, movedKeys) {
         console.log("studentData", this.studentData);
         console.log("value", value);
@@ -257,10 +282,12 @@
       },
       //全部提交按钮事件
       async submitAllData(){
+        let userInfo = JSON.parse(getStore('userInfo'));
         this.form.source = this.sourceList;
         this.form.datetime = getNowFormatDate.YY_MM_DD();
-        this.form.teacherId = JSON.parse(getStore('userInfo')).userId;
-        this.form.teacherName = JSON.parse(getStore('userInfo')).userName;
+        this.form.teacherId = userInfo.userId;
+        this.form.teacherName = userInfo.userName;
+        this.form.centerId = userInfo.centerId;
         this.form.subjectName = '数学';
         if(this.form.name=='' || this.form.target=='' || this.form.source.length==0 ){
           return this.$alert("课程名、教学目标、教学资源等内容不能为空！")

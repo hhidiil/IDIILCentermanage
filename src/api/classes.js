@@ -37,6 +37,13 @@ export const getClassInfo = (data) => {
   const url = `${API_CONFIG}/getClassInfo`;
   return fetch_requset(url,data,'POST')
 }
+/**
+ * [获取学生当前的课程信息]
+ */
+export const getDoingCourseInfoOfStudent = (data) => {
+  const url = `${API_CONFIG}/getDoingCourseInfoOfStudent`;
+  return fetch_requset(url,data,'POST')
+}
 /*
 * 更新课程的信息
 * */

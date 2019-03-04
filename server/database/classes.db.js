@@ -19,9 +19,9 @@ Classes.prototype.getLastClassInfo = function() {
 }
 /*添加课程*/
 Classes.prototype.addClassInfo = function() {
-  var _sql = `INSERT INTO tblClassCourseGroup(courseid,teacherid,teachername,name,subjectid,subjectname,group_student_Info,target,source,othersource,commits)
+  var _sql = `INSERT INTO tblClassCourseGroup(courseid,classid,centerid,teacherid,teachername,name,subjectid,subjectname,group_student_Info,target,source,othersource,commits)
               VALUES
-              ('${this.props.courseId}','${this.props.teacherId}','${this.props.teacherName}','${this.props.name}','${this.props.subjectId}',
+              ('${this.props.courseId}','${this.props.classId}','${this.props.centerId}','${this.props.teacherId}','${this.props.teacherName}','${this.props.name}','${this.props.subjectId}',
                '${this.props.subjectName}','${this.props.studentGroup}','${this.props.target}','${this.props.source}',
                '${this.props.otherSource}','${this.props.commits}');`;
   const res = query_db({sql: _sql, name: 'addClassInfo'}).catch((err)=>{
@@ -83,7 +83,24 @@ Classes.prototype.getClassInfo = function() {
   })
   return res
 }
-/*获取当前需要上的课程的list*/
+
+/*获取学生的课程相关信息*/
+Classes.prototype.getClassInfoOfStudent = function() {
+  var _sql = `select t1.studentId,t1.classId,t2.subjectId,t2.teacherId,t2.teacherName from tblClass2Student t1,tblClass2Subject t2 where t1.studentid='${this.props.studentId}' and t1.classid=t2.classid`;
+  const res = query_db({sql: _sql, name: 'getClassInfo'}).catch((err)=>{
+    console.log("服务端查询出错了(getClassInfo)。。。",err)
+  })
+  return res
+}
+/*获取学生当前上的课程信息*/
+Classes.prototype.getDoingCourseInfoOfStudent = function() {
+  var _sql = `select * from tblClassCourseGroup where classid='${this.props.classId}' and teacherid='${this.props.teacherId}' and doflag='doing'`;
+  const res = query_db({sql: _sql, name: 'getClassInfo'}).catch((err)=>{
+    console.log("服务端查询出错了(getClassInfo)。。。",err)
+  })
+  return res
+}
+/*获取当前正在上的课程的list*/
 Classes.prototype.getCurrentCourseInfo = function() {
   var _sql = `select * from tblClassCourseGroup where teacherid='${this.props.teacherId}' and doflag='doing'`;
   const res = query_db({sql: _sql, name: 'getCurrentCourseInfo'}).catch((err)=>{

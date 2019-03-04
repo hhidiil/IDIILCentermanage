@@ -6,6 +6,7 @@
           <div class="headertext">教师首页</div>
         </el-col>
       </el-row>
+      <el-button class="returnBack" @click="returnBack()">返回</el-button>
     </header>
     <div class="centerDiv">
       <el-row style="position: relative">
@@ -72,6 +73,10 @@
             break;
         }
       },
+    returnBack(){
+      console.log("返回上一层")
+      this.$router.push({name:'door'});
+    }
     }
   }
 </script>
@@ -86,6 +91,11 @@
       font-size: 30px;
       color: white;
       padding: 15px;
+    }
+    .returnBack{
+      position: absolute;
+      right: 35px;
+      top: 20px;
     }
   .centerDiv{
     position: absolute;

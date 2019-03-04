@@ -168,6 +168,34 @@ classRouter.post('/getClassInfo',async(req,res)=>{
   }
 })
 /*
+ * 查找学生当前正在上的课程信息
+ * */
+classRouter.post('/getDoingCourseInfoOfStudent',async(req,res)=>{
+  var props = req.body;
+  var classes = new Classes({props: props});
+  const result1 = await classes.getClassInfoOfStudent();
+  if(result1){
+    let classes2 = new Classes({props:result1[0]});
+    const result = await classes2.getDoingCourseInfoOfStudent();
+    if(result){
+      res.json({
+        code:200,
+        data:result
+      })
+    }else {
+      res.json({
+        code:500,
+        message:'数据获取出错~~'
+      })
+    }
+  }else {
+    res.json({
+      code:500,
+      message:'数据获取出错~~'
+    })
+  }
+})
+/*
 * 获取教师当前上的课的信息，先查正在上的课 doing、没有再查未上的课 do、都没有则需要新加派课。
 * */
 classRouter.post('/getCurrentCourseInfo',async(req,res)=>{

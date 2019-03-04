@@ -14,10 +14,10 @@ var User = function(user) {
 User.prototype.getUser = function() {
   var _sql = '';
   if(this.props.role == '1'){//学生
-    _sql = `select userid,username from tblStudent where username='${this.props.name}' and pwd='${this.props.pass}'`;
+    _sql = `select userId,userName,centerId from tblStudent where username='${this.props.name}' and pwd='${this.props.pass}'`;
   }
   if(this.props.role == '2'){//教师
-    _sql = `select userid,username from tblTeacher where username='${this.props.name}' and pwd='${this.props.pass}'`;
+    _sql = `select userId,userName,centerId from tblTeacher where username='${this.props.name}' and pwd='${this.props.pass}'`;
   }
   if(this.props.role == '3'){//管理员
     _sql = `select userId,userName,centerId,permissionLevel from tblManage where username='${this.props.name}' and pwd='${this.props.pass}'`;

@@ -6,6 +6,7 @@
           <div class="headertext">学生首页</div>
         </el-col>
       </el-row>
+      <el-button class="returnBack" @click="returnBack()">返回</el-button>
     </header>
     <div class="centerDiv">
       <el-row style="position: relative">
@@ -36,7 +37,7 @@
   import headHop from '../../components/headTop'
   import {doTestLogin} from '../../api/user'
   import {filterWebUrl2} from '../../config/methods'
-  import {getCurrentCourseInfo,getClassList} from '../../api/classes'
+  import {getCurrentCourseInfo,getClassList,getClassInfo,getDoingCourseInfoOfStudent} from '../../api/classes'
   import {getStore,setStore} from '../../config/publicMethod'
   export default {
     data(){
@@ -59,16 +60,32 @@
             break;
           case '2':
             const userInfo = this.$route.params;
-            const dataList = await doTestLogin('/static/ClassUserList.json');
-            console.warn("获取课堂数据:::::",userInfo,dataList)
             let dataParams={};
-            dataParams.teacherId = dataList.classList.teacherId;
-            dataParams.CenterID = dataList.CenterID;
-            dataParams.CenterWeb = dataList.CenterWeb;
-            dataParams.ClassID = dataList.ClassID;
-            dataParams.CourseType = dataList.CourseType;
-            dataParams.MainWeb = dataList.MainWeb;
-            dataParams.StudentID = userInfo.userId;
+            if(this.fromFlag){
+              const dataList1 = await getDoingCourseInfoOfStudent({studentId:userInfo.userId});
+              if(dataList1.code != 200){
+                return console.error("数据获取出错",dataList1)
+              }
+              console.log("dataList1------>>>>",dataList1.data[0])
+              const dataList = dataList1.data[0];
+              dataParams.teacherId = dataList.teacherId;
+              dataParams.CenterID = dataList.centerId;
+              dataParams.CenterWeb = "https://nwprodsub.idiil.com.cn";
+              dataParams.MainWeb = "https://nwdev.idiil.com.cn";
+              dataParams.ClassID = dataList.classId;
+              dataParams.CourseType = dataList.courseType;
+              dataParams.StudentID = userInfo.userId;
+            }else {
+              const dataList = await doTestLogin('/static/ClassUserList.json');//本地数据
+              dataParams.teacherId = dataList.classList.teacherId;
+              dataParams.CenterID = dataList.CenterID;
+              dataParams.CenterWeb = dataList.CenterWeb;
+              dataParams.ClassID = dataList.ClassID;
+              dataParams.CourseType = dataList.CourseType;
+              dataParams.MainWeb = dataList.MainWeb;
+              dataParams.StudentID = userInfo.userId;
+            }
+            console.warn("获取课堂数据:::::",userInfo,dataParams)
             let urlEnd = filterWebUrl2(dataParams,"1");
             console.warn("获取课堂地址:::::",urlEnd)
             window.open(urlEnd);//跳转到发现式数学课堂
@@ -77,6 +94,10 @@
                 break;
         }
       },
+      returnBack(){
+        console.log("返回上一层")
+        this.$router.push({name:'door'});
+      }
     }
   }
 </script>
@@ -91,6 +112,11 @@
       font-size: 30px;
       color: white;
       padding: 15px;
+    }
+    .returnBack{
+      position: absolute;
+      right: 35px;
+      top: 20px;
     }
   .centerDiv{
     position: absolute;
