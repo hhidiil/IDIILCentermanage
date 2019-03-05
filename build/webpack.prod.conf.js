@@ -89,7 +89,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       chunks:['manifest','vendor','faXianShiShuXue']
     }),
     new HtmlWebpackPlugin({
-      filename: config.build.faXianShiShuXue,
+      filename: config.build.manage,
       template: 'manage.html',
       inject: true,
       minify: {

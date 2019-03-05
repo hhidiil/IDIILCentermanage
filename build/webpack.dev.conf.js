@@ -76,6 +76,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'manage.html',
       template: 'manage.html',
+      favicon: path.resolve('favicon.ico'),
       inject: true,
       chunks:['manage']
     }),
