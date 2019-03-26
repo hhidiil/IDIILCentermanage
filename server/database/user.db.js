@@ -36,7 +36,7 @@ User.prototype.getMaxUserId = function(callback) {
   if(this.props.role == '2'){//教师
     _sql = "select userId from tblTeacher where id>0  ORDER BY userid DESC LIMIT 0,1";
   }
-  if(this.props.role == '3'){//教师
+  if(this.props.role == '3'){//管理员
     _sql = "select userId from tblManage where id>0  ORDER BY userid DESC LIMIT 0,1";
   }
   const res = query_db({sql: _sql, name: 'getMaxUserId'}).catch((err)=>{
@@ -48,13 +48,13 @@ User.prototype.getMaxUserId = function(callback) {
 User.prototype.getAddUser = function() {
   var _sql = '';
   if(this.props.role == '1'){//学生
-    _sql = `INSERT INTO tblStudent(userid,username,centerid) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.centerId}');`;
+    _sql = `INSERT INTO tblStudent(userid,username,pwd,centerid) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.password}','${this.props.centerId}');`;
   }
   if(this.props.role == '2'){//教师
-    _sql = `INSERT INTO tblTeacher(userid,username,pwd,centerid,phone) VALUES ('${this.props.userId}','${this.props.userName}','123456','${this.props.centerId}','${this.props.phone}');`;
+    _sql = `INSERT INTO tblTeacher(userid,username,pwd,centerid,phone) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.password}','${this.props.centerId}','${this.props.phone}');`;
   }
   if(this.props.role == '3'){
-    _sql = `INSERT INTO tblManage(userid,username,pwd,centerid,phone) VALUES ('${this.props.userId}','${this.props.userName}','123456','${this.props.centerId}','${this.props.phone}');`;
+    _sql = `INSERT INTO tblManage(userid,username,pwd,centerid,phone) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.password}','${this.props.centerId}','${this.props.phone}');`;
   }
   const res = query_db({sql: _sql, name: 'getAddUser'}).catch((err)=>{
     console.log("服务端查询出错了。。。",err)

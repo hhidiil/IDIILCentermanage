@@ -37,7 +37,7 @@
   import headHop from '../../components/headTop'
   import {doTestLogin} from '../../api/user'
   import {filterWebUrl2} from '../../config/methods'
-  import {getCurrentCourseInfo,getClassList,getClassInfo,getDoingCourseInfoOfStudent} from '../../api/classes'
+  import {getCurrentCourseInfo,getClassInfo,getDoingCourseInfoOfStudent} from '../../api/classes'
   import {getStore,setStore} from '../../config/publicMethod'
   export default {
     data(){

@@ -9,7 +9,7 @@ const pool = mysql.createPool({
   port: 3306,
   user: 'root',
   password: 'IDIILCenter',
-  database: 'mathonlinedb',// mathonlinedb
+  database: 'zhongkaodb',// zhongkaodb
 })
 console.log("database connecting......")
 

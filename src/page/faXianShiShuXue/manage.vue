@@ -39,7 +39,7 @@
 
 <script type="text/ecmascript-6">
   import {setStore,getStore,clearStore,setSession,clearSession} from '../../config/publicMethod'
-  import {getClassList} from '../../api/classes'
+  import {getCourseList} from '../../api/classes'
   export default {
     //data中放入初始默认值
     data() {
@@ -58,7 +58,7 @@
       async getCourseList(){
         let classList = [];
         let userInfo = JSON.parse(getStore("userInfo"));
-        let result = await getClassList({teacherId:userInfo.userId});//数据库获取教师的派课列表
+        let result = await getCourseList({teacherId:userInfo.userId});//数据库获取教师的派课列表
         console.log("数据库获取教师的派课列表---classList----->>",result)
         if(result.data.length>0){
           setStore('classList',JSON.stringify(result.data));

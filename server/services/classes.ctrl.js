@@ -12,7 +12,7 @@ const classRouter = express.Router();
 /*
  * 新增课程
  * */
-classRouter.post('/addClassListInfo',async(req, res) => {
+classRouter.post('/addCourseListInfo',async(req, res) => {
   var props = req.body;
   var classes = new Classes({props: props});
   const result1 = await classes.getLastClassInfo();//查询最新的课程ID，用来新建新的课程ID。Classid=CenterID+InstructorID+CourseType+年月+XXX=“00201MM1811001”
@@ -49,7 +49,7 @@ classRouter.post('/addClassListInfo',async(req, res) => {
 /*
  * 修改某课程
  * */
-classRouter.post('/updateClassListInfo',async(req, res) => {
+classRouter.post('/updateCourseListInfo',async(req, res) => {
   var props = req.body;
   var classes = new Classes({props: props});
   props.courseId = req.body.courseId;
@@ -73,7 +73,7 @@ classRouter.post('/updateClassListInfo',async(req, res) => {
 /*
  * 删除某个课程
  * */
-classRouter.post('/deleteClassListInfo',async(req, res) => {
+classRouter.post('/deleteCourseListInfo',async(req, res) => {
   var props = req.body;
   var classes = new Classes({props: props});
   const result = await classes.deleteClassListInfo();
@@ -93,7 +93,7 @@ classRouter.post('/deleteClassListInfo',async(req, res) => {
 /*
  * 更新某个课程的信息，目前更改课程是否正在做的标志
  * */
-classRouter.post('/updateDoingClassInfo',async(req,res)=>{
+classRouter.post('/updateDoingCourseInfo',async(req,res)=>{
   var props = req.body;
   //props.nowDoingInfo = JSON.stringify(req.body);
   var classes = new Classes({props: props});
@@ -130,9 +130,9 @@ classRouter.post('/updateDoingClassInfo',async(req,res)=>{
   }
 })
 /*
- * 获取教师当前上的课的信息，先查正在上的课 doing、没有再查未上的课 do、都没有则需要新加派课。
+ * 获取老师派课列表。
  * */
-classRouter.post('/getClassList',async(req,res)=>{
+classRouter.post('/getCourseList',async(req,res)=>{
   var props = req.body;
   var classes = new Classes({props: props});
   const result = await classes.getClassList();
@@ -151,7 +151,7 @@ classRouter.post('/getClassList',async(req,res)=>{
 /*
  * 根据课程ID查询某个课程的信息。
  * */
-classRouter.post('/getClassInfo',async(req,res)=>{
+classRouter.post('/getCourseInfo',async(req,res)=>{
   var props = req.body;
   var classes = new Classes({props: props});
   const result = await classes.getClassInfo();

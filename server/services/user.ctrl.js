@@ -13,6 +13,7 @@ const userRouter = express.Router()
 
 userRouter.post('/login',async(req, res) => {
   var props = req.body;
+  props.pass = Helper.getMD5(req.body.pass);
   var user = new User({props: props});
   const result = await user.getUser();
   if(result){
@@ -43,6 +44,7 @@ userRouter.get('/getAllUser',async(req, res) => {
         })
       }
 });
+//管理员或者老师添加学生
 userRouter.post('/addStudentUser',async(req, res) => {
   var props = req.body;
   var user = new User({props: props});
@@ -50,8 +52,9 @@ userRouter.post('/addStudentUser',async(req, res) => {
   if (reslut1.length>0) {//有用户
     props.userId = Helper.createUserId(reslut1[0].userId);
   } else {
-    props.userId = '001';//第一个用户
+    props.userId = 'IDIIL00000001';//第一个用户
   }
+  props.password = Helper.getMD5('123456');//默认密码是 123456
   const result2 = await user.getAddUser();//学生表中加入新的数据
   console.log("服务端返回的数据-------111111111111----->>",result2);
   const result3 = await user.getAddUserToClass();//往 班级和学生表中 加入数据
@@ -109,15 +112,9 @@ userRouter.post('/registerUser',async(req, res) => {
   if (reslut1.length>0) {//有用户
     props.userId = Helper.createUserId(reslut1[0].userId);
   } else {
-    if(req.body.role == '1'){
-      props.userId = '001';//第一个用户
-    }else if(req.body.role == '2'){
-      props.userId = '01';//第一个用户
-    }else {
-      props.userId = '0001';//第一个用户
-    }
+    props.userId = 'IDIIL00000001';//第一个用户
   }
-  //props.password = Helper.getMD5(req.body.pass);
+  props.password = Helper.getMD5(req.body.pass);
   const result = await user.getAddUser();
   if(result){
     res.json({

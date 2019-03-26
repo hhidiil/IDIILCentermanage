@@ -49,11 +49,11 @@ var helper = {
    ** randomWord 产生任意长度随机字母数字组合
    ** randomFlag-是否任意长度。为true时： min-任意长度最小位[固定位数] max-任意长度最大位
    **randomFlag为false时，按照第二个参数来生成固定位数，
-   * 防止出现重复结果，加上系统日期。
+   * 防止出现重复结果，可以加上系统日期。
    */
   randomString: function(randomFlag,min,max){
     var date = new Date();
-    var times = date.getTime();
+    var times = date.getTime();//系统时间
     var str = "",
       range = min,
       arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -66,7 +66,7 @@ var helper = {
       pos = Math.round(Math.random() * (arr.length-1));
       str += arr[pos];
     }
-    return str+times;
+    return str;
   },
   // 查看文件是否存在,存在即删除
   deleteFile: function (dirpath,fileurl) {
@@ -93,17 +93,18 @@ var helper = {
     }
     return new_dir;
   },
-  //获取当前用户最大的id  'IDIILMATH0000001'
+  //获取当前用户最大的id  'IDIIL0000001'
   createUserId: function(data){
-    let len = data.length;
-    let num = parseInt(data);
+    let str1 = data.substr(5);
+    let num = parseInt(str1);
+    let len = 7;//固定八位
     num = parseInt(num, 10) + 1;
     num = num.toString();
     while(num.length < len) {
       num = '0' + num;
     }
-    console.log(num)
-    return num
+    console.log("IDIIL"+num)
+    return "IDIIL"+num
   },
   syncGetData:function(){
     var list = [];

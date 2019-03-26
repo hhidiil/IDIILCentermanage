@@ -117,7 +117,7 @@
   import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
   import {setStore,getStore} from '../../config/publicMethod'
   import {uploadFile} from '../../api/upload'
-  import {addClassListInfo,updateClassListInfo} from '../../api/classes'
+  import {addCourseListInfo,updateCourseListInfo} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
   export default {
     props:['data','type','addFlag'],
@@ -296,11 +296,11 @@
         let classList = JSON.parse(getStore("classList"));
         classList.push(this.form);
         if(this.type == 'add'){
-          const  result = await addClassListInfo(this.form)//存入数据库
+          const  result = await addCourseListInfo(this.form)//存入数据库
           setStore("classList",JSON.stringify(classList))//存放在本地缓存里面
           this.$message({message: '提交成功！',type:'success'});
         }else if(this.type == 'update'){
-          const  result = await updateClassListInfo(this.form)
+          const  result = await updateCourseListInfo(this.form)
           this.$message({message: '修改成功！',type:'success'});
         }else {
           this.$message({message: '没有操作类型,什么都没有做^—^！',type:'warning'});

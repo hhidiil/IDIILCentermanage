@@ -88,7 +88,7 @@
   import {setStore,getStore} from '../../config/publicMethod'
   import {toJson} from '../../config/methods'
   import {writeFileJson,doTestLogin} from '../../api/user'
-  import {getClassList,updateDoingClassInfo,deleteClassListInfo} from '../../api/classes'
+  import {getCourseList,updateDoingCourseInfo,deleteCourseListInfo} from '../../api/classes'
   import classData from '../../data/classlist'
   export default {
     data(){
@@ -109,7 +109,7 @@
     },
     activated() {
         //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
-//      this.getClassListInfo()
+      this.getClassListInfo()
     },
     mounted(){
       $('.el-card__header').css('backgroundColor','#67c4ed');
@@ -129,7 +129,7 @@
     methods: {
       async getClassListInfo(){
         let userInfo = JSON.parse(getStore("userInfo"));
-        let classList2 = await getClassList({teacherId:userInfo.userId});//数据库获取教师的派课列表
+        let classList2 = await getCourseList({teacherId:userInfo.userId});//数据库获取教师的派课列表
         console.log("数据库获取教师的派课列表---classList2----->>",classList2)
         if(classList2.data.length>0){
           this.classList = classList2.data
@@ -152,7 +152,7 @@
       },
       async goToClass(tableData){
         console.log("跳转链接",tableData);
-        const result1 = await updateDoingClassInfo(tableData);//更新数据库数据，保存当前正在做的课件信息
+        const result1 = await updateDoingCourseInfo(tableData);//更新数据库数据，保存当前正在做的课件信息
         if(result1.code == 200){
           if(result1.type == '1'){
             this.$alert("当前（ "+result1.data[0].name+" ）的课程还未讲完!", '提示：');
@@ -194,7 +194,7 @@
       },
       async deleteCourse(tableData,index){
         console.log("删除的课程",tableData,index)
-        const result = await deleteClassListInfo(tableData);//删除课件
+        const result = await deleteCourseListInfo(tableData);//删除课件
         if(result.code == 200){
           this.classList.splice(index,1);
           this.$message({type: 'success', message: '删除成功!'});

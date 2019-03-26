@@ -115,10 +115,10 @@
           if (valid) {
             let userinfo = null;
             let fromflag = this.fromFlag;//true为真实数据，false为本地数据
-            console.log('55555555555555555555555555555555555555555555555',fromflag)
+            console.log('使用的是什么数据，true为真实数据即服务端的数据，false为假数据自定义数据',fromflag)
             if(fromflag){
               const result = await doLogin(this.ruleForm)//查询用户信息
-              console.log("注册结果------->",result)
+              console.log("用户登录查询结果------->",result)
               if(result.code == 200){
                 if((result.data[0])){
                   userinfo = {
@@ -147,7 +147,7 @@
                     console.log("555555555555555555555555555555555555555555555555555",result.data[0])
                     setStore("manageUser",result.data[0])
                     let origin = window.location.origin;
-                    window.location.href = origin + "/manage.html#/home";//跳转到数学派课系统
+                    window.open(origin + "/manage.html#/home");//跳转到数学派课系统
                   }
                 }else {
                   alert("用户名或密码错误")

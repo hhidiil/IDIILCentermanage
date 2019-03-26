@@ -10,7 +10,15 @@
       </header>
       <section class="select_section">
         <el-row>
-          <span style="font-weight: bold">中心号：</span><span>{{centerName}}</span>
+          <span style="font-weight: bold">中心号：</span>
+          <el-select v-model="centerValue" placeholder="请选择" @change="selectCenterChange">
+            <el-option
+              v-for="(item,index) in centerOptions"
+              :key="index"
+              :label="item.centerName"
+              :value="item.centerId">
+            </el-option>
+          </el-select>
           <span style="margin-left: 20px;font-weight: bold">班级：</span>
           <el-select v-model="classValue" placeholder="请选择" @change="selectChange">
             <el-option
@@ -95,7 +103,7 @@
           width="40%">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="alterForm" label-width="80px" class="demo-ruleForm">
             <el-form-item label="中心号:" prop="centerId">
-              <el-input type="text" v-model="ruleForm.centerId" :value="centerId" :disabled="true"></el-input>
+              <el-input type="text" v-model="ruleForm.centerId" :value="currentCenterId" :disabled="true"></el-input>
             </el-form-item>
             <el-form-item label="用户名:" prop="userName">
               <el-input type="text" v-model="ruleForm.userName"></el-input>
@@ -122,7 +130,7 @@
 </template>
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
-  import {getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
+  import {getAllCenter,getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
   import {addStudentUser,updateStudentUser,deleteStudentUser} from '../../api/user'
   import {getStore} from '../../config/publicMethod'
   export default{
@@ -142,9 +150,10 @@
         multipleSelection: [],
         dialogVisible:false,
         modalClickOther:false,
-        centerName:'上地中心',
-        centerId:'',
+        currentCenterId:'',//当前选的中心号
+        centerValue:'',
         classValue:'',
+        centerOptions:[],
         classOptions:[],
         alterFlag:false,//true为新增，false为修改
         ruleForm: {
@@ -159,7 +168,7 @@
             { required: true, message: '请输入用户名', trigger: 'blur' },
           ],
           centerId: [
-            { required: true, message: '请输入中心号', trigger: 'blur' },
+            { required: true, message: '请选择中心号', trigger: 'blur' },
           ],
           classId: [
             {required: true,  message: '请输入班级', trigger: 'blur' }
@@ -177,13 +186,20 @@
     },
     mounted(){
       //进入首页的时候查询
-      this.getAllUserList();
+      this.getCenterList();
     },
     methods:{
-      async getAllUserList(){
-        let centerId= JSON.parse(getStore('manageUser')).centerId;//中心号
-        this.ruleForm.centerId = centerId;
-        let result1 = await getAllClassesOfCenter({centerId:'002'});
+      async getCenterList(){
+        let result = await getAllCenter();
+        console.log("中心的数据====》",result)
+        if(result.code == 200){
+          this.centerOptions = result.data;
+        }
+      },
+      async getAllUserList(val){
+        this.currentCenterId = val;
+        this.ruleForm.centerId = val;
+        let result1 = await getAllClassesOfCenter({centerId:val});
         console.log("班级列表",result1)
         if(result1.code == 200){
           this.classOptions = result1.data;
@@ -256,7 +272,7 @@
         this.multipleSelection = val;
       },
       async selectChange(val){
-        console.log("选择的：：---》》》",val);
+        console.log("选择的班级---》》》",val);
         this.currentClass = val;
         let result = await getAllStudentOfClass({classId:val});
         console.log("返回学生列表：：---》》》",result);
@@ -264,6 +280,10 @@
           this.allData = result.data;
           this.currentData = result.data.slice( 0,this.pageSize)
         }
+      },
+      selectCenterChange(val){
+        console.log("选择的中心号---》》》",val);
+        this.getAllUserList(val)
       },
       selectChangeDialog(){
 

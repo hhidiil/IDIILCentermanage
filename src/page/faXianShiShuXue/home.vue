@@ -28,7 +28,7 @@
 <script type="text/ecmascript-6">
   import headHop from '../../components/headTop'
   import {doLogin,registerUser} from '../../api/user'
-  import {getCurrentCourseInfo,getClassList} from '../../api/classes'
+  import {getCurrentCourseInfo} from '../../api/classes'
   import {getStore,setStore} from '../../config/publicMethod'
   export default {
     data(){

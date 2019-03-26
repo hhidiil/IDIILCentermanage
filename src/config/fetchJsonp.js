@@ -1,5 +1,5 @@
 /**
- * 网络请求数据,jsonp格式请求。目前只有GET
+ * 基本的网络请求数据
  * Created by gaoju on 2018/8/14.
  */
 import { baseUrl } from './env'
