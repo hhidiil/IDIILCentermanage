@@ -7,7 +7,7 @@ import router from './router/index.js'
 import ElementUI from 'element-ui'
 import '../node_modules/element-ui/lib/theme-chalk/index.css'
 
-Vue.prototype.fromFlag = true;//本地或者数据库标志,//true为真实数据，false为本地数据
+Vue.prototype.mainfromFlag = true;//本地或者数据库标志,//true为真实数据，false为本地数据
 Vue.config.debug = true
 Vue.config.productionTip = false;
 Vue.use(ElementUI);

@@ -24,7 +24,7 @@
               <el-radio-group v-model="ruleForm.role">
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">教师</el-radio>
-                <el-radio label="3">管理员</el-radio>
+                <!--<el-radio label="3">管理员</el-radio>-->
               </el-radio-group>
             </el-form-item>
             <el-button @click="loginEnter('ruleForm')" class="enterButton">登 录</el-button>
@@ -115,14 +115,14 @@
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
             let userinfo = null;
-            let fromflag = this.fromFlag;//true为真实数据，false为本地数据
+            let fromflag = this.faxianshifromFlag;//true为真实数据，false为本地数据
             console.log('55555555555555555555555555555555555555555555555',fromflag)
             if(fromflag){
               const result = await doLogin(this.ruleForm)//查询用户信息
-              console.log("注册结果------->",result)
+              console.log("查询结果dologin------->",result)
               if(result.code == 200){
                 if((result.data[0])){
-                  userinfo = {userId:result.data[0].userid, userName: result.data[0].username};
+                  userinfo = {userId:result.data[0].userId, userName: result.data[0].userName,centerId: result.data[0].centerId};
                   if(this.ruleForm.role == '1'){//学生登录
                     const dataList = await getClassInfo();
                     console.warn("获取课堂数据:::::",dataList)
@@ -136,7 +136,7 @@
                     dataParams.StudentID = userinfo.userId;
                     let urlend = filterWebUrl2(dataParams,"1");
                     console.warn("获取课堂地址:::::",urlend)
-//                    window.open(urlend);
+                    window.open(urlend);
                     return
                   }else {//教师登录
                     if(getStore("userInfo")){//已经有值

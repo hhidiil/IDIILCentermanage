@@ -9,6 +9,14 @@ var Manage = function(manage) {
   this.props = manage.props
 };
 
+/*c查询某个中心*/
+Manage.prototype.selectCenter = function() {
+  var _sql = `select * from tblCenter where centerid='${this.props.centerId}';`;
+  const res = query_db({sql: _sql, name: 'selectCenter'}).catch((err)=>{
+    console.log("服务端查询出错了。。。",err)
+  })
+  return res
+};
 /*添加新的中心*/
 Manage.prototype.addCenter = function() {
   var _sql = `INSERT INTO tblCenter (centerId,centerName,address) VALUES ('${this.props.centerId}','${this.props.centerName}','${this.props.address}');`;

@@ -114,7 +114,7 @@
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
             let userinfo = null;
-            let fromflag = this.fromFlag;//true为真实数据，false为本地数据
+            let fromflag = this.mainfromFlag;//true为真实数据，false为本地数据
             console.log('使用的是什么数据，true为真实数据即服务端的数据，false为假数据自定义数据',fromflag)
             if(fromflag){
               const result = await doLogin(this.ruleForm)//查询用户信息

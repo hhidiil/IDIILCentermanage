@@ -61,7 +61,9 @@
           case '2':
             const userInfo = this.$route.params;
             let dataParams={};
-            if(this.fromFlag){
+            let dataFlag = this.mainfromFlag;
+//            let dataFlag = false;//此处先用间数据
+            if(dataFlag){
               const dataList1 = await getDoingCourseInfoOfStudent({studentId:userInfo.userId});
               if(dataList1.code != 200){
                 return console.error("数据获取出错",dataList1)
