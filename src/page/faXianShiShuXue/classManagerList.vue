@@ -90,6 +90,7 @@
   import {writeFileJson,doTestLogin} from '../../api/user'
   import {getCourseList,updateDoingCourseInfo,deleteCourseListInfo} from '../../api/classes'
   import classData from '../../data/classlist'
+  import { baseUrl_dev } from '../../config/env'
   export default {
     data(){
       let classList = JSON.parse(getStore("classList"));
@@ -173,7 +174,7 @@
         dataParams.teacherId = JSON.parse(getStore('userInfo')).userId;
         dataParams.centerId = result.data.CenterID;
         dataParams.performanceID = result.data.classList.courseId;//课程ID
-        let url = 'https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
+        let url = baseUrl_dev + '/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
         console.warn("老师上课的地址url-->",url)
         window.open(url)
       },
