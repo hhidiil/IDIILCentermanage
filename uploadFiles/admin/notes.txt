@@ -1,0 +1,48 @@
+账号：0085
+
+测试文件地址：\\nwprodsub\tomcat8\nwprodsub
+
+英语测试地址(本地)：\\nwdev.idiil.com.cn\D\nwDevWEB\WEB\System\VocabQuiz\vocab2
+			http://nwprodsub.idiil.com.cn/preview.html?CourseType=MATH&DirName=A3C_3_2
+
+https://nwdev.idiil.com.cn/System/VocabQuiz/vocab2/vocab2.html?CenterWeb=https://nwsub.idiil.com.cn/&sMemberID=0000007R&sCenterID=002&sStudentID=01j
+
+英语测试地址：test
+https://nwdev.idiil.com.cn/System/VocabQuiz/vocab2/vocab2.html?CWorHW=CW&CenterID=002&StudentID=01J
+
+排课
+http://nwdev.idiil.com.cn/function/teacher/tSelectCourse.asp
+
+数学课件SFPT
+
+host-->nwprodsub.idiil.com.cn
+path-->/var/lib/tomcat8/webapps/nwprodsub
+user name -->root
+passname -->1111
+
+数学中考试题（例子）：
+\\nwdev.idiil.com.cn\D\nwDevWEB\WEB\Function\Student\seniorExam
+
+-------------------------------------------------------------------------------------------------
+https://nwprodsub.idiil.com.cn/SYSTEM/ENGLISH/ESL/vocab/vocab2.html?CenterWeb=https://nwprodsub.idiil.com.cn/&sMemberID=0000007R&sCenterID=002&sStudentID=01j
+英语服务器数据更新：sql语句
+IDIILCNDB20171204 -----》
+delete from tblVocabQuizMain ; 
+
+delete from tblVocabQuizBuffer;
+
+delete from tblVocabQuizUnit;
+
+delete from tblVocabQuizWord;
+
+tblVocabQuiz_Assign---》
+SELECT   TOP (200) VocabQuizID, Status, MemberID, CenterID, StudentID, QuizType, [Level], CreatedDate, PrintID, duedate
+FROM      tblVocabQuiz_Assign
+WHERE   (CenterID = '002') AND (StudentID = '01j')
+-------------------------------------------------------------------------------------------------
+
+服务器控制台：nwprodsub:  使用PuTTY软件打开，进入后 root 密码 1111 
+cd ./idiilsource(进入node文件下的)
+cd var/lib/ tomcat8/webapps/nwprodsub(进入Tomcat)
+然后跟windows控制台一样命令
+22222222222222222222222222222222222阿斯达
