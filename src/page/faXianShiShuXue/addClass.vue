@@ -13,7 +13,7 @@
         <el-row>
           <el-col :span="24">
             <el-form-item label="班级:" :label-width="formLabelWidth">
-              <el-select v-model="form.classId" placeholder="请选择" style="float: left;">
+              <el-select v-model="form.classId" placeholder="请选择" style="float: left;" @change="selectChange()">
                 <el-option
                   v-for="(item,index) in classOptions"
                   :key="index"
@@ -117,7 +117,7 @@
   import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
   import {setStore,getStore} from '../../config/publicMethod'
   import {uploadFile} from '../../api/upload'
-  import {addCourseListInfo,updateCourseListInfo} from '../../api/classes'
+  import {addCourseListInfo,updateCourseListInfo,getStudentListOfClass} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
   export default {
     props:['data','type','addFlag'],
@@ -187,9 +187,9 @@
           this.form.courseId = this.data.courseId;//之前的上传文件
           this.form.classId = this.data.classId;//之前的上传文件
         }else {
-          this.studentData = res.StudentList;
-          this.studentAllData = res.StudentList;
-          console.warn("获取学生数据:::::",this.studentData)
+//          this.studentData = res.StudentList;
+//          this.studentAllData = res.StudentList;
+//          console.warn("获取学生数据:::::",this.studentData)
         }
       }).catch(()=>{
         console.error("获取学生数据出错")
@@ -382,6 +382,19 @@
           }
         }
         return result
+      },
+      async selectChange(){
+        console.log("当前班级ID==》",this.form.classId)
+        let classId = this.form.classId;
+        const  result = await getStudentListOfClass({classId:classId});
+        if(result.code === 200 && result.data.length>0){
+          for(let i in result.data){
+            result.data[i].key = i;
+          }
+          this.studentData = result.data;
+          this.studentAllData = result.data;
+          console.warn("获取学生数据:::::",this.studentData)
+        }
       }
     }
   }

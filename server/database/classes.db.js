@@ -116,5 +116,13 @@ Classes.prototype.getLastedCourseInfo = function() {
   })
   return res
 }
+/*获取班级对应的学生列表*/
+Classes.prototype.getStudentListOfClass = function() {
+  var _sql = `select t1.studentId as userId,t2.username as userName from tblClass2Student t1 ,tblStudent t2 where t1.classId='${this.props.classId}' and t1.studentId=t2.userid ORDER BY t2.id`;
+  const res = query_db({sql: _sql, name: 'getStudentListOfClass'}).catch((err)=>{
+    console.log("服务端查询出错了(getStudentListOfClass)。。。",err)
+  })
+  return res
+}
 
 module.exports = Classes

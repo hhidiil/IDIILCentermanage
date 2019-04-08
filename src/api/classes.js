@@ -59,3 +59,11 @@ export const getCurrentCourseInfo = (data)=>{
   return fetch_requset(url,data,'POST')
 
 }
+/*
+ * 获班级对应的学生
+ * */
+export const getStudentListOfClass = (data)=>{
+  const url = `${API_CONFIG}/getStudentListOfClass`;
+  return fetch_requset(url,data,'POST')
+
+}

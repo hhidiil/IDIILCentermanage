@@ -224,4 +224,24 @@ classRouter.post('/getCurrentCourseInfo',async(req,res)=>{
     }
   }
 })
+/*
+ * 获取某个班级里面所有的学生
+ * */
+classRouter.post('/getStudentListOfClass',async(req,res)=>{
+  var props = req.body;
+  var classes = new Classes({props: props});
+  //获取正在做的课件
+  const result = await classes.getStudentListOfClass();
+  if(result){
+    res.json({
+      code:200,
+      data:result
+    })
+  }else {
+    res.json({
+      code:500,
+      message:'数据获取出错~~'
+    })
+  }
+})
 module.exports = classRouter;
