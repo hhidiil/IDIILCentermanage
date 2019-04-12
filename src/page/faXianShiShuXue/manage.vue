@@ -24,7 +24,7 @@
             <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
             <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
 
-            <el-menu-item index="/manage/practice">练习55556667777</el-menu-item>
+            <el-menu-item index="/manage/practice">练习555566677</el-menu-item>
 
             <el-menu-item index="/manage/classTeam">派课列表</el-menu-item>
             <el-menu-item index="/manage/practice">练习</el-menu-item>
