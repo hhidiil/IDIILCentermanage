@@ -23,7 +23,7 @@
             <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
             <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
             <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
-            <el-menu-item index="/manage/practice">练习1</el-menu-item>
+            <el-menu-item index="/manage/practice">练习5555</el-menu-item>
             <el-menu-item index="/manage/classTeam">派课列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="/manage/editor"><i class="el-icon-menu"></i>编辑器管理</el-menu-item>
