@@ -87,7 +87,7 @@
       </el-form>
 
       <div style="margin-top: 50px;">
-        <el-button type="primary" @click="submitAllData">提 交</el-button>
+        <el-button type="primary" @click="submitAllData">提 交{{count}}</el-button>
       </div>
     </section>
     <el-dialog
