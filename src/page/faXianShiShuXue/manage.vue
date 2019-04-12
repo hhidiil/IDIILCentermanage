@@ -23,7 +23,7 @@
             <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
             <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
             <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
-            <el-menu-item index="/manage/practice">练习</el-menu-item>
+            <el-menu-item index="/manage/classTeam">派课列表</el-menu-item>
           </el-submenu>
           <el-menu-item index="/manage/editor"><i class="el-icon-menu"></i>编辑器管理</el-menu-item>
         </el-menu>
@@ -40,7 +40,7 @@
 
 <script type="text/ecmascript-6">
   import {setStore,getStore,clearStore,setSession,clearSession} from '../../config/publicMethod'
-  import {getClassList} from '../../api/classes'
+  import {getCourseList} from '../../api/classes'
   export default {
     //data中放入初始默认值
     data() {
@@ -59,7 +59,7 @@
       async getCourseList(){
         let classList = [];
         let userInfo = JSON.parse(getStore("userInfo"));
-        let result = await getClassList({teacherId:userInfo.userId});//数据库获取教师的派课列表
+        let result = await getCourseList({teacherId:userInfo.userId});//数据库获取教师的派课列表
         console.log("数据库获取教师的派课列表---classList----->>",result)
         if(result.data.length>0){
           setStore('classList',JSON.stringify(result.data));
