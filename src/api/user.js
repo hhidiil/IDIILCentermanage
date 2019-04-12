@@ -27,7 +27,13 @@ export const registerUser = (data)=>{
   const url = `${API_CONFIG}/registerUser`;
   return fetch_requset(url,data,'POST')
 }
-
+/**
+ * [添加新增备课列表信息]
+ */
+export const addClassListInfo = (data) => {
+  const url = `${API_CONFIG}/addClassListInfo`;
+  return fetch_requset(url,data,'POST')
+}
 /**
  * [添加班级学生信息]
  */

@@ -196,7 +196,7 @@
               this.getAllClasses();
             }
           }else {
-            console.error('error submit!!');
+            console.error('error register submit!!');
             return false;
           }
         })

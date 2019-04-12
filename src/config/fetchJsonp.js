@@ -1,5 +1,5 @@
 /**
- * 基本的网络请求数据
+ * 网络请求数据,jsonp格式请求。目前只有GET
  * Created by gaoju on 2018/8/14.
  */
 import { baseUrl } from './env'
@@ -7,7 +7,7 @@ import fetchJsonp from 'fetch-jsonp'
 
 export default async(url = '', data = {}) => {
 
-  //url = baseUrl + url;
+  url = baseUrl + url;
   let dataStr = ''; //数据拼接字符串
   Object.keys(data).forEach(key => {
     dataStr += key + '=' + data[key] + '&';

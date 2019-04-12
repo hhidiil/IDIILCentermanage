@@ -3,7 +3,6 @@
  */
 
 //var base = new Base64();
-//import { baseUrl_Main ,baseUrl_dev} from './env'
 /*
  * 对象值解码
  * */
@@ -110,7 +109,7 @@ export function filterWebUrl2(param,role){
   let MainWeb = param.MainWeb;
   let StudentID = param.StudentID;
 
-  endUrl = CenterWeb+'/SYSTEM/MathInteractive/OnlineBulidDataDeal_1/OnlineBuildDataDeal_1.jsp?sCenterWeb='+CenterWeb+'&sMainWeb='+MainWeb+'&sInstructorID='+teacherId+'&sStudentID='+StudentID+'&sCenterID='+CenterID;
+  endUrl = 'https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/OnlineBulidDataDeal_1/OnlineBuildDataDeal_1.jsp?sCenterWeb=https://nwprodsub.idiil.com.cn&sMainWeb=https://nwdev.idiil.com.cn&sInstructorID='+teacherId+'&sStudentID='+StudentID+'&sCenterID='+CenterID;
 
   return endUrl
 }

@@ -1,6 +1,8 @@
 <template>
   <div class="addClass">
+
     <section class="data_section">
+
       <el-dialog
         width="30%"
         title="添加组"
@@ -9,91 +11,81 @@
         组名：<el-input v-model="addNewGroupName" style="width: 30%"></el-input>
         <el-button type="primary" @click="addGroupNameHandle()">确定</el-button>
       </el-dialog>
-      <el-form :model="form">
+      <el-form  :model="sourceLists" :label-width="formLabelWidth">
         <el-row>
           <el-col :span="24">
-            <el-form-item label="班级:" :label-width="formLabelWidth">
-              <el-select v-model="form.classId" placeholder="请选择" style="float: left;" @change="selectChange()">
-                <el-option
-                  v-for="(item,index) in classOptions"
-                  :key="index"
-                  :label="item.className"
-                  :value="item.classId">
-                </el-option>
-              </el-select>
-            </el-form-item>
+            <el-card class="box-card">
+              <div class="rowBox cardTop">
+                <el-form-item label="课程名称:">
+                  <span v-if="editClassFlag">
+                    <el-input v-model="sourceLists.classList.name" ></el-input>
+                  </span>
+                  <span v-else>{{sourceLists.classList.name}}</span>
+                </el-form-item>
+                <el-form-item label="课程目标:">
+                  <span v-if="editClassFlag">
+                    <el-input type="textarea" v-model="sourceLists.classList.target"></el-input>
+                  </span>
+                  <span v-else>{{sourceLists.classList.target}}</span>
+                </el-form-item>
+                <el-form-item label="课程时长:">
+                  <span v-if="editClassFlag">
+                    <el-input v-model="sourceLists.classList.duration"></el-input>
+                  </span>
+                  <span v-else>{{sourceLists.classList.duration}}</span>
+                </el-form-item>
+                <el-form-item label="对应版本:">
+                  <span v-if="editClassFlag">
+                    <el-input v-model="sourceLists.classList.version"></el-input>
+                  </span>
+                  <span v-else>{{sourceLists.classList.version}}</span>
+                </el-form-item>
+                <el-form-item>
+                  <div class="button-group">
+                    <span>
+                        <el-button size="mini" @click="addCustomBlock">添加自定义区块</el-button>
+                        <el-button size="mini" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
+                    </span>
+                    <span>
+                        <el-button size="mini" @click="editClass">编辑</el-button>
+                        <el-button size="mini" @click="saveClass">保存</el-button>
+                    </span>
+                  </div>
+                </el-form-item>
+              </div>
+            </el-card>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="11">
-            <el-form-item label="课程名:" :label-width="formLabelWidth">
-              <el-input v-model="form.name"></el-input>
-            </el-form-item></el-col>
-          <el-col :span="11">
-            <el-form-item label="教学目标:" :label-width="formLabelWidth">
-              <el-input v-model="form.target"></el-input>
-            </el-form-item>
+          <el-col>
+            <!--<el-collapse>-->
+              <draggable
+                tag="el-collapse"
+                :list="sourceLists.blockLists"
+              >
+                <div v-for="(blockList,index) in sourceLists.blockLists" :key="blockList.key" class="collapseItem">
+                  <el-collapse-item v-if="blockList.type == 'custom'" >
+                    <template slot="title">
+                      自定义区块课程{{blockList.key}}
+                      <!--<i class="el-icon-xiayi moveUp" @click.stop="moveUp($event)"></i>-->
+                      <!--<i class="el-icon-xiayi1 moveDown" @click.stop="moveDown($event)"></i>-->
+                    </template>
+                    <custom-list :blockLists="sourceLists.blockLists" :blockList="blockList"></custom-list>
+
+                  </el-collapse-item>
+                  <el-collapse-item v-else>
+                    <template slot="title">
+                      IDIIL线上英语课程{{blockList.key}}
+                    </template>
+                    <default-list :blockLists="sourceLists.blockLists" :blockList="blockList"></default-list>
+                  </el-collapse-item>
+                </div>
+              </draggable>
+            <!--</el-collapse>-->
           </el-col>
         </el-row>
-        <el-form-item label="IDIIL课程:" :label-width="formLabelWidth" style="text-align: left">
-          <el-row>
-            <el-col :span="6"><el-button size="mini" @click="DialogIdiilVisible = true;">添加IDIIL课程</el-button></el-col>
-            <el-col :span="14"><li v-for="(item,index) in sourceList"><span>{{(index+1) + '、'+item.name}}</span>
-              <i style="margin-left: 5px;cursor: pointer" class="el-icon-close" @click="deleteResource(index)"></i></li></el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item label="课外资料:" :label-width="formLabelWidth" style="text-align: left">
-          <el-row><el-col :span="12">
-            <el-upload ref="upload"
-                       :file-list="fileList"
-                       action="/api/file/upload"
-                       :on-remove="handleFileRemove"
-                       :auto-upload="false"
-                       :on-change="changeFileHandle"
-                       :on-success="uploadSuccess"
-                       :on-error="uploadError"
-                       :data="uploadParam"
-                       :before-upload="beforeUpload"
-                       :limit=5
-                       multiple>
-              <el-button slot="trigger" size="mini" type="primary">选择文件</el-button>
-              <el-button size="mini" type="success" @click="submitUpload">上传</el-button>
-            </el-upload>
-          </el-col></el-row>
-        </el-form-item>
-        <el-form-item label="备注:" :label-width="formLabelWidth">
-          <el-input type="textarea" v-model="form.commits"></el-input>
-        </el-form-item>
-        <el-form-item label="学生分组:" :label-width="formLabelWidth">
-          <div>
-            <el-transfer
-              style="text-align: left;"
-              v-model="form.studentGroup.nowList"
-              :titles="form.studentGroup.nowGroup"
-              @change="handleChange"
-              :data="studentData"
-              :key="type">
-              <span slot-scope="{ option }">{{ option.userName }}</span>
-              <el-button class="transfer-footer" slot="right-footer" type="primary" size="small" @click="addGroupData()">确定</el-button>
-              <el-button class="transfer-footer" slot="right-footer" type="primary" size="small" @click="resize()">从新分组</el-button>
-              <el-button class="transfer-footer tianjiazu" slot="right-footer" size="small" @click="innerDialogVisible = true">新建组</el-button>
-            </el-transfer>
-            <el-collapse v-model="activeNames" style="text-align: left">
-              <el-collapse-item  v-for="(group,index) in form.studentGroup.groups" :name="index" :key="index">
-                <template slot="title">{{group.name}}
-                  <el-button @click.stop="editGroup(group,index)" style="margin-left: 10px" size="mini" type="primary" icon="el-icon-edit" circle></el-button>
-                </template>
-                <el-tag
-                  v-for="(item,index) in group.studentItem"
-                  :key="index"
-                >
-                  {{item.userName}}
-                </el-tag>
-              </el-collapse-item>
-            </el-collapse>
-          </div>
-        </el-form-item>
       </el-form>
+
       <div style="margin-top: 50px;">
         <el-button type="primary" @click="submitAllData">提 交</el-button>
       </div>
@@ -111,14 +103,19 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import { mapState,mapMutations } from 'vuex'
   import headTop from '../../components/headTop.vue'
   import selectClass from '../../components/selectClassDom.vue'
   import classData from '../../data/classlist'
   import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
   import {setStore,getStore} from '../../config/publicMethod'
   import {uploadFile} from '../../api/upload'
-  import {addCourseListInfo,updateCourseListInfo,getStudentListOfClass} from '../../api/classes'
+  import {addClassListInfo,updateClassListInfo} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
+  import customList from '../../components/customList.vue'
+  import defaultList from '../../components/defaultList.vue'
+  import draggable from 'vuedraggable'
+
   export default {
     props:['data','type','addFlag'],
     data(){
@@ -132,27 +129,32 @@
         DialogIdiilVisible:false,
         formLabelWidth: '90px',
         addNewGroupName:'',
-        form: JSON.parse(classData1).classList,
         classOptions:[],
-        sourceList:[],//idiil课件list
-        fileList:[],
-        uploadParam:{
-          username:JSON.parse(getStore('userInfo')).userName
-        }
+        editClassFlag:false,
+        sourceLists:{}
+
       }
     },
+    created(){
+      //在页面加载时读取localStorage里的状态信息
+      const object2 = Object.assign({}, this.sourceListsInfo);
+      console.log(object2);
+      const object=JSON.parse(JSON.stringify(this.sourceListsInfo));
+      this.sourceLists=JSON.parse(getStore("sourceLists")) || object;
+      console.log('1111111111111111'+this.sourceLists)
+    },
     computed: {
+      ...mapState(['sourceListsInfo','count']),
       sourceData() {
         let changeValue = this.form.studentGroup.nowList;
         return this.studentData.filter(item => changeValue.indexOf(item.key) === -1);
-      },
+      }
     },
     watch:{
       //当监听的属性值变化的时候 会执行对应的处理逻辑
       addFlag:function(newValue,oldValue){
-        console.error("watch 监听数据-----》",newValue,oldValue)
-//        let classData1 = JSON.stringify(classData);
-//        this.form = JSON.parse(classData1).classList
+        console.error("watch 监听数据-----》",newValue,oldValue);
+
       },
       $route:function(to,from){
         console.error("watch 监听数据--$route--11-》",to,from)
@@ -164,20 +166,27 @@
         console.error("watch 监听数据--beforeRouteUpdate--33-》",to,from)
       }
     },
+
     components:{
       headTop,
-      selectClass
+      draggable,
+      selectClass,
+      customList,
+      defaultList
     },
     mounted(){
+
       const Wh = $(window).height();
       console.log('222222222222--->',this.data,this.type);
       this.getclassesList();
+      this.setItemDisabled();
+
       fetch('static/ClassUserList.json').then((response)=>{
         return response.json();
       }).then((res)=>{
         if(this.type == 'update'){
           this.form.studentGroup = toJson(this.data.group_student_Info);
-          this.sourceList = toJson(this.data.source);//之前的idiil课件list
+          this.sourceLists.blockLists = toJson(this.data.source);//之前的idiil课件list
           this.fileList = toJson(this.data.otherSource);//之前的上传文件
           this.form.otherSource = toJson(this.data.otherSource);//之前的上传文件
           this.form.source = toJson(this.data.source);//之前的上传文件
@@ -187,15 +196,19 @@
           this.form.courseId = this.data.courseId;//之前的上传文件
           this.form.classId = this.data.classId;//之前的上传文件
         }else {
-//          this.studentData = res.StudentList;
-//          this.studentAllData = res.StudentList;
-//          console.warn("获取学生数据:::::",this.studentData)
+          this.studentData = res.StudentList;
+          this.studentAllData = res.StudentList;
+          console.warn("获取学生数据:::::",this.studentData)
         }
       }).catch(()=>{
         console.error("获取学生数据出错")
       })
     },
     methods: {
+      ...mapMutations([
+        'ADD_COUNT',
+        'SOURCE_LIST'// 将 `this.classList()` 映射为 `this.$store.commit('increment')`//将 `this.blockList(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
+      ]),
       async getclassesList(){
         let result1 = await getAllClassesOfCenter({centerId:'002'});
         console.log("班级列表--------------------->",result1)
@@ -273,17 +286,11 @@
         })
         console.log("添加的新租、",this.addNewGroupName)
       },
-      submitUpload() {
-        const data = new FormData();
-        data.append("files", this.$refs.upload.uploadFiles);
-        data.append("username", JSON.parse(getStore('userInfo')).userName);
-        console.log("upload--->",this.$refs.upload)
-        this.$refs.upload.submit(); //上传文件 "/api/file/upload"
-      },
+
       //全部提交按钮事件
       async submitAllData(){
         let userInfo = JSON.parse(getStore('userInfo'));
-        this.form.source = this.sourceList;
+        this.form.source = this.sourceLists.blockLists;
         this.form.datetime = getNowFormatDate.YY_MM_DD();
         this.form.teacherId = userInfo.userId;
         this.form.teacherName = userInfo.userName;
@@ -296,55 +303,22 @@
         let classList = JSON.parse(getStore("classList"));
         classList.push(this.form);
         if(this.type == 'add'){
-          const  result = await addCourseListInfo(this.form)//存入数据库
+          const  result = await addClassListInfo(this.form)//存入数据库
           setStore("classList",JSON.stringify(classList))//存放在本地缓存里面
           this.$message({message: '提交成功！',type:'success'});
         }else if(this.type == 'update'){
-          const  result = await updateCourseListInfo(this.form)
+          const  result = await updateClassListInfo(this.form)
           this.$message({message: '修改成功！',type:'success'});
         }else {
           this.$message({message: '没有操作类型,什么都没有做^—^！',type:'warning'});
         }
       },
-      //删除选择的上传文件
-      handleFileRemove(file){
-        let filterNowList = this.fileList;
-        for(let ii in filterNowList){
-          if(filterNowList[ii].uid == file.uid){
-            filterNowList.splice(ii,1)
-            break;
-          }
-        }
-        console.log("删除的文件：：：：",file, this.fileList);
-      },
-      //添加外部文件时的处理函数
-      changeFileHandle(file){
-        console.log("改变文件：：：：",file, this.fileList);
-      },
-      beforeUpload(file){
-        //在这里可以做文件上传之前的操作
-        console.log("文件上传之前：：：：",file);
-      },
-      //文件上传成功
-      uploadSuccess(response, file, fileList){
-        console.log("上传成功：：：：",response,file,fileList);
-        this.form.otherSource = fileList;
-        this.$message({message: '上传成功！',type:'success'});
-      },
-      //文件上传失败处理
-      uploadError(err, file, fileList){
-        console.log("上传失败：：：：",err,file,fileList);
-        this.$message({message: '上传成功！',type:'error'});
-      },
-      //删除IDIIL课程列表中的某项
-      deleteResource(index){
-        this.sourceList.splice(index,1)
-      },
+
       //选择完课程之后的处理逻辑
       selectClassHandle(param){
         let ClassUserInfo = JSON.parse(getStore("ClassUserList"));
         let UserInfo = JSON.parse(getStore("userInfo"));
-        console.log("选择的链接---》",ClassUserInfo,ClassUserInfo.CenterID)
+        console.log("选择的链接---》",ClassUserInfo,ClassUserInfo.CenterID);
         let objParam={
           sChapterID:param.CID,
           sUnitID:param.UID,
@@ -359,16 +333,17 @@
           InstructorID : UserInfo.InstructorID,
           OutputType:param.selectType,
           GlobalID:param.GlobalID
-        }
-        let urlEnd = filterWebUrl(objParam);
+        };
         let urlJson= {
           name:param.selectUnitName,
-//          url:urlEnd,
+          target:"2222",
+          duration:'100分钟',
           params:objParam,
           type:"class",
-          uid: new Date().getTime()
-        }
-        this.sourceList.push(urlJson)
+          uid: new Date().getTime(),
+          key: Date.now()
+        };
+        this.sourceLists.blockLists.push(urlJson);
         this.$message({'type':'success',message:"添加成功！"})
       },
       //获取选中的学生的信息
@@ -383,49 +358,110 @@
         }
         return result
       },
-      async selectChange(){
-        console.log("当前班级ID==》",this.form.classId)
-        let classId = this.form.classId;
-        const  result = await getStudentListOfClass({classId:classId});
-        if(result.code === 200 && result.data.length>0){
-          for(let i in result.data){
-            result.data[i].key = i;
-          }
-          this.studentData = result.data;
-          this.studentAllData = result.data;
-          console.warn("获取学生数据:::::",this.studentData)
+      //添加区块
+      addCustomBlock(param){
+        let urlJson= {
+          name:"",
+          target:"",
+          duration:'50分钟',
+          type:"custom",
+          params:"custom",
+          uid: new Date().getTime(),
+          key: Date.now()
+        };
+        this.sourceLists.blockLists.push(urlJson);
+        this.$nextTick(function(){this.setItemDisabled()})
+      },
+      alertFn(num){
+        alert(num)
+
+      },
+      editClass(){
+        this.editClassFlag=true;
+      },
+      saveClass(){
+        this.editClassFlag=false;
+        console.log(this.sourceLists);
+        this.SOURCE_LIST(this.sourceLists);
+        this.ADD_COUNT();
+      },
+
+
+      //设置上移下移按钮的状态
+      setItemDisabled(){
+        $("i.moveUp,i.moveDown").show();
+        $("div[role=tab]:first").find(".moveUp").hide();
+        $("div[role=tab]:last").find(".moveDown").hide();
+      },
+      //上移区块
+      moveUp(btn){
+        var thisIndex=$("div[role=tab]").index($(btn.target).parents("div[role=tab]").eq(0));
+        if(thisIndex!=0){
+          $("div[role=tab]").eq(thisIndex-1).parent().parent().before($(btn.target).parents("div.el-collapse-item").eq(0).parent())
         }
+        this.setItemDisabled()
+      },
+      //下移区块
+      moveDown(btn){
+        var thisIndex=$("div[role=tab]").index($(btn.target).parents("div[role=tab]").eq(0));
+        if(thisIndex!=$("div[role=tab]").length-1){
+          $("div[role=tab]").eq(thisIndex+1).parent().parent().after($(btn.target).parents("div.el-collapse-item").eq(0).parent())
+        }
+        this.setItemDisabled()
       }
     }
   }
 </script>
 
 <style scoped  lang="less" type="text/less">
-  .addClass{
-    .data_section {
-      padding: 20px;
-      margin-bottom: 40px;
-      .righttable table{
-        border: 1px solid #999;
-        tr td{
-          border-top: 0;
-          border-right: 1px solid #999;
-          border-bottom: 1px solid #999;
-          border-left: 0;
 
-        }
-      }
-      .transfer-footer {
-        margin-left:10px;
-        padding: 6px 5px;
-      }
-      .el-tag{
-        margin: 0 3px;
-      }
-      .tianjiazu{
-        float: right;
-        margin: 6px 0 0 5px;
-      }
-    }
+  i{
+    font-size: 16px;
+    padding-left: 15px;
+  }
+  .addClass{
+  .data_section {
+    padding: 20px;
+    margin-bottom: 40px;
+    text-align: left;
+  .el-row{
+    margin-bottom: 25px;
+  }
+  .collapseItem{
+    border-bottom: 1px solid #ebeef5;
+  }
+  .cardTop,.cardBody {
+
+    color: #000000;
+  .button-group{
+    text-align: right;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  }
+
+  .righttable table{
+    border: 1px solid #999;
+  tr td{
+    border-top: 0;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-left: 0;
+
+  }
+  }
+  .transfer-footer {
+    margin-left:10px;
+    padding: 6px 5px;
+  }
+  .el-tag{
+    margin: 0 3px;
+  }
+  .tianjiazu{
+    float: right;
+    margin: 6px 0 0 5px;
+  }
+  }
   }
 </style>

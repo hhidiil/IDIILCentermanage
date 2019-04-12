@@ -8,35 +8,36 @@
       </el-row>
       <el-button class="returnBack" @click="returnBack()">返回</el-button>
     </header>
-    <el-row class="centerDiv">
-      <el-col :span="12" class="section">
-        <el-card class="box-card">
-          <div class="headerbgcolor leftS">
-          </div>
-          <div class="content">
-            <div class="centertext" @click="goSys('1')">中考批改系统</div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="12" class="section">
-        <el-card class="box-card">
-          <div class="headerbgcolor rightS">
-          </div>
-          <div class="content">
-            <div class="centertext" @click="goSys('2')">教师派课系统</div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <div class="centerDiv">
+      <el-row style="position: relative">
+        <el-col :span="12" class="leftsection">
+          <el-card class="box-card">
+            <div class="headerbgcolor">
+            </div>
+            <div class="content">
+              <div class="centertext" @click="goSys('1')">中考批改系统</div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="12" class="rightsection">
+          <el-card class="box-card">
+            <div class="headerbgcolor">
+            </div>
+            <div class="content">
+              <div class="centertext" @click="goSys('2')">教师派课系统</div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
   </section>
 </template>
 
 <script type="text/ecmascript-6">
   import headHop from '../../components/headTop'
   import {doTestLogin} from '../../api/user'
-  import {getCurrentCourseInfo} from '../../api/classes'
+  import {getCurrentCourseInfo,getClassList} from '../../api/classes'
   import {getStore,setStore,clearStore} from '../../config/publicMethod'
-  import { baseUrl } from '../../config/env'
   export default {
     data(){
       return {
@@ -59,8 +60,7 @@
         console.log("window.location--,--origin",window.location,origin)
         switch (param){
           case '1':
-            let url =  baseUrl + ":10008/teacher"
-            window.open(url);//跳转到中考教师批改系统
+            window.open("http://" + location.hostname + ":10008/teacher");//跳转到中考教师批改系统
             break;
           case '2':
             let userInfo = this.userInfo;
@@ -76,7 +76,6 @@
     returnBack(){
       console.log("返回上一层")
       this.$router.push({name:'door'});
-//      this.$router.back();
     }
     }
   }
@@ -88,7 +87,6 @@
     position: relative;
     height: 100%;
     background-color: rgb(50, 64, 87);
-    overflow: auto;
     header .headertext{
       font-size: 30px;
       color: white;
@@ -101,29 +99,27 @@
     }
   .centerDiv{
     position: absolute;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    width: 100%;
+    width: 65%;
     height: 500px;
+    left: 50%;
     top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-    .section{
-      width: 450px;
-      padding: 50px;
-      .headerbgcolor{
-        height: 40px;
-        width: 100%;
-      }
-      .leftS{
-        background-color: #71b7ee;
-      }
-      .rightS{
-        background-color: #cd85e2;
-      }
-
-    }
+    transform: translate(-50%,-50%);
+  .leftsection{
+    height: 500px;
+    padding: 50px 100px;
+  .headerbgcolor{
+    height: 40px;
+    background-color: #71b7ee;
+  }
+  }
+  .rightsection{
+    height: 500px;
+    padding: 50px 100px;
+  .headerbgcolor{
+    height: 40px;
+    background-color: #cd85e2;
+  }
+  }
   .content {
     position: relative;
     font-size: 48px;

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-Vue.use(Router)
+Vue.use(Router);
 
 // 导入相应的子组件
 import Door from '../page/manageCenter/door'
@@ -11,6 +11,7 @@ import defaultPage from './../page/manageCenter/default'
 import TeacherManage from '../page/manageCenter/TeacherManage.vue'
 import StudentManage from '../page/manageCenter/StudentManage.vue'
 import CenterManage from '../page/manageCenter/CenterManage.vue'
+import projectManage from '../page/manageCenter/projectManage.vue'
 
 
 const routes = [
@@ -45,6 +46,11 @@ const routes = [
         name: 'centerManage',
         component: CenterManage,
         meta:['中心用户管理']
+      },{
+        path: 'projectManage',
+        name: 'projectManage',
+        component: projectManage,
+        meta:['me练习']
       }
     ]
   }

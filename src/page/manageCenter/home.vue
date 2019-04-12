@@ -23,6 +23,7 @@
             <template slot="title"><i class="el-icon-menu"></i><span>中心管理</span></template>
             <el-menu-item index="/home/teacherManage">班级管理</el-menu-item>
             <el-menu-item index="/home/studentManage">学生管理</el-menu-item>
+            <el-menu-item index="/home/projectManage">me</el-menu-item>
           </el-submenu>
           <el-menu-item v-if="isTrue" index="/home/centerManage"><i class="el-icon-menu"></i>总中心管理</el-menu-item>
         </el-menu>

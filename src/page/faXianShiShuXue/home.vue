@@ -1,35 +1,35 @@
 <template>
   <section class="home_section">
-    <el-button class="returnBack" @click="returnBack()">返回</el-button>
-    <el-row class="centerDiv">
-      <el-col :span="12" class="section">
-        <el-card class="box-card">
-          <div class="headerbgcolor leftS">
-          </div>
-          <div class="content">
-            <div class="centertext" @click="goPaiKe()">派 课</div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="12" class="section">
-        <el-card class="box-card">
-          <div class="headerbgcolor rightS">
-          </div>
-          <div class="content">
-            <div class="centertext" @click="goShangKe()">上 课</div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <div class="centerDiv">
+      <el-row style="position: relative">
+        <el-col :span="12" class="leftsection">
+          <el-card class="box-card">
+            <div class="headerbgcolor">
+            </div>
+            <div class="content">
+              <div class="centertext" @click="goPaiKe()">派 课</div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="12" class="rightsection">
+          <el-card class="box-card">
+            <div class="headerbgcolor">
+            </div>
+            <div class="content">
+              <div class="centertext" @click="goShangKe()">上 课</div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
   </section>
 </template>
 
 <script type="text/ecmascript-6">
   import headHop from '../../components/headTop'
   import {doLogin,registerUser} from '../../api/user'
-  import {getCurrentCourseInfo} from '../../api/classes'
+  import {getCurrentCourseInfo,getClassList} from '../../api/classes'
   import {getStore,setStore} from '../../config/publicMethod'
-  import { baseUrl_dev } from '../../config/env'
   export default {
     data(){
       return {
@@ -56,7 +56,7 @@
             dataParams.teacherId = JSON.parse(getStore('userInfo')).userId;
             dataParams.centerId = JSON.parse(getStore('ClassUserList')).CenterID;
             dataParams.performanceID = result.data[0].courseId;//课程ID
-            let url = baseUrl_dev + '/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
+            let url = 'https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
             console.warn("老师上课的地址url-->",url)
             window.open(url);
             return
@@ -66,10 +66,6 @@
         }else {
           console.error("出错了------！！！：",result.message)
         }
-      },
-      returnBack(){
-        console.log("返回上一层")
-        this.$router.back();
       }
     }
   }
@@ -81,33 +77,26 @@
     position: relative;
     height: 100%;
     background-color: rgb(50, 64, 87);
-    overflow: auto;
-    .returnBack{
-      position: absolute;
-      right: 35px;
-      top: 20px;
-    }
     .centerDiv{
       position: absolute;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      width: 100%;
+      width: 65%;
       height: 500px;
+      left: 50%;
       top: 50%;
-      -webkit-transform: translateY(-50%);
-      transform: translateY(-50%);
-      .section{
-        width: 450px;
-        padding: 50px;
+      transform: translate(-50%,-50%);
+      .leftsection{
+        height: 500px;
+        padding: 50px 100px;
         .headerbgcolor{
           height: 40px;
-          width: 100%;
-        }
-        .leftS{
           background-color: #71b7ee;
         }
-        .rightS{
+      }
+      .rightsection{
+        height: 500px;
+        padding: 50px 100px;
+        .headerbgcolor{
+          height: 40px;
           background-color: #cd85e2;
         }
       }
