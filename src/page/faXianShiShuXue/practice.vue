@@ -1,42 +1,37 @@
 <template>
   <div>
-    <div class="row">
-      <div class="col-2">
+    <!--<div class="row">-->
+      <!--<div class="col-6">-->
+        <!--{{draggingInfo}}-->
 
-      </div>
+        <!--<draggable-->
+          <!--tag="el-collapse"-->
+          <!--:list="list"-->
+          <!--:component-data="collapseComponentData"-->
+          <!--@start="isDragging = true"-->
+          <!--@end="isDragging = false"-->
+        <!--&gt;-->
 
-      <div class="col-6">
-        {{draggingInfo}}
+            <!--<el-collapse-item-->
+              <!--v-for="item in list"-->
+              <!--:key="item.id"-->
+              <!--:title="item.title"-->
+              <!--:name="item.id"-->
+            <!--&gt;-->
+              <!--<transition-group type="transition" name="flip-list">-->
+              <!--<div v-for="(lign, idx) in item.text" :key="idx">{{ lign }}</div>-->
+              <!--</transition-group>-->
+            <!--</el-collapse-item>-->
 
-        <draggable
-          tag="el-collapse"
-          :list="list"
-          :component-data="collapseComponentData"
-          @start="isDragging = true"
-          @end="isDragging = false"
-        >
-
-            <el-collapse-item
-              v-for="item in list"
-              :key="item.id"
-              :title="item.title"
-              :name="item.id"
-            >
-              <transition-group type="transition" name="flip-list">
-              <div v-for="(lign, idx) in item.text" :key="idx">{{ lign }}</div>
-              </transition-group>
-            </el-collapse-item>
-
-        </draggable>
-      </div>
-     <div>
-       {{activeNames}}
-     </div>
-    </div>
+        <!--</draggable>-->
+      <!--</div>-->
+     <!--<div>-->
+       <!--{{activeNames}}-->
+     <!--</div>-->
+    <!--</div>-->
 
     <div>
       <div ref="data_section" class="data_section">
-
         <div class="drag drag1" style="width:200px;height:200px;background: lightblue;position: absolute;" @mousedown="move($event,1)"></div>
         <div class="drag drag2" style="width:200px;height:200px;background: lightcoral;position: absolute" @mousedown="move($event,2)"></div>
         <div class="drag drag3" style="width:200px;height:200px;background: lightgreen;position: absolute" @mousedown="move($event,3)"></div>
@@ -213,7 +208,7 @@
     width:600px;
   .uls{
     width:300px;height: 200px;
-    background: lightskyblue;margin: 10px;;
+    background: lightskyblue;margin: 10px;
   }
   }
 </style>
