@@ -5,36 +5,36 @@ const API_CONFIG = '/api/classes';
 /**
  * [添加新增备课列表信息]
  */
-export const addClassListInfo = (data) => {
-  const url = `${API_CONFIG}/addClassListInfo`;
+export const addCourseListInfo = (data) => {
+  const url = `${API_CONFIG}/addCourseListInfo`;
   return fetch_requset(url,data,'POST')
 }
 /**
  * [修改课程的信息]
  */
-export const updateClassListInfo = (data) => {
-  const url = `${API_CONFIG}/updateClassListInfo`;
+export const updateCourseListInfo = (data) => {
+  const url = `${API_CONFIG}/updateCourseListInfo`;
   return fetch_requset(url,data,'POST')
 }
 /**
  * [删除课程的信息]
  */
-export const deleteClassListInfo = (data) => {
-  const url = `${API_CONFIG}/deleteClassListInfo`;
+export const deleteCourseListInfo = (data) => {
+  const url = `${API_CONFIG}/deleteCourseListInfo`;
   return fetch_requset(url,data,'POST')
 }
 /**
  * [获取备课列表信息]
  */
-export const getClassList = (data) => {
-  const url = `${API_CONFIG}/getClassList`;
+export const getCourseList = (data) => {
+  const url = `${API_CONFIG}/getCourseList`;
   return fetch_requset(url,data,'POST')
 }
 /**
  * [获取课程信息]
  */
 export const getClassInfo = (data) => {
-  const url = `${API_CONFIG}/getClassInfo`;
+  const url = `${API_CONFIG}/getCourseInfo`;
   return fetch_requset(url,data,'POST')
 }
 /**
@@ -47,8 +47,8 @@ export const getDoingCourseInfoOfStudent = (data) => {
 /*
 * 更新课程的信息
 * */
-export const updateDoingClassInfo = (data)=>{
-  const url = `${API_CONFIG}/updateDoingClassInfo`;
+export const updateDoingCourseInfo = (data)=>{
+  const url = `${API_CONFIG}/updateDoingCourseInfo`;
   return fetch_requset(url,data,'POST')
 }
 /*
@@ -56,6 +56,14 @@ export const updateDoingClassInfo = (data)=>{
  * */
 export const getCurrentCourseInfo = (data)=>{
   const url = `${API_CONFIG}/getCurrentCourseInfo`;
+  return fetch_requset(url,data,'POST')
+
+}
+/*
+ * 获班级对应的学生
+ * */
+export const getStudentListOfClass = (data)=>{
+  const url = `${API_CONFIG}/getStudentListOfClass`;
   return fetch_requset(url,data,'POST')
 
 }
