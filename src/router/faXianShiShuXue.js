@@ -10,6 +10,7 @@ import addClassManager from './../page/faXianShiShuXue/classManager'
 import classManagerList from './../page/faXianShiShuXue/classManagerList'
 import classTeam from './../page/faXianShiShuXue/classTeam'
 import editorVue from './../page/faXianShiShuXue/editor'
+import practice from './../page/faXianShiShuXue/practice'
 
 Vue.use(Router)
 
@@ -46,6 +47,11 @@ const routes = [
         name: 'classTeam',
         component: classTeam,
         meta: ['备课管理', '派课列表']
+      }, {
+        path: 'practice',
+        name: 'practice',
+        component: practice,
+        meta: ['备课管理', '练习']
       }, {
         path: 'editor',
         component: editorVue,
