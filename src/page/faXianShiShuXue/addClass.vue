@@ -48,7 +48,7 @@
                     </span>
                     <span>
                         <el-button size="mini" @click="editClass">编辑</el-button>
-                        <el-button size="mini" @click="saveClass">保存</el-button>
+                        <el-button size="mini" @click="saveClass">保存hhhhhh</el-button>
                     </span>
                   </div>
                 </el-form-item>
