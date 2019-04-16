@@ -151,7 +151,7 @@ classRouter.post('/getCourseList',async(req,res)=>{
 /*
  * 根据课程ID查询某个课程的信息。
  * */
-classRouter.post('/getCourseInfo',async(req,res)=>{
+classRouter.post('/+',async(req,res)=>{
   var props = req.body;
   var classes = new Classes({props: props});
   const result = await classes.getClassInfo();

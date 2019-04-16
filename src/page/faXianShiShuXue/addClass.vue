@@ -112,9 +112,11 @@
   import {uploadFile} from '../../api/upload'
   import {addClassListInfo,updateClassListInfo} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
+  import {getOnLineData} from '../../api/exploration'
   import customList from '../../components/customList.vue'
   import defaultList from '../../components/defaultList.vue'
   import draggable from 'vuedraggable'
+  let Base64 = require('js-base64').Base64;
 
   export default {
     props:['data','type','addFlag'],
@@ -211,10 +213,19 @@
       ]),
       async getclassesList(){
         let result1 = await getAllClassesOfCenter({centerId:'002'});
-        console.log("班级列表--------------------->",result1)
+        console.log("班级列表--------------------->",result1);
+
+
         if(result1.code == 200){
           this.classOptions = result1.data;
         }
+      },
+
+      async getBlockNum(param){
+        const onlinePra={FileName:'Math--'+param,Action:'get',Content:'',Function:'OnlineMathBaseData'};
+        let result2=await getOnLineData(onlinePra);
+        result2=JSON.parse(Base64.decode(result2));
+        console.log(result2);
       },
       handleChange(value, direction, movedKeys) {
         console.log("studentData", this.studentData);
@@ -344,6 +355,8 @@
           key: Date.now()
         };
         this.sourceLists.blockLists.push(urlJson);
+
+        this.getBlockNum(param.GlobalID);
         this.$message({'type':'success',message:"添加成功！"})
       },
       //获取选中的学生的信息
