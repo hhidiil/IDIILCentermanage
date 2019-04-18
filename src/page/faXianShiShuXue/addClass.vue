@@ -51,7 +51,7 @@
         <el-row>
           <el-col>
 
-
+            <el-form :model="sourceLists" status-icon  ref="blockForm" :label-width="formLabelWidth" class="demo-ruleForm" :rules="blockRules">
                 <draggable
                   tag="el-collapse"
                   :list="sourceLists.blockLists"
@@ -60,25 +60,13 @@
                 <!--<el-collapse v-model="activeNames" @change="handleChange1">-->
                   {{sourceLists.blockLists}}
                   <div v-for="(blockList,index) in sourceLists.blockLists" :key="index" class="collapseItem" >
-                    <el-form :model="blockList" status-icon  ref="blockForm" :label-width="formLabelWidth" class="demo-ruleForm" :rules="blockRules">
+
                       <el-collapse-item v-if="blockList.type == 'custom'" :name="index.toString()">
                         <template slot="title">
                           自定义区块课程{{blockList.name}}
                         </template>
 
-                        <el-card>
-                          <el-form-item label="区块名称:"
-                                        :prop="name">
-                            <span v-if="editClassFlag"><el-input v-model="blockList.name"></el-input></span>
-                            <span v-else>{{blockList.name}}</span>
-                          </el-form-item>
-                          <el-form-item label="教学目标:"
-                                        :prop="target">
-                            <span v-if="editClassFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
-                            <span v-else>{{blockList.target}}</span>
-                          </el-form-item>
-                        </el-card>
-                        <!--<custom-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></custom-list>-->
+                        <custom-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></custom-list>
                       </el-collapse-item>
 
                       <el-collapse-item v-else :name="index.toString()">
@@ -87,11 +75,11 @@
                         </template>
                         <default-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></default-list>
                       </el-collapse-item>
-                    </el-form>
+
                   </div>
                 <!--</el-collapse>-->
                 </draggable>
-
+            </el-form>
 
           </el-col>
         </el-row>
@@ -339,9 +327,9 @@
 
       //全部提交按钮事件
       async submitAllData(formName){
-        for(var i=0; i<this.sourceLists.blockLists.length; i++){
-          this.SelectedIndex = i;
-          this.$refs[formName][i].validate((valid) => {
+//        for(var i=0; i<this.sourceLists.blockLists.length; i++){
+//          this.SelectedIndex = i;
+          this.$refs[formName].validate((valid) => {
             if (valid) {
               alert('submit!');
             } else {
@@ -349,7 +337,7 @@
               return false;
             }
           });
-        }
+//        }
 
 
 
