@@ -1,11 +1,17 @@
 <template>
   <el-card>
     <div class="rowBox cardBody">
-      <el-form-item label="区块名称:">
-        <el-input v-model="blockList.name"></el-input>
+      <el-form-item label="区块名称:"
+                    :prop="blockLists['index'].name"
+                    :rules="{required: true, message: '区块名称不能为空', trigger: 'blur'}">
+        <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
+        <span v-else>{{blockList.name}}</span>
       </el-form-item>
-      <el-form-item label="教学目标:">
-        <el-input type="textarea" v-model="blockList.target"></el-input>
+      <el-form-item label="教学目标:"
+                    :prop="'blockLists[index].target'"
+                    :rules="{required: true, message: '教学目标不能为空', trigger: 'blur'}">
+        <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
+        <span v-else>{{blockList.target}}</span>
       </el-form-item>
       <el-form-item>
         <div class="btnBox">
@@ -40,9 +46,10 @@
 <script>
   import {setStore,getStore} from '../config/publicMethod'
   export default{
-    props:['blockLists', 'blockList'],
+    props:['blockLists', 'blockList', 'index'],
     data(){
       return{
+        editBlockFlag:true,
         fileList:[], //上传的文件列表 eg： [{name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg'}]
         uploadParam:{
           username:JSON.parse(getStore('userInfo')).userName

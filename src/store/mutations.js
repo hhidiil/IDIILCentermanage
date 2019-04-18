@@ -13,7 +13,7 @@ export default{
     state.sourceListsInfo.classList=newList.classList;
 
     //存入localStorage
-    setStore('sourceLists',JSON.stringify(state.sourceListsInfo))
+    //setStore('sourceLists',JSON.stringify(state.sourceListsInfo))
 
   },
   [ADD_COUNT](state){

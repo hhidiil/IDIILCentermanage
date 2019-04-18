@@ -1,22 +1,20 @@
 <template>
   <el-card>
     <div class="rowBox cardBody">
-      <el-form-item label="区块名称:">
-        <span v-if="editBlockFlag">
-          <el-input v-model="blockList.name"></el-input>
-        </span>
+      <el-form-item label="区块名称:"
+                    :prop="'blockLists.' + index + '.name'"
+                    :rules="{required: true, message: '区块名称不能为空', trigger: 'blur'}">
+        <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
         <span v-else>{{blockList.name}}</span>
       </el-form-item>
-      <el-form-item label="教学目标:">
-        <span v-if="editBlockFlag">
-          <el-input type="textarea" v-model="blockList.target"></el-input>
-        </span>
+      <el-form-item label="教学目标:"
+                    :prop="'blockLists.' + index + '.target'"
+                    :rules="{required: true, message: '教学目标不能为空', trigger: 'blur'}">
+        <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
         <span v-else>{{blockList.target}}</span>
       </el-form-item>
       <el-form-item label="课程时长:">
-        <span v-if="editBlockFlag">
-          <el-input v-model="blockList.duration"></el-input>
-        </span>
+        <span v-if="editBlockFlag"><el-input v-model="blockList.duration"></el-input></span>
         <span v-else>{{blockList.duration}}</span>
       </el-form-item>
       <el-form-item label="课程内容:">
@@ -36,7 +34,7 @@
 <script>
   import {setStore,getStore} from '../config/publicMethod'
   export default{
-    props:['blockLists', 'blockList'],
+    props:['blockLists', 'blockList', 'index'],
     data(){
       return{
         editBlockFlag:false
