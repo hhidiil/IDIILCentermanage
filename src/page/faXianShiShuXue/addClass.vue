@@ -58,7 +58,6 @@
                   :component-data="collapseComponentData"
                 >
                 <!--<el-collapse v-model="activeNames" @change="handleChange1">-->
-                  {{sourceLists.blockLists}}
                   <div v-for="(blockList,index) in sourceLists.blockLists" :key="index" class="collapseItem" >
 
                       <el-collapse-item v-if="blockList.type == 'custom'" :name="index.toString()">

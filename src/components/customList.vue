@@ -48,11 +48,30 @@
   export default{
     props:['blockLists', 'blockList', 'index'],
     data(){
+
+      let validBlockContent=(rule, value, callback) => {
+        if (value < 0) {
+          callback(new Error('必须大于0'));
+        } else if (value.length > 5) {
+          callback(new Error('不超过5位数字'));
+        } else if (!value) {
+          callback(new Error('排序不能为空'));
+        } else {
+          callback();
+        }
+      }
       return{
         editBlockFlag:true,
         fileList:[], //上传的文件列表 eg： [{name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg'}]
         uploadParam:{
           username:JSON.parse(getStore('userInfo')).userName
+        },
+        //新增表单的验证规则
+        moreRules: {
+          fieldSort: [
+            {required: true, message: '请输入排序', trigger: 'change'},
+            {validator:validBlockContent, trigger: 'change'}
+          ]
         }
       }
     },
