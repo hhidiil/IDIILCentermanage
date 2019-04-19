@@ -1,40 +1,40 @@
 <template>
   <el-card>
-    <div class="rowBox cardBody">
-      <el-form-item label="区块名称:"
-                    :prop="'blockLists.' + index + '.name'"
-                    :rules="moreRules.fieldSortName">
-        <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
-        <span v-else>{{blockList.name}}</span>
-      </el-form-item>
-      <el-form-item label="教学目标:"
-                    :prop="'blockLists.' + index + '.target'"
-                    :rules="moreRules.fieldSortTarget">
-        <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
-        <span v-else>{{blockList.target}}</span>
-      </el-form-item>
-      <el-form-item label="课程时长:">
-        <span v-if="editBlockFlag"><el-input v-model="blockList.duration"></el-input></span>
-        <span v-else>{{blockList.duration}}</span>
-      </el-form-item>
-      <el-form-item label="课程内容:">
-        <div class="fileContainer">
-            <span class="fileItem">
-              <span>{{blockList.name}}</span>
-            </span>
-        </div>
-      </el-form-item>
-      <el-form-item class="btnBox">
-        <el-button size="mini" @click.prevent="editBlock">编辑</el-button>
-        <el-button size="mini" @click.prevent="removeResource(blockList)">删除</el-button>
-      </el-form-item>
-    </div>
+    <el-form :model="blockList" status-icon :rules="moreRules"  ref="moreRules" class="demo-ruleForm">
+      <div class="rowBox cardBody">
+        <el-form-item label="区块名称:"
+                      prop="name">
+          <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
+          <span v-else>{{blockList.name}}</span>
+        </el-form-item>
+        <el-form-item label="教学目标:"
+                      prop="target">
+          <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
+          <span v-else>{{blockList.target}}</span>
+        </el-form-item>
+        <el-form-item label="课程时长:">
+          <span v-if="editBlockFlag"><el-input v-model="blockList.duration"></el-input></span>
+          <span v-else>{{blockList.duration}}</span>
+        </el-form-item>
+        <el-form-item label="课程内容:">
+          <div class="fileContainer">
+              <span class="fileItem">
+                <span>{{blockList.name}}</span>
+              </span>
+          </div>
+        </el-form-item>
+        <el-form-item class="btnBox">
+          <el-button size="mini" @click.prevent="editBlock">编辑</el-button>
+          <el-button size="mini" @click.prevent="removeResource(blockList)">删除</el-button>
+        </el-form-item>
+      </div>
+    </el-form>
   </el-card>
 </template>
 <script>
   import {setStore,getStore} from '../config/publicMethod'
   export default{
-    props:['blockLists', 'blockList', 'index'],
+    props:['blockLists', 'blockList'],
     data(){
       let validBlockName=(rule, value, callback) => {
         if (!value) {
@@ -54,11 +54,11 @@
           editBlockFlag:false,
           //新增表单的验证规则
           moreRules: {
-            fieldSortName: [
-              {required: true, message: '请输入教学名称', trigger: 'blur'},
+            name: [
+              {required: true, message: '请输入区块名称', trigger: 'blur'},
               {validator: validBlockName, trigger: 'blur'}
             ],
-            fieldSortTarget: [
+            target: [
               {required: true, message: '请输入教学目标', trigger: 'blur'},
               {validator: validBlockTarget, trigger: 'blur'}
             ]

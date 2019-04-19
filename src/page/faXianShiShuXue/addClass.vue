@@ -2,96 +2,82 @@
   <div class="addClass">
 
     <section class="data_section">
-        <el-row>
-          <el-col :span="24">
-            <el-form :model="sourceLists.classList" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth" class="demo-ruleForm">
-              <el-card class="box-card">
-                <div class="rowBox cardTop">
-                    <el-form-item label="课程名称:" prop="name">
-                      <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.name" auto-complete="off"></el-input></span>
-                      <span v-else>{{sourceLists.classList.name}}</span>
-                    </el-form-item>
-                    <el-form-item label="课程目标:" prop="target">
-                        <span v-if="editClassFlag"><el-input type="textarea" v-model="sourceLists.classList.target" auto-complete="off"></el-input></span>
-                        <span v-else>{{sourceLists.classList.target}}</span>
-                    </el-form-item>
-                    <el-form-item label="课程时长:" prop="duration">
-                        <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.duration" auto-complete="off"></el-input></span>
-                        <span v-else>{{sourceLists.classList.duration}}</span>
-                    </el-form-item>
-                    <el-form-item label="对应版本:" prop="version">
-                        <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.version" auto-complete="off"></el-input></span>
-                        <span v-else>{{sourceLists.classList.version}}</span>
-                    </el-form-item>
-                    <el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="8">
+              <el-card class="classListCard">
+                <el-form :model="sourceLists.classList" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth" class="demo-ruleForm">
+                  <div class="rowBox cardTop">
+                      <el-form-item label="课程名称:" prop="name">
+                        <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.name" auto-complete="off"></el-input></span>
+                        <span v-else>{{sourceLists.classList.name}}</span>
+                      </el-form-item>
+                      <el-form-item label="课程目标:" prop="target">
+                          <span v-if="editClassFlag"><el-input type="textarea" v-model="sourceLists.classList.target" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceLists.classList.target}}</span>
+                      </el-form-item>
+                      <el-form-item label="课程时长:" prop="duration">
+                          <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.duration" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceLists.classList.duration}}</span>
+                      </el-form-item>
+                      <el-form-item label="对应版本:" prop="version">
+                          <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.version" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceLists.classList.version}}</span>
+                      </el-form-item>
                       <div class="button-group">
-                        <span>
-                            <el-button size="mini" @click="addCustomBlock">添加自定义区块</el-button>
-                            <el-button size="mini" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
-                        </span>
                         <span>
                             <el-button v-if="editClassFlag" size="mini" @click="saveClass('classForm')">保存</el-button>
                             <el-button v-else size="mini" @click="editClass">编辑</el-button>
                         </span>
-                        </div>
-                    </el-form-item>
-                </div>
-              </el-card>
-            </el-form>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col>
-            <div class="foldBtn">
-              <el-button size="mini" v-if="sourceLists.blockLists.length>0"  @click="controlFold">{{controlFoldFlag==true ? '折叠' : '展开'}}</el-button>
-            </div>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col>
-
-            <el-form :model="sourceLists" status-icon  ref="blockForm" :label-width="formLabelWidth" class="demo-ruleForm" :rules="blockRules">
-                <draggable
-                  tag="el-collapse"
-                  :list="sourceLists.blockLists"
-                  :component-data="collapseComponentData"
-                >
-                <!--<el-collapse v-model="activeNames" @change="handleChange1">-->
-                  <div v-for="(blockList,index) in sourceLists.blockLists" :key="index" class="collapseItem" >
-
-                      <el-collapse-item v-if="blockList.type == 'custom'" :name="index.toString()">
-                        <template slot="title">
-                          自定义区块课程{{blockList.name}}
-                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
-                        </template>
-
-                        <custom-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></custom-list>
-                      </el-collapse-item>
-
-                      <el-collapse-item v-else :name="index.toString()">
-                        <template slot="title">
-                          {{blockList.name}}
-                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
-                        </template>
-                        <default-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></default-list>
-                      </el-collapse-item>
+                      </div>
 
                   </div>
-                <!--</el-collapse>-->
-                </draggable>
-            </el-form>
+                </el-form>
+              </el-card>
+              <el-card class="blockListCard">
+                <div slot="header" class="clearfix">
+                  <span>区块列表</span>
+                  <el-button style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
+                </div>
+                <div class="list-group-box">
+                  <draggable
+                    class="list-group"
+                    tag="ul"
+                    v-model="sourceLists.blockLists"
+                    v-bind="dragOptions"
+                    @start="isDragging = true"
+                    @end="isDragging = false"
+                  >
+                    <transition-group type="transition" name="flip-list">
+                      <li
+                        class="list-group-item blockListItem"
+                        v-for="(blockList,index) in sourceLists.blockLists"
+                        :key="blockList.key"
+                      >
+                        <div class="blockListInfo">
+                          {{blockList.name}}
+                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
+                        </div>
+                      </li>
+                    </transition-group>
+                  </draggable>
+                </div>
 
+              </el-card>
+          </el-col>
+          <el-col :span="16">
+            <el-card class="box-card">
+              <!--<div v-for="o in 4" :key="o" class="text item">-->
+                <!--{{'列表内容 ' + o }}-->
+              <!--</div>-->
+              <div v-if="sourceLists.blockLists.length>0">
+                {{sourceLists.blockLists[0]}}
+                <default-list :blockLists="sourceLists.blockLists" :blockList="sourceLists.blockLists[0]"></default-list>
+
+              </div>
+
+            </el-card>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col>
-            <div style="margin-top: 50px;">
-              <el-button type="primary" @click="submitAllData('blockForm')">提 交</el-button>
-            </div>
-          </el-col>
-        </el-row>
-
     </section>
     <el-dialog
       width="60%"
@@ -214,14 +200,19 @@
       if(this.sourceLists.classList.name==""){
         this.editClassFlag=true;
       }
-      console.log('1111111111111111'+this.sourceLists)
+
     },
     computed: {
       ...mapState(['sourceListsInfo','count']),
-      sourceData() {
-        let changeValue = this.form.studentGroup.nowList;
-        return this.studentData.filter(item => changeValue.indexOf(item.key) === -1);
+      dragOptions() {
+        return {
+          animation: 0,
+          group: "description",
+          disabled: false,
+          ghostClass: "ghost"
+        };
       }
+
     },
     watch:{
       //当监听的属性值变化的时候 会执行对应的处理逻辑
@@ -301,14 +292,13 @@
           result2.forEach(item => {
             console.log(item);
             let urlJson= {
-              name:param.selectUnitName+item.id,
-              target:"2222",
-              duration:'100分钟',
-//              params:objParam,
-              type:"class",
-              validate:false,
+              name: param.selectUnitName + item.id,
+              target: "2222",
+              duration: '100分钟',
+              type: "class",
+              validate: false,
               uid: new Date().getTime(),
-              key:  new Date().getTime()
+              key: new Date().getTime() + item.index.toString()
             };
             this.sourceLists.blockLists.push(urlJson);
 
@@ -402,9 +392,8 @@
           duration:'50分钟',
           type:"custom",
           validate:false,
-//          params:"custom",
           uid: new Date().getTime(),
-          key: Date.now()
+          key: new Date().getTime()
         };
         this.sourceLists.blockLists.push(urlJson);
       },
@@ -456,58 +445,49 @@
     font-size: 16px;
     padding-left: 15px;
   }
-  .foldBtn{
-    text-align: right;
-  }
-  .validateTag{
-    color: #e84444;
-  }
-  .el-collapse {
-    border: 0;
-  }
+
   .addClass{
     .data_section {
-      padding: 20px;
       margin-bottom: 40px;
       text-align: left;
-    .el-row{
-      margin-bottom: 25px;
-    }
-    .collapseItem{
-      border-bottom: 1px solid #ebeef5;
-    }
-    .cardTop,.cardBody {
+      .el-row{
+        margin-bottom: 25px;
+        .classListCard{
+          margin-bottom: 20px;
+          .button-group{
+            text-align: right;
+          }
+        }
 
-      color: #000000;
-    .button-group{
-      text-align: right;
-      margin: 0;
-      display: flex;
-      justify-content: space-between;
-    }
-    }
+        .blockListItem{
+          border: 1px solid #cceff5;
+          background: #fafcfd;
+          padding: 10px;
+          margin-bottom: 5px;
+          color: #606266;
+          cursor: pointer;
 
-    .righttable table{
-      border: 1px solid #999;
-    tr td{
-      border-top: 0;
-      border-right: 1px solid #999;
-      border-bottom: 1px solid #999;
-      border-left: 0;
+        }
 
-    }
-    }
-    .transfer-footer {
-      margin-left:10px;
-      padding: 6px 5px;
-    }
-    .el-tag{
-      margin: 0 3px;
-    }
-    .tianjiazu{
-      float: right;
-      margin: 6px 0 0 5px;
+        .flip-list-move {
+          transition: transform 0.5s;
+        }
+        .no-move {
+          transition: transform 0s;
+        }
+        .ghost {
+          opacity: 0.5;
+          background: #c8ebfb;
+        }
+        .list-group {
+          min-height: 20px;
+        }
+
+      }
+
     }
   }
-  }
+
+
+
 </style>
