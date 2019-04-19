@@ -34,7 +34,7 @@
             </el-upload>
           </div>
           <div>
-            <el-button size="mini" @click="removeResource(blockList)">删除</el-button>
+            <el-button size="mini" @click="removeResource(blockList)">删除111</el-button>
           </div>
         </div>
 
