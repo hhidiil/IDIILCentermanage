@@ -63,6 +63,7 @@
                       <el-collapse-item v-if="blockList.type == 'custom'" :name="index.toString()">
                         <template slot="title">
                           自定义区块课程{{blockList.name}}
+                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
                         </template>
 
                         <custom-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></custom-list>
@@ -71,6 +72,7 @@
                       <el-collapse-item v-else :name="index.toString()">
                         <template slot="title">
                           {{blockList.name}}
+                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
                         </template>
                         <default-list :blockLists="sourceLists.blockLists" :blockList="blockList" :index="index"></default-list>
                       </el-collapse-item>
@@ -297,13 +299,14 @@
 
         if(result2.length>0){
           result2.forEach(item => {
-            console.log(item)
+            console.log(item);
             let urlJson= {
               name:param.selectUnitName+item.id,
               target:"2222",
               duration:'100分钟',
 //              params:objParam,
               type:"class",
+              validate:false,
               uid: new Date().getTime(),
               key:  new Date().getTime()
             };
@@ -326,46 +329,32 @@
 
       //全部提交按钮事件
       async submitAllData(formName){
-//        for(var i=0; i<this.sourceLists.blockLists.length; i++){
-//          this.SelectedIndex = i;
+
           this.$refs[formName].validate((valid) => {
             if (valid) {
+              this.sourceLists.blockLists.forEach((item,index) => {
+                item.validate=false;
+              });
               alert('submit!');
             } else {
-              console.log('error submit!!');
+              this.activeNames=[];
+              this.sourceLists.blockLists.forEach((item,index) => {
+                item.validate=false;
+                if(item.name=="" || item.target==""){
+                  item.validate=true;
+
+                  this.activeNames.push(index.toString())
+                }
+              });
+
+              this.collapseComponentData.props.value=this.activeNames;
+              alert('error submit!! 请完善表单信息');
               return false;
             }
           });
-//        }
 
 
 
-
-
-
-//        let userInfo = JSON.parse(getStore('userInfo'));
-//        this.form.source = this.sourceLists.blockLists;
-//        this.form.datetime = getNowFormatDate.YY_MM_DD();
-//        this.form.teacherId = userInfo.userId;
-//        this.form.teacherName = userInfo.userName;
-//        this.form.centerId = userInfo.centerId;
-//        this.form.subjectName = '数学';
-//        if(this.form.name=='' || this.form.target=='' || this.form.source.length==0 ){
-//          return this.$alert("课程名、教学目标、教学资源等内容不能为空！")
-//        }
-//        console.log("提交所有的数据",this.form,this.type)
-//        let classList = JSON.parse(getStore("classList"));
-//        classList.push(this.form);
-//        if(this.type == 'add'){
-//          const  result = await addClassListInfo(this.form)//存入数据库
-//          setStore("classList",JSON.stringify(classList))//存放在本地缓存里面
-//          this.$message({message: '提交成功！',type:'success'});
-//        }else if(this.type == 'update'){
-//          const  result = await updateClassListInfo(this.form)
-//          this.$message({message: '修改成功！',type:'success'});
-//        }else {
-//          this.$message({message: '没有操作类型,什么都没有做^—^！',type:'warning'});
-//        }
       },
 
       //选择完线上课程之后的处理逻辑
@@ -412,7 +401,8 @@
           target:"",
           duration:'50分钟',
           type:"custom",
-          params:"custom",
+          validate:false,
+//          params:"custom",
           uid: new Date().getTime(),
           key: Date.now()
         };
@@ -468,6 +458,9 @@
   }
   .foldBtn{
     text-align: right;
+  }
+  .validateTag{
+    color: #e84444;
   }
   .el-collapse {
     border: 0;

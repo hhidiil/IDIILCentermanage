@@ -3,13 +3,13 @@
     <div class="rowBox cardBody">
       <el-form-item label="区块名称:"
                     :prop="'blockLists.' + index + '.name'"
-                    :rules="{required: true, message: '区块名称不能为空', trigger: 'blur'}">
+                    :rules="moreRules.fieldSortName">
         <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
         <span v-else>{{blockList.name}}</span>
       </el-form-item>
       <el-form-item label="教学目标:"
                     :prop="'blockLists.' + index + '.target'"
-                    :rules="{required: true, message: '教学目标不能为空', trigger: 'blur'}">
+                    :rules="moreRules.fieldSortTarget">
         <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
         <span v-else>{{blockList.target}}</span>
       </el-form-item>
@@ -34,7 +34,7 @@
             </el-upload>
           </div>
           <div>
-            <el-button size="mini" @click="removeResource(blockList)">删除111</el-button>
+            <el-button size="mini" @click="removeResource(blockList)">删除</el-button>
           </div>
         </div>
 
@@ -48,14 +48,16 @@
   export default{
     props:['blockLists', 'blockList', 'index'],
     data(){
-
-      let validBlockContent=(rule, value, callback) => {
-        if (value < 0) {
-          callback(new Error('必须大于0'));
-        } else if (value.length > 5) {
-          callback(new Error('不超过5位数字'));
-        } else if (!value) {
-          callback(new Error('排序不能为空'));
+      let validBlockName=(rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入教学名称'));
+        } else {
+          callback();
+        }
+      }
+      let validBlockTarget=(rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入教学目标'));
         } else {
           callback();
         }
@@ -68,9 +70,13 @@
         },
         //新增表单的验证规则
         moreRules: {
-          fieldSort: [
-            {required: true, message: '请输入排序', trigger: 'change'},
-            {validator:validBlockContent, trigger: 'change'}
+          fieldSortName: [
+            {required: true, message: '请输入教学名称', trigger: 'blur'},
+            {validator: validBlockName, trigger: 'blur'}
+          ],
+          fieldSortTarget: [
+            {required: true, message: '请输入教学目标', trigger: 'blur'},
+            {validator: validBlockTarget, trigger: 'blur'}
           ]
         }
       }

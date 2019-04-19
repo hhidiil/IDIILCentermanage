@@ -3,13 +3,13 @@
     <div class="rowBox cardBody">
       <el-form-item label="区块名称:"
                     :prop="'blockLists.' + index + '.name'"
-                    :rules="{required: true, message: '区块名称不能为空', trigger: 'blur'}">
+                    :rules="moreRules.fieldSortName">
         <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
         <span v-else>{{blockList.name}}</span>
       </el-form-item>
       <el-form-item label="教学目标:"
                     :prop="'blockLists.' + index + '.target'"
-                    :rules="{required: true, message: '教学目标不能为空', trigger: 'blur'}">
+                    :rules="moreRules.fieldSortTarget">
         <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
         <span v-else>{{blockList.target}}</span>
       </el-form-item>
@@ -36,9 +36,35 @@
   export default{
     props:['blockLists', 'blockList', 'index'],
     data(){
-      return{
-        editBlockFlag:false
+      let validBlockName=(rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入教学名称'));
+        } else {
+          callback();
         }
+      }
+      let validBlockTarget=(rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请输入教学目标'));
+        } else {
+          callback();
+        }
+      }
+      return{
+          editBlockFlag:false,
+          //新增表单的验证规则
+          moreRules: {
+            fieldSortName: [
+              {required: true, message: '请输入教学名称', trigger: 'blur'},
+              {validator: validBlockName, trigger: 'blur'}
+            ],
+            fieldSortTarget: [
+              {required: true, message: '请输入教学目标', trigger: 'blur'},
+              {validator: validBlockTarget, trigger: 'blur'}
+            ]
+          }
+        }
+
       },
       mounted(){
 
