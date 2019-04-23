@@ -5,23 +5,23 @@
         <el-row :gutter="20">
           <el-col :span="8">
               <el-card class="classListCard">
-                <el-form :model="sourceLists.classList" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth" class="demo-ruleForm">
+                <el-form :model="sourceListsInfo.classList" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth" class="demo-ruleForm">
                   <div class="rowBox cardTop">
                       <el-form-item label="课程名称:" prop="name">
-                        <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.name" auto-complete="off"></el-input></span>
-                        <span v-else>{{sourceLists.classList.name}}</span>
+                        <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.name" auto-complete="off"></el-input></span>
+                        <span v-else>{{sourceListsInfo.classList.name}}</span>
                       </el-form-item>
                       <el-form-item label="课程目标:" prop="target">
-                          <span v-if="editClassFlag"><el-input type="textarea" v-model="sourceLists.classList.target" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceLists.classList.target}}</span>
+                          <span v-if="editClassFlag"><el-input type="textarea" v-model="sourceListsInfo.classList.target" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceListsInfo.classList.target}}</span>
                       </el-form-item>
                       <el-form-item label="课程时长:" prop="duration">
-                          <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.duration" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceLists.classList.duration}}</span>
+                          <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.duration" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceListsInfo.classList.duration}}</span>
                       </el-form-item>
                       <el-form-item label="对应版本:" prop="version">
-                          <span v-if="editClassFlag"><el-input v-model="sourceLists.classList.version" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceLists.classList.version}}</span>
+                          <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.version" auto-complete="off"></el-input></span>
+                          <span v-else>{{sourceListsInfo.classList.version}}</span>
                       </el-form-item>
                       <div class="button-group">
                         <span>
@@ -42,15 +42,15 @@
                   <draggable
                     class="list-group"
                     tag="ul"
-                    v-model="sourceLists.blockLists"
+                    v-model="sourceListsInfo.blockLists"
                     v-bind="dragOptions"
                     @start="isDragging = true"
-                    @end="isDragging = false"
+                    @end="isDraggingHandle"
                   >
                     <transition-group type="transition" name="flip-list">
                       <li
                         class="list-group-item blockListItem"
-                        v-for="(blockList,index) in sourceLists.blockLists"
+                        v-for="(blockList,index) in sourceListsInfo.blockLists"
                         :key="blockList.key"
                         :class="{activeBlockStyle: blockList.key==currentBlockKey}"
                         @click="showBlock(blockList.key)"
@@ -58,7 +58,7 @@
                       >
                         <div class="blockListInfo">
                           {{blockList.name}}
-                          <span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>
+                          <!--<span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>-->
                         </div>
                       </li>
                     </transition-group>
@@ -68,28 +68,28 @@
           </el-col>
           <el-col :span="16">
             <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>区块内容</span>
+              </div>
               <div v-if="currentBlockList[0]">
-                <default-list :blockLists="sourceLists.blockLists"></default-list>
+                <default-list></default-list>
 
               </div>
 
             </el-card>
           </el-col>
         </el-row>
-
-
-      <el-dialog
-        width="60%"
-        v-dialogDrag
-        title="添加课程"
-        :visible.sync="DialogIdiilVisible"
-        :close-on-click-modal="false"
-        append-to-body
-        v-if='DialogIdiilVisible'>
-        <select-class v-on:selectClassHandle="selectClassHandle"></select-class>
-      </el-dialog>
     </section>
-
+    <el-dialog
+      width="60%"
+      v-dialogDrag
+      title="IDIIL教材"
+      :visible.sync="DialogIdiilVisible"
+      :close-on-click-modal="false"
+      append-to-body
+      v-if='DialogIdiilVisible'>
+      <select-class v-on:selectClassHandle="selectClassHandle"></select-class>
+    </el-dialog>
   </div>
 </template>
 
@@ -169,24 +169,6 @@
           version:[
             { validator: validClassVersion, trigger: 'blur' }
           ]
-        },
-        blockRules:{
-          name:[
-            {required:true,message:'请输入课程名称',trigger:'blur'},
-            { validator: validClassName, trigger: 'blur' }
-          ],
-          target:[
-            {required:true,message:'请输入课程目标',trigger:'blur'},
-            { validator: validClassTarget, trigger: 'blur' }
-          ]
-        },
-        collapseComponentData:{
-          on: {
-            input: this.handleChange1
-          },
-          props: {
-            value: this.activeNames
-          }
         }
 
       }
@@ -197,6 +179,7 @@
       console.log(object2);
       const object=JSON.parse(JSON.stringify(this.sourceListsInfo));
       this.sourceLists=JSON.parse(getStore("sourceLists")) || object;
+      this.SOURCE_LIST( this.sourceLists );
 
 
       if(this.sourceLists.classList.name==""){
@@ -222,62 +205,27 @@
     },
     watch:{
       //当监听的属性值变化的时候 会执行对应的处理逻辑
-      addFlag:function(newValue,oldValue){
-        console.error("watch 监听数据-----》",newValue,oldValue);
-
-      },
-      $route:function(to,from){
-        console.error("watch 监听数据--$route--11-》",to,from)
-      },
       '$route' (to, from) {
         console.error("watch 监听数据--$route--22-》",to,from)
       },
-      beforeRouteUpdate (to, from, next) {
-        console.error("watch 监听数据--beforeRouteUpdate--33-》",to,from)
+      sourceListsInfo(val, oldVal){
+        console.log('------------change')
+        this.sourceLists=val;
       }
+
     },
 
     components:{
       headTop,
       draggable,
       selectClass,
-      customList,
       defaultList
     },
     mounted(){
 
-//      this.eidt()
-
-      const Wh = $(window).height();
-      console.log('222222222222--->',this.data,this.type);
-      this.getclassesList();
-
-      fetch('static/ClassUserList.json').then((response)=>{
-        return response.json();
-      }).then((res)=>{
-        if(this.type == 'update'){
-          this.form.studentGroup = toJson(this.data.group_student_Info);
-          this.sourceLists.blockLists = toJson(this.data.source);//之前的idiil课件list
-          this.fileList = toJson(this.data.otherSource);//之前的上传文件
-          this.form.otherSource = toJson(this.data.otherSource);//之前的上传文件
-          this.form.source = toJson(this.data.source);//之前的上传文件
-          this.form.name = this.data.name;//之前的上传文件
-          this.form.target = this.data.target;//之前的上传文件
-          this.form.commits = this.data.commits;//之前的上传文件
-          this.form.courseId = this.data.courseId;//之前的上传文件
-          this.form.classId = this.data.classId;//之前的上传文件
-        }else {
-          this.studentData = res.StudentList;
-          this.studentAllData = res.StudentList;
-          console.warn("获取学生数据:::::",this.studentData)
-        }
-      }).catch(()=>{
-        console.error("获取学生数据出错")
-      })
     },
     methods: {
       ...mapMutations([
-        'ADD_COUNT',
         'SOURCE_LIST',// 将 `this.classList()` 映射为 `this.$store.commit('increment')`//将 `this.blockList(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
         'CURRENT_BLOCK_KEY',
         'CURRENT_BLOCK_LIST'
@@ -285,8 +233,6 @@
       async getclassesList(){
         let result1 = await getAllClassesOfCenter({centerId:'002'});
         console.log("班级列表--------------------->",result1);
-
-
         if(result1.code == 200){
           this.classOptions = result1.data;
         }
@@ -306,6 +252,7 @@
               duration: '100分钟',
               type: "class",
               validate: false,
+              editFlag:false,
               uid: new Date().getTime(),
               key: new Date().getTime() + item.index.toString()
             };
@@ -313,110 +260,33 @@
           })
         }
 
+
         if(this.sourceLists.blockLists.length>0){
           let cBlockKey=this.sourceLists.blockLists[0].key;
           let cBlockList=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
             return currentValue.key ==  cBlockKey;
           });
+          this.SOURCE_LIST(this.sourceLists);
           this.CURRENT_BLOCK_KEY(cBlockKey);
           this.CURRENT_BLOCK_LIST(cBlockList);
         }
 
       },
-      handleChange(value, direction, movedKeys) {
-        console.log("studentData", this.studentData);
-        console.log("value", value);
-        console.log("direction", direction);
-        console.log("movedKeys", movedKeys);
-        this.direction = direction;
-        this.form.studentGroup.nowList = value;
-      },
-
-      //全部提交按钮事件
-      async submitAllData(formName){
-
-          this.$refs[formName].validate((valid) => {
-            if (valid) {
-              this.sourceLists.blockLists.forEach((item,index) => {
-                item.validate=false;
-              });
-              alert('submit!');
-            } else {
-              this.activeNames=[];
-              this.sourceLists.blockLists.forEach((item,index) => {
-                item.validate=false;
-                if(item.name=="" || item.target==""){
-                  item.validate=true;
-
-                  this.activeNames.push(index.toString())
-                }
-              });
-
-              this.collapseComponentData.props.value=this.activeNames;
-              alert('error submit!! 请完善表单信息');
-              return false;
-            }
-          });
-
-      },
 
       //选择完线上课程之后的处理逻辑
       selectClassHandle(param){
-        let ClassUserInfo = JSON.parse(getStore("ClassUserList"));
-        let UserInfo = JSON.parse(getStore("userInfo"));
-        console.log("选择的链接---》",ClassUserInfo,ClassUserInfo.CenterID);
-        let objParam={
-          sChapterID:param.CID,
-          sUnitID:param.UID,
-          sChapterName:param.ChapterName,
-          sUnitName:param.UnitName,
-          sDirName:param.DirName,
-          sCenterID : ClassUserInfo.CenterID,
-          sCenterWeb : ClassUserInfo.CenterWeb,
-          sMainWeb : ClassUserInfo.MainWeb,
-          sAssignID : ClassUserInfo.ClassID,
-          sPerformanceID : ClassUserInfo.ClassID,
-          InstructorID : UserInfo.InstructorID,
-          OutputType:param.selectType,
-          GlobalID:param.GlobalID
-        };
-
-
+        this.DialogIdiilVisible=false;
         this.getBlockNum(param);
-        this.$message({'type':'success',message:"添加成功！"})
-      },
-      //获取选中的学生的信息
-      filterNowList(data){
-        let result = [];
-        for(let ii in data){
-          for(let jj in this.studentData){
-            if(this.studentData[jj].key == data[ii]){
-              result.push(this.studentData[jj])
-            }
-          }
-        }
-        return result
-      },
-      //添加区块
-      addCustomBlock(param){
-        let urlJson= {
-          name:"",
-          target:"",
-          duration:'50分钟',
-          type:"custom",
-          validate:false,
-          uid: new Date().getTime(),
-          key: new Date().getTime()
-        };
-        this.sourceLists.blockLists.push(urlJson);
-      },
-      alertFn(num){
-        alert(num)
+        this.$message({'type':'success',message:"添加成功！"});
 
       },
+
       editClass(formName){
         this.editClassFlag=true;
       },
+      /*
+      * 保存课程区块
+      * */
       saveClass(formName){
         this.$refs[formName].validate((valid)=>{
           if(valid){
@@ -424,40 +294,13 @@
             this.editClassFlag=false;
             console.log(this.sourceLists);
             this.SOURCE_LIST(this.sourceLists);
-            this.ADD_COUNT();
           }else{
             console.log('error submit!!');
             return false
           }
         });
       },
-      //全部区块展开 或 折叠
-      controlFold(){
-        this.activeNames=[];
-        if(!this.controlFoldFlag){
-          for(var i = 0; i < this.sourceLists.blockLists.length; i++) {
-            this.activeNames.push(i.toString())
-          }
-        }
-        this.collapseComponentData.props.value=this.activeNames;
-        this.controlFoldFlag=!this.controlFoldFlag;
 
-      },
-      handleChange1(val){
-        this.activeNames=val;
-        console.log(val);
-      },
-      eidt() {
-        this.$layer.iframe({
-          content: {
-            content: selectClass, //传递的组件对象
-            parent: this,//当前的vue对象
-            data:{}//props
-          },
-          area:['800px','600px'],
-          title:"线上教材"
-        });
-      },
     /*
     * 显示选中的区块
     * */
@@ -469,6 +312,12 @@
         this.CURRENT_BLOCK_KEY(cBlockKey);
         this.CURRENT_BLOCK_LIST(cBlockList);
 
+      },
+      /*
+      * 拖拽结束 重新排序
+      * */
+      isDraggingHandle(){
+        this.SOURCE_LIST(this.sourceLists);
       }
     }
   }
@@ -516,7 +365,7 @@
         }
         .list-group-box{
           max-height:450px;
-          scroll:auto;
+          overflow: auto;
           .list-group {
             min-height: 20px;
 
@@ -533,6 +382,7 @@
 
     }
   }
+
 
 
 

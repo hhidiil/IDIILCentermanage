@@ -1,41 +1,62 @@
 <template>
-  <el-card>
-    <el-form :model="currentBlockList[0]" status-icon :rules="moreRules"  ref="moreRules" class="demo-ruleForm" :label-width="formLabelWidth">
-      <div class="rowBox cardBody">
-        <el-form-item label="区块名称:"
-                      prop="name">
-          <span v-if="editBlockFlag"><el-input v-model="currentBlockList[0].name"></el-input></span>
-          <span v-else>{{currentBlockList[0].name}}</span>
-        </el-form-item>
-        <el-form-item label="教学目标:"
-                      prop="target">
-          <span v-if="editBlockFlag"><el-input type="textarea" v-model="currentBlockList[0].target"></el-input></span>
-          <span v-else>{{currentBlockList[0].target}}</span>
-        </el-form-item>
-        <el-form-item label="课程时长:">
-          <span v-if="editBlockFlag"><el-input v-model="currentBlockList[0].duration"></el-input></span>
-          <span v-else>{{currentBlockList[0].duration}}</span>
-        </el-form-item>
-        <el-form-item label="课程内容:">
-          <div class="fileContainer">
-              <span class="fileItem">
-                <span>{{currentBlockList[0].name}}</span>
-              </span>
-          </div>
-        </el-form-item>
-        <el-form-item class="btnBox">
-          <el-button size="mini" @click.prevent="editBlock">编辑</el-button>
-          <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
-        </el-form-item>
+  <section>
+    <div>
+      <ul>
+        <li>
+          <span>区块名称 : </span>
+          <span>{{currentBlockList[0].name}}</span>
+        </li>
+        <li>
+          <span>教学目标 : </span>
+          <span>{{currentBlockList[0].target}}</span>
+        </li>
+        <li>
+          <span>课程时长 : </span>
+          <span>{{currentBlockList[0].duration}}</span>
+        </li>
+        <li>
+          <span>课程内容 : </span>
+          <span>{{currentBlockList[0].name}}</span>
+        </li>
+      </ul>
+      <div>
+        <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
+        <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
       </div>
-    </el-form>
-  </el-card>
+    </div>
+
+    <!-- 编辑弹出框 -->
+    <el-dialog
+      title="编辑区块内容"
+      v-dialogDrag
+      :visible.sync="editVisible"
+      width="40%">
+      <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" class="demo-ruleForm" :label-width="formLabelWidth">
+          <el-form-item label="区块名称:"
+                        prop="name">
+            <el-input v-model="blockForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="教学目标:"
+                        prop="target">
+            <el-input type="textarea" v-model="blockForm.target"></el-input>
+          </el-form-item>
+          <el-form-item label="课程时长:">
+            <el-input v-model="blockForm.duration"></el-input>
+          </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="editVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveBlockEdit('moreRules')">确 定</el-button>
+      </span>
+    </el-dialog>
+
+  </section>
 </template>
 <script>
   import { mapState,mapMutations } from 'vuex'
   import {setStore,getStore} from '../config/publicMethod'
   export default{
-    props:['blockLists'],
+    props:[],
     data(){
       let validBlockName=(rule, value, callback) => {
         if (!value) {
@@ -53,6 +74,8 @@
       }
       return{
           editBlockFlag:false,
+          editVisible:false, //编辑弹出框
+          sourceLists:[], //区块列表集合
           //新增表单的验证规则
           moreRules: {
             name: [
@@ -64,8 +87,16 @@
               {validator: validBlockTarget, trigger: 'blur'}
             ]
           },
-        formLabelWidth: '90px'
-        }
+          blockForm: {
+            name: '',
+            target: '',
+            duration: ''
+          },
+          formLabelWidth: '90px'
+          }
+
+      },
+      created(){
 
       },
       mounted(){
@@ -86,27 +117,70 @@
         ]),
         //删除区块列表中的选中项
         removeResource(item) {
+              let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
 
-          var index = this.blockLists.indexOf(item);
-          if (index !== -1) {
-            this.blockLists.splice(index, 1);
+              if(sourceLists.blockLists.length>1){
+                sourceLists.blockLists.forEach((item,index) => {
+                  if(item.key == this.currentBlockKey){
+                  sourceLists.blockLists.splice(index, 1);
+                }
+              })
 
-            if(this.blockLists.length>0){
-              let cBlockKey=this.blockLists[0].key;
-              let cBlockList=this.blockLists.filter((currentValue,index,arr) => {
-                  return currentValue.key ==  this.blockLists[0].key;
+              let cBlockKey=sourceLists.blockLists[0].key;
+              let cBlockList=sourceLists.blockLists.filter((currentValue,index,arr) => {
+                  return currentValue.key ==  sourceLists.blockLists[0].key;
                 });
+              this.SOURCE_LIST(sourceLists);
               this.CURRENT_BLOCK_KEY(cBlockKey);
               this.CURRENT_BLOCK_LIST(cBlockList);
             }else{
+              sourceLists.blockLists.splice(0, 1);
+                this.SOURCE_LIST(sourceLists);
               this.CURRENT_BLOCK_KEY("");
               this.CURRENT_BLOCK_LIST([]);
             }
 
-          }
         },
-        editBlock(){
-          this.editBlockFlag=true
+        editBlock(item){
+
+          this.blockForm = {
+            name: item.name,
+            target: item.target,
+            duration: item.duration
+          };
+          this.editVisible = true;
+
+        },
+
+        /*
+        * 区块内容编辑保存
+        * */
+        saveBlockEdit(formName){
+//
+          this.$refs[formName].validate((valid) => {
+            if(valid){
+              alert('submit!');
+              let currList=JSON.parse(JSON.stringify(this.currentBlockList));
+                currList[0].name=this.blockForm.name
+                currList[0].target=this.blockForm.target
+                currList[0].duration=this.blockForm.duration
+
+              let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+              sourceLists.blockLists.forEach((item) => {
+                if(item.key == this.currentBlockKey){
+                  item.name=this.blockForm.name
+                  item.target=this.blockForm.target
+                  item.duration=this.blockForm.duration
+                }
+              })
+              this.CURRENT_BLOCK_LIST(currList);
+              this.SOURCE_LIST(sourceLists);
+              this.editVisible = false;
+
+            }else{
+                console.log('error submit!!');
+            }
+          })
         }
       }
   }
@@ -114,5 +188,10 @@
 <style scoped lang="less">
   .btnBox{
     text-align: right;
+  }
+  ul{
+    li{
+     padding: 5px 0;
+    }
   }
 </style>

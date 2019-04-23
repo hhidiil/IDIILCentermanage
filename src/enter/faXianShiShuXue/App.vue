@@ -32,7 +32,7 @@ export default {
     min-width: 100px !important;
   }
   .el-dialog__body{
-    max-height: 400px;
+    max-height: 500px;
     overflow: auto;
   }
 </style>
