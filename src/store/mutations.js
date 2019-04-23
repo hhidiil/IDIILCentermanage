@@ -4,7 +4,9 @@
 
 import {
   ADD_COUNT,
-  SOURCE_LIST
+  SOURCE_LIST,
+  CURRENT_BLOCK_KEY,
+  CURRENT_BLOCK_LIST
 } from './mutation-types'
 import {setStore,getStore} from '../config/publicMethod'
 export default{
@@ -18,5 +20,13 @@ export default{
   },
   [ADD_COUNT](state){
     state.count++;
+  },
+  //---储存当前的区块key值
+  [CURRENT_BLOCK_KEY](state,key){
+    state.currentBlockKey=key;
+  },
+  //---储存当前的区块列表
+  [CURRENT_BLOCK_LIST](state,key){
+    state.currentBlockList=key;
   }
 }

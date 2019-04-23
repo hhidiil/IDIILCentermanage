@@ -97,7 +97,7 @@
         onSearch();
       },
       handleClick(){
-        let url = onNewPreview('Y')
+        let url = onNewPreview('Y');
         if(!url){
           return this.$message({type:'warning',message:'添加失败！'})
         }

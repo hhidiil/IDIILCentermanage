@@ -9,7 +9,12 @@ import '../../../node_modules/element-ui/lib/theme-chalk/index.css'
 import VueQuillEditor from 'vue-quill-editor'
 import '../../assets/font/iconfont.css'
 import layer from 'vue-layer'
-Vue.prototype.$layer = layer(Vue);
+// 引入自定义指令
+import '../../../static/js/directives.js';
+
+Vue.prototype.$layer = layer(Vue, {
+  msgtime: 3//目前只有一项，即msg方法的默认消失时间，单位：秒
+});
 
 Vue.prototype.fromFlag = false;//本地或者数据库标志,//true为真实数据，false为本地数据
 Vue.config.debug = true;

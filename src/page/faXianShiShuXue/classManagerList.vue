@@ -164,7 +164,7 @@
         let classList2 = await getCourseList({teacherId: userInfo.userId});//数据库获取教师的派课列表
         console.log("数据库获取教师的派课列表---classList2----->>", classList2)
         if (classList2.data.length > 0) {
-          this.classList = classList2.data
+          this.classList = classList2.data;
           this.tableData = classList2.data[this.currentindex];
         }
         console.log("this.tableData--->>", this.tableData)

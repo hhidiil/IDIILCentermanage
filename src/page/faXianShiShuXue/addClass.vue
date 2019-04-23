@@ -52,6 +52,9 @@
                         class="list-group-item blockListItem"
                         v-for="(blockList,index) in sourceLists.blockLists"
                         :key="blockList.key"
+                        :class="{activeBlockStyle: blockList.key==currentBlockKey}"
+                        @click="showBlock(blockList.key)"
+
                       >
                         <div class="blockListInfo">
                           {{blockList.name}}
@@ -61,33 +64,32 @@
                     </transition-group>
                   </draggable>
                 </div>
-
               </el-card>
           </el-col>
           <el-col :span="16">
             <el-card class="box-card">
-              <!--<div v-for="o in 4" :key="o" class="text item">-->
-                <!--{{'列表内容 ' + o }}-->
-              <!--</div>-->
-              <div v-if="sourceLists.blockLists.length>0">
-                {{sourceLists.blockLists[0]}}
-                <default-list :blockLists="sourceLists.blockLists" :blockList="sourceLists.blockLists[0]"></default-list>
+              <div v-if="currentBlockList[0]">
+                <default-list :blockLists="sourceLists.blockLists"></default-list>
 
               </div>
 
             </el-card>
           </el-col>
         </el-row>
+
+
+      <el-dialog
+        width="60%"
+        v-dialogDrag
+        title="添加课程"
+        :visible.sync="DialogIdiilVisible"
+        :close-on-click-modal="false"
+        append-to-body
+        v-if='DialogIdiilVisible'>
+        <select-class v-on:selectClassHandle="selectClassHandle"></select-class>
+      </el-dialog>
     </section>
-    <el-dialog
-      width="60%"
-      title="添加课程"
-      :visible.sync="DialogIdiilVisible"
-      :close-on-click-modal="false"
-      append-to-body
-      v-if='DialogIdiilVisible'>
-      <select-class v-on:selectClassHandle="selectClassHandle"></select-class>
-    </el-dialog>
+
   </div>
 </template>
 
@@ -152,7 +154,6 @@
         editClassFlag:false,
         sourceLists:{},
         SelectedIndex: 0, //检测的form的索引
-
         classRules:{
           name:[
             {required:true,message:'请输入课程名称',trigger:'blur'},
@@ -197,13 +198,18 @@
       const object=JSON.parse(JSON.stringify(this.sourceListsInfo));
       this.sourceLists=JSON.parse(getStore("sourceLists")) || object;
 
+
       if(this.sourceLists.classList.name==""){
         this.editClassFlag=true;
       }
 
     },
     computed: {
-      ...mapState(['sourceListsInfo','count']),
+      ...mapState([
+        'sourceListsInfo',
+        'currentBlockKey',
+        'currentBlockList'
+      ]),
       dragOptions() {
         return {
           animation: 0,
@@ -240,6 +246,8 @@
     },
     mounted(){
 
+//      this.eidt()
+
       const Wh = $(window).height();
       console.log('222222222222--->',this.data,this.type);
       this.getclassesList();
@@ -270,8 +278,10 @@
     methods: {
       ...mapMutations([
         'ADD_COUNT',
-        'SOURCE_LIST'// 将 `this.classList()` 映射为 `this.$store.commit('increment')`//将 `this.blockList(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
-      ]),
+        'SOURCE_LIST',// 将 `this.classList()` 映射为 `this.$store.commit('increment')`//将 `this.blockList(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
+        'CURRENT_BLOCK_KEY',
+        'CURRENT_BLOCK_LIST'
+    ]),
       async getclassesList(){
         let result1 = await getAllClassesOfCenter({centerId:'002'});
         console.log("班级列表--------------------->",result1);
@@ -290,7 +300,6 @@
 
         if(result2.length>0){
           result2.forEach(item => {
-            console.log(item);
             let urlJson= {
               name: param.selectUnitName + item.id,
               target: "2222",
@@ -301,12 +310,18 @@
               key: new Date().getTime() + item.index.toString()
             };
             this.sourceLists.blockLists.push(urlJson);
-
           })
-
         }
 
-        console.log(result2);
+        if(this.sourceLists.blockLists.length>0){
+          let cBlockKey=this.sourceLists.blockLists[0].key;
+          let cBlockList=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
+            return currentValue.key ==  cBlockKey;
+          });
+          this.CURRENT_BLOCK_KEY(cBlockKey);
+          this.CURRENT_BLOCK_LIST(cBlockList);
+        }
+
       },
       handleChange(value, direction, movedKeys) {
         console.log("studentData", this.studentData);
@@ -342,8 +357,6 @@
               return false;
             }
           });
-
-
 
       },
 
@@ -433,8 +446,30 @@
       handleChange1(val){
         this.activeNames=val;
         console.log(val);
-      }
+      },
+      eidt() {
+        this.$layer.iframe({
+          content: {
+            content: selectClass, //传递的组件对象
+            parent: this,//当前的vue对象
+            data:{}//props
+          },
+          area:['800px','600px'],
+          title:"线上教材"
+        });
+      },
+    /*
+    * 显示选中的区块
+    * */
+      showBlock(key){
+        let cBlockKey=key;
+        let cBlockList=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
+          return currentValue.key == cBlockKey
+        });
+        this.CURRENT_BLOCK_KEY(cBlockKey);
+        this.CURRENT_BLOCK_LIST(cBlockList);
 
+      }
     }
   }
 </script>
@@ -479,8 +514,19 @@
           opacity: 0.5;
           background: #c8ebfb;
         }
-        .list-group {
-          min-height: 20px;
+        .list-group-box{
+          max-height:450px;
+          scroll:auto;
+          .list-group {
+            min-height: 20px;
+
+          }
+        }
+
+
+        .activeBlockStyle{
+          border:1px solid #96C2F1;
+          background-color:#EFF7FF;
         }
 
       }

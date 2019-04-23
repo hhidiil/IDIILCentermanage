@@ -56,9 +56,15 @@
     })
     };
     },
+    mounted(){
+      this.init()
+    },
     methods: {
       sort() {
         this.list = this.list.sort((a, b) => a.order - b.order);
+      },
+      init(){
+        this.$layer.alert("找不到对象！");
       }
     },
     computed: {
