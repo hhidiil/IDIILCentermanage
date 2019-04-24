@@ -25,11 +25,10 @@
                       </el-form-item>
                       <div class="button-group">
                         <span>
-                            <el-button v-if="editClassFlag" size="mini" @click="saveClass('classForm')">保存</el-button>
+                            <el-button v-if="editClassFlag" size="mini" @click="saveClass('classForm')">确定</el-button>
                             <el-button v-else size="mini" @click="editClass">编辑</el-button>
                         </span>
                       </div>
-
                   </div>
                 </el-form>
               </el-card>
@@ -290,7 +289,6 @@
       saveClass(formName){
         this.$refs[formName].validate((valid)=>{
           if(valid){
-            alert('submit!');
             this.editClassFlag=false;
             console.log(this.sourceLists);
             this.SOURCE_LIST(this.sourceLists);
@@ -318,6 +316,12 @@
       * */
       isDraggingHandle(){
         this.SOURCE_LIST(this.sourceLists);
+      },
+      /*
+      * 移除整个表单的校验结果
+      * */
+      clearValidate(formName){
+        this.$refs[formName].clearValidate();
       }
     }
   }

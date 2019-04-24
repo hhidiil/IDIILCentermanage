@@ -1,28 +1,26 @@
 <template>
   <section>
     <div>
-      <ul>
-        <li>
-          <span>区块名称 : </span>
+      <el-form  class="textForm" label-width="formLabelWidth">
+        <el-form-item label="区块名称:">
           <span>{{currentBlockList[0].name}}</span>
-        </li>
-        <li>
-          <span>教学目标 : </span>
+        </el-form-item>
+        <el-form-item label="教学目标:">
           <span>{{currentBlockList[0].target}}</span>
-        </li>
-        <li>
-          <span>课程时长 : </span>
+        </el-form-item>
+        <el-form-item label="课程时长:">
           <span>{{currentBlockList[0].duration}}</span>
-        </li>
-        <li>
-          <span>课程内容 : </span>
+        </el-form-item>
+        <el-form-item label="课程内容:">
           <span>{{currentBlockList[0].name}}</span>
-        </li>
-      </ul>
-      <div>
-        <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
-        <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
-      </div>
+        </el-form-item>
+        <el-form-item>
+          <div class="btnBox">
+            <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
+            <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
+          </div>
+        </el-form-item>
+      </el-form>
     </div>
 
     <!-- 编辑弹出框 -->
@@ -31,7 +29,7 @@
       v-dialogDrag
       :visible.sync="editVisible"
       width="40%">
-      <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" class="demo-ruleForm" :label-width="formLabelWidth">
+      <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" :label-width="formLabelWidth">
           <el-form-item label="区块名称:"
                         prop="name">
             <el-input v-model="blockForm.name"></el-input>
@@ -141,25 +139,34 @@
             }
 
         },
-        editBlock(item){
 
+        /*
+        * 初始化弹框数据
+        * */
+        editBlock(item){
           this.blockForm = {
             name: item.name,
             target: item.target,
             duration: item.duration
           };
           this.editVisible = true;
+          this.clearValidate('moreRules');
+        },
+        /*
+         * 移除整个表单的校验结果
+         * */
+        clearValidate(formName){
+          this.$nextTick(function(){
+            this.$refs[formName].clearValidate();
+          });
 
         },
-
         /*
-        * 区块内容编辑保存
+        * 弹框区块内容编辑保存
         * */
         saveBlockEdit(formName){
-//
           this.$refs[formName].validate((valid) => {
             if(valid){
-              alert('submit!');
               let currList=JSON.parse(JSON.stringify(this.currentBlockList));
                 currList[0].name=this.blockForm.name
                 currList[0].target=this.blockForm.target
@@ -192,6 +199,11 @@
   ul{
     li{
      padding: 5px 0;
+    }
+  }
+  .textForm{
+    .el-form-item{
+      margin: 0;
     }
   }
 </style>
