@@ -11,12 +11,8 @@ import {
 import {setStore,getStore} from '../config/publicMethod'
 export default{
   [SOURCE_LIST](state,newList){
-    console.log(newList);
-    //state.sourceListsInfo.classList=newList.classList;
-    //state.sourceListsInfo.blockLists=newList.blockLists;
+    console.log('save---mutation');
     state.sourceListsInfo=newList;
-
-
     //存入localStorage
     //setStore('sourceLists',JSON.stringify(state.sourceListsInfo))
 

@@ -1,146 +1,181 @@
 <template>
-  <el-card>
-    <div class="rowBox cardBody">
-      <el-form-item label="区块名称:"
-                    :prop="'blockLists.' + index + '.name'"
-                    :rules="moreRules.fieldSortName">
-        <span v-if="editBlockFlag"><el-input v-model="blockList.name"></el-input></span>
-        <span v-else>{{blockList.name}}</span>
-      </el-form-item>
-      <el-form-item label="教学目标:"
-                    :prop="'blockLists.' + index + '.target'"
-                    :rules="moreRules.fieldSortTarget">
-        <span v-if="editBlockFlag"><el-input type="textarea" v-model="blockList.target"></el-input></span>
-        <span v-else>{{blockList.target}}</span>
-      </el-form-item>
-      <el-form-item>
-        <div class="btnBox">
-          <div>
-            <el-upload ref="upload"
-                       :file-list="fileList"
-                       action="/api/file/upload"
-                       :on-preview="handlePreview"
-                       :on-remove="handleFileRemove"
-                       :auto-upload="false"
-                       :on-change="changeFileHandle"
-                       :on-success="uploadSuccess"
-                       :on-error="uploadError"
-                       :data="uploadParam"
-                       :before-upload="beforeUpload"
-                       :limit=5
-                       multiple>
-              <el-button slot="trigger" size="mini" type="primary">选择文件</el-button>
-              <el-button size="mini" type="success" @click="submitUpload">上传</el-button>
-            </el-upload>
+  <section>
+    <div>
+      <el-form  class="textForm" label-width="formLabelWidth">
+        <el-form-item label="课程名称:">
+          <span>{{sourceListsInfo.classList.name}}</span>
+        </el-form-item>
+        <el-form-item label="课程目标:">
+          <span>{{sourceListsInfo.classList.target}}</span>
+        </el-form-item>
+        <el-form-item label="课程时长:">
+          <span>{{sourceListsInfo.classList.duration}}</span>
+        </el-form-item>
+        <el-form-item label="对应版本:">
+          <span>{{sourceListsInfo.classList.version}}</span>
+        </el-form-item>
+        <el-form-item>
+          <div class="btnBox">
+            <el-button size="mini" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
           </div>
-          <div>
-            <el-button size="mini" @click="removeResource(blockList)">删除</el-button>
-          </div>
-        </div>
-
-      </el-form-item>
-
+        </el-form-item>
+      </el-form>
     </div>
-  </el-card>
+
+    <!-- 课程编辑弹出框 -->
+    <el-dialog
+      title="编辑课程信息"
+      v-dialogDrag
+      :visible.sync="editVisible"
+      width="40%">
+      <el-form :model="classForm" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth">
+        <el-form-item label="课程名称:" prop="name">
+          <el-input v-model="classForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="课程目标:" prop="target">
+          <el-input type="textarea" v-model="classForm.target" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="课程时长:" prop="duration">
+          <el-input v-model="classForm.duration" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="对应版本:" prop="version">
+          <el-input v-model="classForm.version" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="editVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveBlockEdit('classForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+
+  </section>
 </template>
 <script>
-  import {setStore,getStore} from '../config/publicMethod'
+  import { mapState, mapMutations } from 'vuex'
   export default{
-    props:['blockLists', 'blockList', 'index'],
+    props:[],
     data(){
-      let validBlockName=(rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入教学名称'));
-        } else {
+      let validClassName=(rule, value, callback)=>{
+        if(!value){
+          return callback(new Error('课程名称不能为空'))
+        }
+        callback();
+      }
+      let validClassTarget=(rule, value, callback)=>{
+        if(!value){
+          return callback(new Error('课程目标不能为空'))
+        }
+        callback();
+      }
+      let validClassDuration=(rule, value, callback)=>{
+        if(value=='' || value==undefined){
           callback();
+        }else{
+          let reg=/^[1-9]\d*$/;
+          if(!reg.test(Number(value))){
+            callback(new Error('时间必须是正整数'))
+          }else {
+            callback();
+          }
         }
       }
-      let validBlockTarget=(rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入教学目标'));
-        } else {
-          callback();
-        }
+      let validClassVersion=(rule, value, callback)=>{
+        callback()
       }
       return{
-        editBlockFlag:true,
-        fileList:[], //上传的文件列表 eg： [{name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg'}]
-        uploadParam:{
-          username:JSON.parse(getStore('userInfo')).userName
-        },
+        editVisible:false, //编辑弹出框
         //新增表单的验证规则
-        moreRules: {
-          fieldSortName: [
-            {required: true, message: '请输入教学名称', trigger: 'blur'},
-            {validator: validBlockName, trigger: 'blur'}
+        classRules:{
+          name:[
+            { required:true, message:'请输入课程名称', trigger:'blur' },
+            { validator: validClassName, trigger: 'blur' }
           ],
-          fieldSortTarget: [
-            {required: true, message: '请输入教学目标', trigger: 'blur'},
-            {validator: validBlockTarget, trigger: 'blur'}
+          target:[
+            { required:true, message:'请输入课程目标', trigger:'blur'},
+            {validator: validClassTarget, trigger: 'blur' }
+          ],
+          duration:[
+            { validator: validClassDuration, trigger: 'blur' }
+          ],
+          version:[
+            { validator: validClassVersion, trigger: 'blur' }
           ]
-        }
+        },
+        classForm: {
+          name: '',
+          target: '',
+          duration: '',
+          version: ''
+        },
+        formLabelWidth: '90px'
       }
+
+    },
+    created(){
+
     },
     mounted(){
 
     },
-    methods:{
-      //点击文件列表中已上传的文件时的钩子
-      handlePreview(file){
-        console.log(file);
-      },
-      //删除选择的上传文件
-      handleFileRemove(file){
-        let filterNowList = this.fileList;
-        for(let ii in filterNowList){
-          if(filterNowList[ii].uid == file.uid){
-            filterNowList.splice(ii,1)
-            break;
-          }
-        }
-        console.log("删除的文件：：：：",file, this.fileList);
-      },
-      //添加外部文件时的处理函数
-      changeFileHandle(file){
-        console.log("改变文件：：：：",file, this.fileList);
-      },
-      beforeUpload(file){
-        //在这里可以做文件上传之前的操作
-        console.log("文件上传之前：：：：",file);
-      },
-      //文件上传成功
-      uploadSuccess(response, file, fileList){
-        console.log("上传成功：：：：",response,file,fileList);
-        this.form.otherSource = fileList;
-        this.$message({message: '上传成功！',type:'success'});
-      },
-      //文件上传失败处理
-      uploadError(err, file, fileList){
-        console.log("上传失败：：：：",err,file,fileList);
-        this.$message({message: '上传成功！',type:'error'});
-      },
-      submitUpload() {
-        const data = new FormData();
-        data.append("files", this.$refs.upload.uploadFiles);
-        data.append("username", JSON.parse(getStore('userInfo')).userName);
-        console.log("upload--->",this.$refs.upload)
-        this.$refs.upload.submit(); //上传文件 "/api/file/upload"
+    computed:{
+      ...mapState([
+        'sourceListsInfo'
+      ])
+  },
+  methods:{
+  ...mapMutations([
+      'SOURCE_LIST'
+    ]),
 
-      },
-      //删除区块列表中的选中项
-      removeResource(item) {
-        var index = this.blockLists.indexOf(item);
-        if (index !== -1) {
-          this.blockLists.splice(index, 1)
-        }
-      }
+    /*
+     * 初始化弹框数据
+     * */
+    editClass(item){
+      this.classForm = {
+        name: item.name,
+        target: item.target,
+        duration: item.duration,
+        version: item.version
+      };
+      this.editVisible = true;
+      this.clearValidate('classForm');
+    },
+    /*
+     * 移除整个表单的校验结果
+     * */
+    clearValidate(formName){
+      this.$nextTick(function(){
+        this.$refs[formName].clearValidate();
+      });
 
-    }
+    },
+    /*
+     * 弹框区块内容编辑保存
+     * */
+    saveBlockEdit(formName){
+      this.$refs[formName].validate((valid) => {
+        if(valid){
+          let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+            sourceLists.classList.name=this.classForm.name;
+            sourceLists.classList.target=this.classForm.target;
+            sourceLists.classList.duration=this.classForm.duration;
+            sourceLists.classList.version=this.classForm.version;
+
+          this.SOURCE_LIST(sourceLists);
+          this.editVisible = false;
+
+        }else{
+          console.log('error submit!!');
+        }
+    })
+  }
+  }
   }
 </script>
-<style scoped  lang="less" type="text/less">
-.btnBox{
-  display: flex;
-  justify-content: space-between;
-}
+<style scoped lang="less">
+
+  .btnBox{
+    text-align: right;
+  }
+
 </style>

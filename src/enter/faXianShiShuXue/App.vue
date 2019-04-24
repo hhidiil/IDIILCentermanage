@@ -35,4 +35,14 @@ export default {
     max-height: 500px;
     overflow: auto;
   }
+
+
+  .textForm{
+    .el-form-item{
+      margin: 0;
+      &__label{
+         color:rgb(0, 102, 153);
+       }
+    }
+  }
 </style>

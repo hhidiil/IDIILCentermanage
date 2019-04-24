@@ -2,35 +2,10 @@
   <div class="addClass">
 
     <section class="data_section">
-        <el-row :gutter="20">
+        <el-row :gutter="20" class="mainContainer">
           <el-col :span="8">
               <el-card class="classListCard">
-                <el-form :model="sourceListsInfo.classList" status-icon :rules="classRules" ref="classForm" :label-width="formLabelWidth" class="demo-ruleForm">
-                  <div class="rowBox cardTop">
-                      <el-form-item label="课程名称:" prop="name">
-                        <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.name" auto-complete="off"></el-input></span>
-                        <span v-else>{{sourceListsInfo.classList.name}}</span>
-                      </el-form-item>
-                      <el-form-item label="课程目标:" prop="target">
-                          <span v-if="editClassFlag"><el-input type="textarea" v-model="sourceListsInfo.classList.target" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceListsInfo.classList.target}}</span>
-                      </el-form-item>
-                      <el-form-item label="课程时长:" prop="duration">
-                          <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.duration" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceListsInfo.classList.duration}}</span>
-                      </el-form-item>
-                      <el-form-item label="对应版本:" prop="version">
-                          <span v-if="editClassFlag"><el-input v-model="sourceListsInfo.classList.version" auto-complete="off"></el-input></span>
-                          <span v-else>{{sourceListsInfo.classList.version}}</span>
-                      </el-form-item>
-                      <div class="button-group">
-                        <span>
-                            <el-button v-if="editClassFlag" size="mini" @click="saveClass('classForm')">确定</el-button>
-                            <el-button v-else size="mini" @click="editClass">编辑</el-button>
-                        </span>
-                      </div>
-                  </div>
-                </el-form>
+                <custom-list></custom-list>
               </el-card>
               <el-card class="blockListCard">
                 <div slot="header" class="clearfix">
@@ -56,8 +31,8 @@
 
                       >
                         <div class="blockListInfo">
-                          {{blockList.name}}
-                          <!--<span v-if="blockList.validate" class="validateTag"><i class="icon iconfont el-icon-warn"></i></span>-->
+                          <span>{{blockList.name}}</span>
+                          <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
                         </div>
                       </li>
                     </transition-group>
@@ -66,19 +41,26 @@
               </el-card>
           </el-col>
           <el-col :span="16">
-            <el-card class="box-card">
+            <el-card class="blockContainerCard">
               <div slot="header" class="clearfix">
                 <span>区块内容</span>
               </div>
               <div v-if="currentBlockList[0]">
                 <default-list></default-list>
-
               </div>
-
             </el-card>
           </el-col>
         </el-row>
+      <el-row :gutter="20">
+        <el-col :span="24">
+          <div class="btnBox">
+            <el-button type="primary" size="small" @click="saveAllInfo">保存</el-button>
+          </div>
+        </el-col>
+      </el-row>
     </section>
+
+    <!--IDIIL教材弹出框-->
     <el-dialog
       width="60%"
       v-dialogDrag
@@ -109,82 +91,19 @@
   let Base64 = require('js-base64').Base64;
 
   export default {
-    props:['data','type','addFlag'],
+    props:[],
     data(){
-      let validClassName=(rule, value, callback)=>{
-        if(!value){
-          return callback(new Error('课程名称不能为空'))
-        }
-        callback();
-      };
-      let validClassTarget=(rule, value, callback)=>{
-        if(!value){
-          return callback(new Error('课程目标不能为空'))
-        }
-        callback();
-      };
-      let validClassDuration=(rule, value, callback)=>{
-        if(value=='' || value==undefined){
-          callback();
-        }else{
-          let reg=/^[1-9]\d*$/;
-          if(!reg.test(Number(value))){
-            callback(new Error('时间必须是正整数'))
-          }else {
-            callback();
-          }
-        }
-      };
-      let validClassVersion=(rule, value, callback)=>{
-        callback()
-      };
-
       return {
-        studentData: [],
-        studentAllData: [],//学生的总列表，一直不变 在重置的时候需要
-        direction:'',//学生分组方向
-        activeNames: ['0'], //控制面板折叠展开
-        controlFoldFlag:false, //展开折叠按钮显示
-        innerDialogVisible:false,
         DialogIdiilVisible:false,
         formLabelWidth: '90px',
-        addNewGroupName:'',
-        classOptions:[],
-        editClassFlag:false,
-        sourceLists:{},
-        SelectedIndex: 0, //检测的form的索引
-        classRules:{
-          name:[
-            {required:true,message:'请输入课程名称',trigger:'blur'},
-            { validator: validClassName, trigger: 'blur' }
-          ],
-          target:[
-            {required:true,message:'请输入课程目标',trigger:'blur'},
-            { validator: validClassTarget, trigger: 'blur' }
-          ],
-          duration:[
-            { validator: validClassDuration, trigger: 'blur' }
-          ],
-          version:[
-            { validator: validClassVersion, trigger: 'blur' }
-          ]
-        }
-
+        sourceLists:{}
       }
     },
     created(){
       //在页面加载时读取localStorage里的状态信息
-      const object2 = Object.assign({}, this.sourceListsInfo);
-      console.log(object2);
       const object=JSON.parse(JSON.stringify(this.sourceListsInfo));
       this.sourceLists=JSON.parse(getStore("sourceLists")) || object;
-      this.SOURCE_LIST( this.sourceLists );
-
-
-      if(this.sourceLists.classList.name==""){
-        this.editClassFlag=true;
-      }
-
+      this.initBlcokShow();
     },
     computed: {
       ...mapState([
@@ -208,7 +127,7 @@
         console.error("watch 监听数据--$route--22-》",to,from)
       },
       sourceListsInfo(val, oldVal){
-        console.log('------------change')
+        console.log('------------change');
         this.sourceLists=val;
       }
 
@@ -218,6 +137,7 @@
       headTop,
       draggable,
       selectClass,
+      customList,
       defaultList
     },
     mounted(){
@@ -229,14 +149,6 @@
         'CURRENT_BLOCK_KEY',
         'CURRENT_BLOCK_LIST'
     ]),
-      async getclassesList(){
-        let result1 = await getAllClassesOfCenter({centerId:'002'});
-        console.log("班级列表--------------------->",result1);
-        if(result1.code == 200){
-          this.classOptions = result1.data;
-        }
-      },
-
       //获取课程区块列表
       async getBlockNum(param){
         const onlinePra={FileName:'Math--'+param.GlobalID,Action:'get',Content:'',Function:'OnlineMathBaseData'};
@@ -247,8 +159,8 @@
           result2.forEach(item => {
             let urlJson= {
               name: param.selectUnitName + item.id,
-              target: "2222",
-              duration: '100分钟',
+              target: "",
+              duration: '',
               type: "class",
               validate: false,
               editFlag:false,
@@ -258,8 +170,11 @@
             this.sourceLists.blockLists.push(urlJson);
           })
         }
-
-
+        this.initBlcokShow();
+      },
+      //初始化区块显示信息
+      initBlcokShow(){
+        this.SOURCE_LIST(this.sourceLists);
         if(this.sourceLists.blockLists.length>0){
           let cBlockKey=this.sourceLists.blockLists[0].key;
           let cBlockList=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
@@ -269,34 +184,12 @@
           this.CURRENT_BLOCK_KEY(cBlockKey);
           this.CURRENT_BLOCK_LIST(cBlockList);
         }
-
       },
-
       //选择完线上课程之后的处理逻辑
       selectClassHandle(param){
         this.DialogIdiilVisible=false;
         this.getBlockNum(param);
-        this.$message({'type':'success',message:"添加成功！"});
-
-      },
-
-      editClass(formName){
-        this.editClassFlag=true;
-      },
-      /*
-      * 保存课程区块
-      * */
-      saveClass(formName){
-        this.$refs[formName].validate((valid)=>{
-          if(valid){
-            this.editClassFlag=false;
-            console.log(this.sourceLists);
-            this.SOURCE_LIST(this.sourceLists);
-          }else{
-            console.log('error submit!!');
-            return false
-          }
-        });
+        this.promptMessage('添加成功^_^', 'success');
       },
 
     /*
@@ -312,17 +205,52 @@
 
       },
       /*
-      * 拖拽结束 重新排序
+      * 拖拽结束 重新排序并保存
       * */
       isDraggingHandle(){
         this.SOURCE_LIST(this.sourceLists);
       },
       /*
-      * 移除整个表单的校验结果
+      * 保存所有编辑信息
       * */
-      clearValidate(formName){
-        this.$refs[formName].clearValidate();
+      saveAllInfo(){
+        if(this.sourceLists.classList.name == '' || this.sourceLists.classList.target == ''){
+          this.promptMessage('课程名称和课程目标不能为空哦^o^', 'error');
+        }else{
+          if(this.sourceLists.blockLists.length>0){
+            this.sourceLists.blockLists.forEach((item, index) => {
+                item.validate = false;
+                if(item.name == '' || item.target==''){
+                  item.validate = true;
+                }
+            });
+            this.SOURCE_LIST(this.sourceLists);
+            let validatorsFail=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
+              return currentValue.validate == true
+            });
+             if(validatorsFail.length>0){
+               this.promptMessage('区块名称和区块目标不能为空哦^o^', 'error');
+             }else{
+               setStore("sourceLists",this.sourceLists);
+               this.promptMessage('保存成功^_^', 'success');
+             }
+          }else{
+            setStore("sourceLists",this.sourceLists);
+            this.promptMessage('保存成功^_^', 'success');
+          }
+        }
+      },
+      /*
+      * 保存时的提示信息
+      * */
+      promptMessage(text, type){
+        this.$message({
+          showClose: true,
+          message: text,
+          type: type
+        });
       }
+
     }
   }
 </script>
@@ -331,7 +259,21 @@
 
   i{
     font-size: 16px;
-    padding-left: 15px;
+  }
+  .mainContainer{
+    display: flex;
+    align-items: stretch;
+    .textForm{
+      .el-form-item{
+        margin: 0;
+      }
+    }
+    .blockContainerCard{
+      height: 100%;
+    }
+  }
+  .btnBox{
+    text-align: right;
   }
 
   .addClass{
@@ -356,7 +298,6 @@
           cursor: pointer;
 
         }
-
         .flip-list-move {
           transition: transform 0.5s;
         }
@@ -375,8 +316,6 @@
 
           }
         }
-
-
         .activeBlockStyle{
           border:1px solid #96C2F1;
           background-color:#EFF7FF;

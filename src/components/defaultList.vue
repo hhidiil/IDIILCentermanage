@@ -14,6 +14,11 @@
         <el-form-item label="课程内容:">
           <span>{{currentBlockList[0].name}}</span>
         </el-form-item>
+        <el-form-item label="教参:">
+          <div>
+            hfdhfdhfdfhjfja
+          </div>
+        </el-form-item>
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
@@ -23,7 +28,7 @@
       </el-form>
     </div>
 
-    <!-- 编辑弹出框 -->
+    <!-- 区块编辑弹出框 -->
     <el-dialog
       title="编辑区块内容"
       v-dialogDrag
@@ -32,14 +37,14 @@
       <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" :label-width="formLabelWidth">
           <el-form-item label="区块名称:"
                         prop="name">
-            <el-input v-model="blockForm.name"></el-input>
+            <el-input v-model="blockForm.name" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="教学目标:"
                         prop="target">
-            <el-input type="textarea" v-model="blockForm.target"></el-input>
+            <el-input type="textarea" v-model="blockForm.target" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="课程时长:">
-            <el-input v-model="blockForm.duration"></el-input>
+            <el-form-item label="区块时长:">
+            <el-input v-model="blockForm.duration" auto-complete="off"></el-input>
           </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -52,7 +57,6 @@
 </template>
 <script>
   import { mapState,mapMutations } from 'vuex'
-  import {setStore,getStore} from '../config/publicMethod'
   export default{
     props:[],
     data(){
@@ -71,9 +75,7 @@
         }
       }
       return{
-          editBlockFlag:false,
           editVisible:false, //编辑弹出框
-          sourceLists:[], //区块列表集合
           //新增表单的验证规则
           moreRules: {
             name: [
@@ -116,7 +118,6 @@
         //删除区块列表中的选中项
         removeResource(item) {
               let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-
               if(sourceLists.blockLists.length>1){
                 sourceLists.blockLists.forEach((item,index) => {
                   if(item.key == this.currentBlockKey){
@@ -133,7 +134,7 @@
               this.CURRENT_BLOCK_LIST(cBlockList);
             }else{
               sourceLists.blockLists.splice(0, 1);
-                this.SOURCE_LIST(sourceLists);
+              this.SOURCE_LIST(sourceLists);
               this.CURRENT_BLOCK_KEY("");
               this.CURRENT_BLOCK_LIST([]);
             }
@@ -196,14 +197,5 @@
   .btnBox{
     text-align: right;
   }
-  ul{
-    li{
-     padding: 5px 0;
-    }
-  }
-  .textForm{
-    .el-form-item{
-      margin: 0;
-    }
-  }
+
 </style>
