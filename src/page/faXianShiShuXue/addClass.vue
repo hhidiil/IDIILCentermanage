@@ -320,13 +320,8 @@
           border:1px solid #96C2F1;
           background-color:#EFF7FF;
         }
-
       }
-
     }
   }
-
-
-
 
 </style>
