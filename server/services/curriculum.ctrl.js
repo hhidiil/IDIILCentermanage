@@ -49,7 +49,7 @@ CurriculumRouter.post('/addCurriculumInfo',async(req, res) => {
 /*
  * 修改某课程
  * */
-classRouter.post('/updateCurriculumInfo',async(req, res) => {
+CurriculumRouter.post('/updateCurriculumInfo',async(req, res) => {
   var props = req.body;
   var objCurriculum = new Curriculum({props: props});
   props.courseId = req.body.courseId;
@@ -73,7 +73,7 @@ classRouter.post('/updateCurriculumInfo',async(req, res) => {
 /*
  * 删除某个课程
  * */
-classRouter.post('/deleteCurriculumInfo',async(req, res) => {
+CurriculumRouter.post('/deleteCurriculumInfo',async(req, res) => {
   var props = req.body;
   var objCurriculum = new Curriculum({props: props});
   const result = await objCurriculum.deleteCurriculumInfo();
@@ -93,7 +93,7 @@ classRouter.post('/deleteCurriculumInfo',async(req, res) => {
 /*
  * 获取老师派课列表。
  * */
-classRouter.post('/getCurriculumInfo',async(req,res)=>{
+CurriculumRouter.post('/getCurriculumInfo',async(req,res)=>{
   var props = req.body;
   var objCurriculum = new Curriculum({props: props});
   const result = await objCurriculum.getCurriculumInfo();
