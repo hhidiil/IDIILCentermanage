@@ -5,7 +5,7 @@
 import { baseUrl } from './env'
 import fetchJsonp from 'fetch-jsonp'
 
-export default async(url = '', data = {}) => {
+export default async(url = '', data = {}, ContentType = 'application/json') => {
 
   url = baseUrl + url;
   let dataStr = ''; //数据拼接字符串
@@ -17,15 +17,17 @@ export default async(url = '', data = {}) => {
     url = url + '?' + dataStr;
   }
   let requestConfig = {
+    jsonpCallbackFunction: 'portraitCallBack',
     credentials: 'include',
-    method: type,
+    //method: type,
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': ContentType
+      //'Content-Type': 'text/html'
     },
     mode: "cors",
     cache: "force-cache"
-  }
+  };
   try {
     const response = await fetchJsonp(url,requestConfig);
     const responseJson = await response.json();

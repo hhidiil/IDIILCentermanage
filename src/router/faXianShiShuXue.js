@@ -12,7 +12,7 @@ import classTeam from './../page/faXianShiShuXue/classTeam'
 import editorVue from './../page/faXianShiShuXue/editor'
 import practice from './../page/faXianShiShuXue/practice'
 
-Vue.use(Router)
+Vue.use(Router);
 
 const routes = [
   {
