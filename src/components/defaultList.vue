@@ -14,9 +14,26 @@
         <el-form-item label="课程内容:">
           <span>{{currentBlockList[0].name}}</span>
         </el-form-item>
-        <el-form-item label="教参:">
+        <el-form-item label="教学参考:">
           <div>
-            hfdhfdhfdfhjfja
+            <el-upload
+              class="upload-demo"
+              ref="upload"
+              action="/api/file/upload"
+              :file-list="fileList"
+              multiple
+              show-file-list
+              :auto-upload="false"
+              :on-preview="handlePreview"
+              :on-change="handleChange"
+              :before-remove="beforeRemove"
+              :on-remove="handleRemove"
+              :before-upload="beforeUpload"
+              :on-success="UploadSuccess"
+              :on-error="UploadError">
+              <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
+              <el-button style="margin-left: 10px;" size="mini" type="success" @click="submitUpload">上传到服务器</el-button>
+            </el-upload>
           </div>
         </el-form-item>
         <el-form-item>
@@ -92,7 +109,8 @@
             target: '',
             duration: ''
           },
-          formLabelWidth: '90px'
+          formLabelWidth: '90px',
+          fileList: []
           }
 
       },
@@ -189,6 +207,41 @@
                 console.log('error submit!!');
             }
           })
+        },
+
+        /*
+        *文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
+        * */
+        handleChange(file, fileList) {
+//          this.fileList = fileList.slice(-3);
+        },
+
+       //点击已上传的文件链接时的钩子, 可以通过 file.response 拿到服务端返回数据
+        handlePreview(file) {
+          console.log(file);
+        },
+        //删除文件之前的钩子，参数为上传的文件和文件列表
+        beforeRemove(file, fileList) {
+          return this.$confirm(`确定移除 ${ file.name }？`);
+        },
+        //文件列表移除文件时的钩子
+        handleRemove(file, fileList) {
+          console.log(file, fileList);
+        },
+        //上传文件之前的钩子，参数为上传的文件
+        beforeUpload(file){
+          console.log(file)
+        },
+        //文件上传成功时的钩子
+        UploadSuccess(response, file, fileList){
+          console.log(file)
+        },
+        //文件上传失败时的钩子
+        UploadError(err, file, fileList){
+          console.log(file)
+        },
+        submitUpload(){
+          this.$refs.upload.submit();
         }
       }
   }
