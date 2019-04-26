@@ -14,33 +14,14 @@
         <el-form-item label="课程内容:">
           <span>{{currentBlockList[0].name}}</span>
         </el-form-item>
-        <el-form-item label="教学参考:">
-          <div>
-            <el-upload
-              class="upload-demo"
-              ref="upload"
-              action="/api/file/upload"
-              :file-list="fileList"
-              multiple
-              show-file-list
-              :auto-upload="false"
-              :on-preview="handlePreview"
-              :on-change="handleChange"
-              :before-remove="beforeRemove"
-              :on-remove="handleRemove"
-              :before-upload="beforeUpload"
-              :on-success="UploadSuccess"
-              :on-error="UploadError">
-              <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
-              <el-button style="margin-left: 10px;" size="mini" type="success" @click="submitUpload">上传到服务器</el-button>
-            </el-upload>
-          </div>
-        </el-form-item>
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
             <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
           </div>
+        </el-form-item>
+        <el-form-item label="教学参考:">
+          <upload-files :group="'people'"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -74,45 +55,49 @@
 </template>
 <script>
   import { mapState,mapMutations } from 'vuex'
+  import uploadFiles from './uploadFiles.vue'
   export default{
-    props:[],
-    data(){
-      let validBlockName=(rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入教学名称'));
-        } else {
-          callback();
-        }
-      }
-      let validBlockTarget=(rule, value, callback) => {
-        if (!value) {
-          callback(new Error('请输入教学目标'));
-        } else {
-          callback();
-        }
-      }
-      return{
-          editVisible:false, //编辑弹出框
-          //新增表单的验证规则
-          moreRules: {
-            name: [
-              {required: true, message: '请输入区块名称', trigger: 'blur'},
-              {validator: validBlockName, trigger: 'blur'}
-            ],
-            target: [
-              {required: true, message: '请输入教学目标', trigger: 'blur'},
-              {validator: validBlockTarget, trigger: 'blur'}
-            ]
-          },
-          blockForm: {
-            name: '',
-            target: '',
-            duration: ''
-          },
-          formLabelWidth: '90px',
-          fileList: []
+      props:[],
+      data(){
+        let validBlockName=(rule, value, callback) => {
+          if (!value) {
+            callback(new Error('请输入教学名称'));
+          } else {
+            callback();
           }
+        }
+        let validBlockTarget=(rule, value, callback) => {
+          if (!value) {
+            callback(new Error('请输入教学目标'));
+          } else {
+            callback();
+          }
+        }
+        return{
+            editVisible:false, //编辑弹出框
+            //新增表单的验证规则
+            moreRules: {
+              name: [
+                {required: true, message: '请输入区块名称', trigger: 'blur'},
+                {validator: validBlockName, trigger: 'blur'}
+              ],
+              target: [
+                {required: true, message: '请输入教学目标', trigger: 'blur'},
+                {validator: validBlockTarget, trigger: 'blur'}
+              ]
+            },
+            blockForm: {
+              name: '',
+              target: '',
+              duration: ''
+            },
+            formLabelWidth: '90px'
 
+        }
+
+      },
+      components:{
+        uploadFiles
       },
       created(){
 
@@ -125,8 +110,18 @@
           'sourceListsInfo',
           'currentBlockKey',
           'currentBlockList'
-        ])
+        ]),
+        proStatus(){ //上传状态
+          if(this.pass){
+            return 'success'
+          } else if (this.pass === false){
+            return 'exception'
+          } else {
+            return 'text'
+          }
+        }
       },
+
       methods:{
       ...mapMutations([
           'SOURCE_LIST',
@@ -210,38 +205,14 @@
         },
 
         /*
-        *文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
-        * */
-        handleChange(file, fileList) {
-//          this.fileList = fileList.slice(-3);
-        },
-
-       //点击已上传的文件链接时的钩子, 可以通过 file.response 拿到服务端返回数据
-        handlePreview(file) {
-          console.log(file);
-        },
-        //删除文件之前的钩子，参数为上传的文件和文件列表
-        beforeRemove(file, fileList) {
-          return this.$confirm(`确定移除 ${ file.name }？`);
-        },
-        //文件列表移除文件时的钩子
-        handleRemove(file, fileList) {
-          console.log(file, fileList);
-        },
-        //上传文件之前的钩子，参数为上传的文件
-        beforeUpload(file){
-          console.log(file)
-        },
-        //文件上传成功时的钩子
-        UploadSuccess(response, file, fileList){
-          console.log(file)
-        },
-        //文件上传失败时的钩子
-        UploadError(err, file, fileList){
-          console.log(file)
-        },
-        submitUpload(){
-          this.$refs.upload.submit();
+         * 提示信息
+         * */
+        promptMessage(text, type){
+          this.$message({
+            showClose: true,
+            message: text,
+            type: type
+          });
         }
       }
   }
@@ -250,5 +221,14 @@
   .btnBox{
     text-align: right;
   }
-
+  .file-li-box{
+    display: flex;
+    .file-li-delete{
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
 </style>

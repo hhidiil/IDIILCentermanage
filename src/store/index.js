@@ -17,7 +17,7 @@ const state = {
       datetime: "",
       target: "",
       duration:"",
-      version:"",
+      version:[],
       commits: ""
     },
     blockLists:[]

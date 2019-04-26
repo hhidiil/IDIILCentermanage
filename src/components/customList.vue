@@ -12,12 +12,20 @@
           <span>{{sourceListsInfo.classList.duration}}</span>
         </el-form-item>
         <el-form-item label="对应版本:">
-          <span>{{sourceListsInfo.classList.version}}</span>
+          {{sourceListsInfo.classList}}
+          <el-tag
+            v-for="tag in sourceListsInfo.classList.version"
+            :key="tag">
+            {{tag}}
+          </el-tag>
         </el-form-item>
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
           </div>
+        </el-form-item>
+        <el-form-item label="教学参考:">
+          <upload-files :group="{ name: 'people', pull: 'clone', put: false }"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -38,8 +46,9 @@
         <el-form-item label="课程时长:" prop="duration">
           <el-input v-model="classForm.duration" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="对应版本:" prop="version">
-          <el-input v-model="classForm.version" auto-complete="off"></el-input>
+        <el-form-item label="对应版本:">
+
+          <add-tags :tagType="'添加版本'" :toDynamicTags="sourceListsInfo.classList.version" v-on:listenToChildTagLists="ChildTagLists"></add-tags>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -52,6 +61,8 @@
 </template>
 <script>
   import { mapState, mapMutations } from 'vuex'
+  import uploadFiles from './uploadFiles.vue'
+  import addTags from './addTags.vue'
   export default{
     props:[],
     data(){
@@ -79,9 +90,7 @@
           }
         }
       }
-      let validClassVersion=(rule, value, callback)=>{
-        callback()
-      }
+
       return{
         editVisible:false, //编辑弹出框
         //新增表单的验证规则
@@ -96,20 +105,21 @@
           ],
           duration:[
             { validator: validClassDuration, trigger: 'blur' }
-          ],
-          version:[
-            { validator: validClassVersion, trigger: 'blur' }
           ]
         },
         classForm: {
           name: '',
           target: '',
           duration: '',
-          version: ''
+          version: []
         },
         formLabelWidth: '90px'
       }
 
+    },
+    components:{
+      uploadFiles,
+      addTags
     },
     created(){
 
@@ -149,26 +159,30 @@
       });
 
     },
-    /*
-     * 弹框区块内容编辑保存
-     * */
-    saveBlockEdit(formName){
-      this.$refs[formName].validate((valid) => {
-        if(valid){
-          let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-            sourceLists.classList.name=this.classForm.name;
-            sourceLists.classList.target=this.classForm.target;
-            sourceLists.classList.duration=this.classForm.duration;
-            sourceLists.classList.version=this.classForm.version;
+      /*
+       * 弹框区块内容编辑保存
+       * */
+      saveBlockEdit(formName){
+        this.$refs[formName].validate((valid) => {
+          if(valid){
+            let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+              sourceLists.classList.name=this.classForm.name;
+              sourceLists.classList.target=this.classForm.target;
+              sourceLists.classList.duration=this.classForm.duration;
+              sourceLists.classList.version=this.classForm.version;
 
-          this.SOURCE_LIST(sourceLists);
-          this.editVisible = false;
+            this.SOURCE_LIST(sourceLists);
+            this.editVisible = false;
 
-        }else{
-          console.log('error submit!!');
-        }
-    })
-  }
+          }else{
+            console.log('error submit!!');
+          }
+      })
+    },
+    ChildTagLists(data){
+//      console.log(data)
+//      this.classForm.version=data;
+    }
   }
   }
 </script>
