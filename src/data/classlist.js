@@ -17,7 +17,46 @@ const classData = {
     version:"人教版",
     commits: "",
     studentGroup:{
-      groupArray:[],//创建的组
+      groupArray:[
+        {
+          name:"组1",
+          studentList:[{
+          id:"00201",
+          name:"学生1",
+          pass:"123456",
+          key:"1",
+        },{
+          id:"00202",
+          name:"栗战书",
+          pass:"123456",
+          key:"2",
+        },{
+          id:"00203",
+          name:"邵伟思",
+          pass:"123456",
+          key:"3",
+        }]
+        },
+        {
+          name:"组2",
+          studentList:[{
+            id:"00204",
+            name:"濠江",
+            pass:"123456",
+            key:"4",
+          },{
+            id:"00205",
+            name:"刘上传",
+            pass:"123456",
+            key:"5",
+          },{
+            id:"00206",
+            name:"五七",
+            pass:"123456",
+            key:"6",
+          }]
+        }
+        ],//创建的组
       nowGroup:['学生列表','默认组'],//当前正在修改的组
       nowList:[],//当前正在修改的组的数据
       nowStudentData:[],

@@ -13,7 +13,7 @@
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           :picker-options="pickerOptions2"
-          @change="screeningByTime">
+          @change="changeStatus">
         </el-date-picker>
       </div>
       <el-checkbox-group v-model="checkedSearchTypes" @change="handleCheckedSearchTypesChange">
@@ -137,7 +137,7 @@
         name:"",
         startDate:"",
         endDate:"",
-        status:"",
+        status:"未开始",
         pickerOptions2: {
           shortcuts: [{
             text: '最近一周',
@@ -251,6 +251,7 @@
         this.tableData.splice(index,1)
       },
       handleCheckedSearchTypesChange(value) {
+        debugger
         if(value[value.length-1]==="查看全部"){
           this.checkedSearchTypes= ['查看全部'];
           this.showAll();
@@ -277,6 +278,9 @@
         }
       },
       screeningByTime(){
+        if(this.checkedSearchTypes[0]==="查看全部"){
+          return;
+        }
         const start=this.selectedDate[0].getTime();
         const end=this.selectedDate[1].getTime()+86400000;
         this.tableData.forEach(item => {

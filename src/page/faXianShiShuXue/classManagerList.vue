@@ -3,51 +3,66 @@
     <head-top></head-top>
     <section class="classManagerList_section">
       <el-row>
-        <el-col :span="4" style="margin-right: 10px;">
-          <el-card class="box-card" style="height: 600px">
-            <div slot="header" class="clearfix">
-              <span>爱迪乐探究课程</span>
-            </div>
-            <div v-if="classList.length>0">
-              <div class="text item classlist"
-                   v-for="(item,index) in classList"
-                   :id="'listitem' + index"
-                   :key="index"
-                   :class="{ listcolor:index==currentindex}"
-                   @click="clickItem(item,index)">
-                {{(index+1)+'、'+item.name}}
-              </div>
-            </div>
-          </el-card>
+        <el-col :span="24" style="text-align: left;margin-bottom: 10px"><el-button type="primary" round @click="goToAddClass" >新增备课</el-button></el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24" style="text-align: left;margin-bottom: 10px">
+          <el-form :inline="true" :model="formInline" class="demo-form-inline">
+            <el-form-item label="科目">
+              <el-select v-model="formInline.CourseType" placeholder="科目">
+                <el-option label="数学" value="MM"></el-option>
+                <el-option label="英语" value="EE"></el-option>
+                <el-option label="逻辑" value="PS"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="课程类型">
+              <el-select v-model="formInline.CourseType1" placeholder="课程类型">
+                <el-option label="爱迪乐探究课程" value="idiil"></el-option>
+                <el-option label="自定义探究课程" value="custom"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="课程名称">
+              <el-input v-model="formInline.Name" placeholder="课程名称"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="">查询</el-button>
+            </el-form-item>
+          </el-form>
         </el-col>
-        <el-col :span="4" style="margin-right: 10px;">
-          <el-card class="box-card" style="height: 600px">
-            <div slot="header" class="clearfix">
-              <span>自定义探究课程</span>
-            </div>
-            <div v-if="classList.length>0">
-              <div class="text item classlist"
-                   v-for="(item,index) in classList1"
-                   :id="'listitem' + index"
-                   :key="index"
-                   :class="{ listcolor:index==currentindex1}"
-                   @click="clickItem1(item,index)">
-                {{(index+1)+'、'+item.name}}
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12" style="height: 100%;overflow: hidden" class="righttable">
-          <el-card class="box-card" style="height: 600px">
-            <div slot="header" class="clearfix">
-              <span>课程描述</span>
-              <el-button type="warning" size="small" style="float: right;margin-left: 5px"
-                         @click="deleteCourseConfirm(tableData,currentindex)">删除
-              </el-button>
-              <el-button type="warning" size="small" style="float: right;" @click="goToAddClass" >编辑<!--dialogEditVisible = true-->
-              </el-button>
-              <el-button  type="warning" size="small" style="float: right;" @click="goToClass(tableData)">上课</el-button>
-            </div>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <el-table
+            :data="classList"
+            border
+            style="width: 100%;text-align: center"
+            :header-cell-style="tableHeaderColor"
+          >
+            <el-table-column
+              prop="name"
+              label="课程"
+              align="center"
+            >
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              align="center">
+              <template slot-scope="scope">
+                <el-button-group>
+                  <el-button type="primary" icon="el-icon-view" @click="handleClick(scope.row)" title="查看">查看</el-button>
+                  <el-button type="primary" icon="el-icon-edit" @click="goToAddClass(scope.row)" title="编辑">编辑</el-button>
+                  <el-button type="primary" icon="el-icon-document" @click="goToPK(scope.row)" title="上课">上课</el-button>
+                  <el-button type="primary" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)" title="删除">删除</el-button>
+                </el-button-group>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-dialog
+            title="课程描述"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
             <div class="text item">
               <table width="100%" height="500px" border="0" cellpadding="10">
                 <tbody>
@@ -93,14 +108,15 @@
                 </tbody>
               </table>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="4" style="height: 100%;" class="righttable">
+            <span slot="footer" class="dialog-footer"></span>
+          </el-dialog>
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="totalItem">
+          </el-pagination>
         </el-col>
       </el-row>
-      <el-dialog title="修改课程" :visible.sync="dialogEditVisible" @close="closeDialogHandle" v-if='dialogEditVisible'>
-        <add-class :data="tableData" type="update" key="update"></add-class>
-      </el-dialog>
     </section>
   </div>
 </template>
@@ -126,13 +142,21 @@
       return {
         classList: classList,
         classList1: classList1,
+
         tableData: classList.length > 0 ? classList[0] : classData.classList,
         currentindex: 0,//当前选择的爱迪乐探究课程列表
         currentindex1: -1,//当前选择的自定义探究课程列表
         isCollapse: false,
         dialogEditVisible: false,
         formLabelWidth: '90px',
-        datetimes: ''
+        datetimes: '',
+        formInline: {
+          CourseType: '',
+          Name: '',
+          CourseType1:''
+        },
+        dialogVisible:false,
+        totalItem:classList.length
       }
     },
     components: {
@@ -168,6 +192,16 @@
           this.tableData = classList2.data[this.currentindex];
         }
         console.log("this.tableData--->>", this.tableData)
+      },
+      tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+        if (rowIndex === 0) {
+          return 'background-color: #EFF2F7;color: #000000;font-weight: 500;'
+        }
+      },
+      handleClick(row){
+        this.dialogVisible=!this.dialogVisible;
+        this.target=row.target;
+        this.name=row.name;
       },
       toJson: function (str) {
         return toJson(str)
@@ -241,6 +275,9 @@
       },
       goToAddClass(){
         this.$router.push({name:'addClassManager',params:{tableData:JSON.stringify(this.tableData)}})
+      },
+      goToPK(){
+        this.$router.push({name:'classTeam',params:{tableData:JSON.stringify(this.tableData)}})
       }
     }
   }
@@ -250,6 +287,8 @@
   .classManagerList_section {
     padding: 20px;
     margin-bottom: 40px;
+    height:800px;
+    overflow: scroll;
 
     .resoucelist {
       text-decoration: underline;
@@ -304,5 +343,6 @@
     .box-card {
       width: 100%;
     }
+
   }
 </style>
