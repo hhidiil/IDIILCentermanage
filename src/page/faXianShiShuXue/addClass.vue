@@ -54,7 +54,8 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div class="btnBox">
-            <el-button type="primary" size="small" @click="saveAllInfo">保存</el-button>
+            <el-button type="primary" size="small" @click="saveAllInfo('save')">保存</el-button>
+            <el-button type="success" size="small" @click="saveAllInfo('upload')">上传</el-button>
           </div>
         </el-col>
       </el-row>
@@ -103,6 +104,10 @@
       //在页面加载时读取localStorage里的状态信息
       const object=JSON.parse(JSON.stringify(this.sourceListsInfo));
       this.sourceLists=JSON.parse(getStore("sourceLists")) || object;
+      if(this.sourceLists.classList.classId == ""){
+        this.sourceLists.classList.classId=this.createGuid();
+      }
+
       this.initBlcokShow();
     },
     computed: {

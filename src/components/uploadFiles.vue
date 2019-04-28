@@ -9,13 +9,12 @@
         :show-file-list="false"
         action="/api/file/upload"
         multiple
-        :auto-upload="false"
         :on-change="handleChange"
         :on-progress="uploadOnProgress"
         :on-success="UploadOnSuccess"
         :on-error="UploadOnError">
-        <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
-        <el-button style="margin-left: 10px;" size="mini" type="success" @click="submitUpload">上传到服务器</el-button>
+        <el-button slot="trigger" size="mini" type="primary">上传文件</el-button>
+        <!--<el-button style="margin-left: 10px;" size="mini" type="success" @click="submitUpload">上传到服务器</el-button>-->
       </el-upload>
     </div>
     <div class="file-list">
@@ -73,7 +72,6 @@
                 progress: 0,
                 pgStatus: 'text'
               });
-              this.sendFilesToParent();
             } else if (file.status == 'success'){
               this.fileLists.forEach((item, index) => {
                 if(item.name == file.name){
@@ -81,6 +79,7 @@
                   item.pgStatus = 'success'
                 }
               })
+              this.sendFilesToParent();
             } else if (file.status == 'fail') {
               this.fileLists.forEach((item, index) => {
                 if(item.name == file.name){
