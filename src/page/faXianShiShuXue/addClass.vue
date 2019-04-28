@@ -164,6 +164,7 @@
               type: "class",
               validate: false,
               editFlag:false,
+              fileLists: [],
               uid: new Date().getTime(),
               key: new Date().getTime() + item.index.toString()
             };
@@ -286,6 +287,9 @@
           margin-bottom: 20px;
           .button-group{
             text-align: right;
+          }
+          .el-tag {
+            margin-right: 10px;
           }
         }
 

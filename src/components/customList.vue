@@ -12,20 +12,20 @@
           <span>{{sourceListsInfo.classList.duration}}</span>
         </el-form-item>
         <el-form-item label="对应版本:">
-          {{sourceListsInfo.classList}}
           <el-tag
             v-for="tag in sourceListsInfo.classList.version"
             :key="tag">
             {{tag}}
           </el-tag>
         </el-form-item>
+
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
           </div>
         </el-form-item>
         <el-form-item label="教学参考:">
-          <upload-files :group="{ name: 'people', pull: 'clone', put: false }"></upload-files>
+          <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileList="sourceListsInfo.classList.fileLists" @listenChildFiles="listenChildFiles"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -179,9 +179,20 @@
           }
       })
     },
+    /*
+     * 监听子组件信息
+     * */
+    //-----监听版本信息
     ChildTagLists(data){
-//      console.log(data)
-//      this.classForm.version=data;
+      console.log(data)
+      this.classForm.version=data;
+      console.log(this.classForm)
+    },
+    //----监听文件列表
+    listenChildFiles(data){
+      let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+      sourceLists.classList.fileLists=data;
+      this.SOURCE_LIST(sourceLists);
     }
   }
   }
@@ -191,5 +202,7 @@
   .btnBox{
     text-align: right;
   }
-
+  .el-tag {
+    margin-right: 10px;
+  }
 </style>

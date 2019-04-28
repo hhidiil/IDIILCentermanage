@@ -18,6 +18,7 @@ const state = {
       target: "",
       duration:"",
       version:[],
+      fileLists: [],
       commits: ""
     },
     blockLists:[]

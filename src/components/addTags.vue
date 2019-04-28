@@ -34,6 +34,11 @@
         created(){
           this.dynamicTags = JSON.parse(JSON.stringify(this.toDynamicTags))
         },
+        watch:{
+          toDynamicTags(newVal, oldVal){
+            this.dynamicTags = JSON.parse(JSON.stringify(newVal));
+          }
+        },
         methods: {
           handleTagClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);

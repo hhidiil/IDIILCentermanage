@@ -21,7 +21,7 @@
           </div>
         </el-form-item>
         <el-form-item label="教学参考:">
-          <upload-files :group="'people'"></upload-files>
+          <upload-files :group="'people'" :fileList="currentBlockList[0].fileLists" @listenChildFiles="listenChildFiles"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -41,7 +41,7 @@
                         prop="target">
             <el-input type="textarea" v-model="blockForm.target" auto-complete="off"></el-input>
           </el-form-item>
-            <el-form-item label="区块时长:">
+          <el-form-item label="区块时长:">
             <el-input v-model="blockForm.duration" auto-complete="off"></el-input>
           </el-form-item>
       </el-form>
@@ -91,6 +91,7 @@
               target: '',
               duration: ''
             },
+            fileLists:[],
             formLabelWidth: '90px'
 
         }
@@ -213,6 +214,22 @@
             message: text,
             type: type
           });
+        },
+        /*
+        * 监听子组件信息
+        * */
+        listenChildFiles(data){
+          let currList=JSON.parse(JSON.stringify(this.currentBlockList));
+          currList[0].fileLists=data;
+          let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+          sourceLists.blockLists.forEach((item) => {
+            if(item.key == this.currentBlockKey){
+            item.fileLists=data
+          }
+        })
+          this.CURRENT_BLOCK_LIST(currList);
+          this.SOURCE_LIST(sourceLists);
+
         }
       }
   }

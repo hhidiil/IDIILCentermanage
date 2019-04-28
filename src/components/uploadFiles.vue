@@ -1,6 +1,7 @@
 <template>
   <div class="uploadFilesContainer">
     <div class="file-upload">
+
       <el-upload
         class="upload-demo"
         ref="upload"
@@ -41,7 +42,7 @@
 <script>
   import draggable from 'vuedraggable'
     export default {
-        props: ['group'],
+        props: ['group','fileList'],
         data(){
           return{
             fileLists: []
@@ -49,6 +50,14 @@
         },
         components:{
           draggable
+        },
+        created(){
+          this.fileLists = JSON.parse(JSON.stringify(this.fileList));
+        },
+        watch:{
+          fileList(newVal, oldVal){
+            this.fileLists = JSON.parse(JSON.stringify(newVal));
+          }
         },
         methods:{
           /*
@@ -64,6 +73,7 @@
                 progress: 0,
                 pgStatus: 'text'
               });
+              this.sendFilesToParent();
             } else if (file.status == 'success'){
               this.fileLists.forEach((item, index) => {
                 if(item.name == file.name){
@@ -113,9 +123,9 @@
               cancelButtonText: '取消',
               type: 'warning'
             }).then(() => {
-
               this.promptMessage( '删除成功', 'success');
               this.fileLists.splice(i, 1);
+              this.sendFilesToParent()
             }).catch(() => {
                 this.promptMessage( '已取消删除', 'info')
             });
@@ -132,7 +142,15 @@
           },
           log(evt){
             console.log(evt);
+            this.sendFilesToParent();
+          },
+          /*
+          *向父组件传递参数
+          * */
+          sendFilesToParent(){
+            this.$emit("listenChildFiles", this.fileLists)
           }
+
         }
     }
 
