@@ -278,6 +278,9 @@
       },
       goToPK(){
         this.$router.push({name:'classTeam',params:{tableData:JSON.stringify(this.tableData)}})
+      },
+      handleClose(){
+
       }
     }
   }

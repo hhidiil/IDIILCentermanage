@@ -18,14 +18,13 @@
             {{tag}}
           </el-tag>
         </el-form-item>
-
+        <el-form-item label="教学参考:">
+          <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists"></upload-files>
+        </el-form-item>
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
           </div>
-        </el-form-item>
-        <el-form-item label="教学参考:">
-          <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileList="sourceListsInfo.classList.fileLists" @listenChildFiles="listenChildFiles"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -47,8 +46,7 @@
           <el-input v-model="classForm.duration" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="对应版本:">
-
-          <add-tags :tagType="'添加版本'" :toDynamicTags="sourceListsInfo.classList.version" v-on:listenToChildTagLists="ChildTagLists"></add-tags>
+          <add-tags :tagType="'添加版本'" :dynamicTags="classForm.version"></add-tags>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -140,7 +138,8 @@
     /*
      * 初始化弹框数据
      * */
-    editClass(item){
+    editClass(items){
+      var item=JSON.parse(JSON.stringify(items));
       this.classForm = {
         name: item.name,
         target: item.target,
@@ -178,22 +177,8 @@
             console.log('error submit!!');
           }
       })
-    },
-    /*
-     * 监听子组件信息
-     * */
-    //-----监听版本信息
-    ChildTagLists(data){
-      console.log(data)
-      this.classForm.version=data;
-      console.log(this.classForm)
-    },
-    //----监听文件列表
-    listenChildFiles(data){
-      let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-      sourceLists.classList.fileLists=data;
-      this.SOURCE_LIST(sourceLists);
     }
+
   }
   }
 </script>

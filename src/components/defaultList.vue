@@ -14,14 +14,14 @@
         <el-form-item label="课程内容:">
           <span>{{currentBlockList[0].name}}</span>
         </el-form-item>
+        <el-form-item label="教学参考:">
+          <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists"></upload-files>
+        </el-form-item>
         <el-form-item>
           <div class="btnBox">
             <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
             <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
           </div>
-        </el-form-item>
-        <el-form-item label="教学参考:">
-          <upload-files :group="'people'" :fileList="currentBlockList[0].fileLists" @listenChildFiles="listenChildFiles"></upload-files>
         </el-form-item>
       </el-form>
     </div>
@@ -91,7 +91,6 @@
               target: '',
               duration: ''
             },
-            fileLists:[],
             formLabelWidth: '90px'
 
         }
@@ -214,23 +213,8 @@
             message: text,
             type: type
           });
-        },
-        /*
-        * 监听子组件信息
-        * */
-        listenChildFiles(data){
-          let currList=JSON.parse(JSON.stringify(this.currentBlockList));
-          currList[0].fileLists=data;
-          let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-          sourceLists.blockLists.forEach((item) => {
-            if(item.key == this.currentBlockKey){
-            item.fileLists=data
-          }
-        })
-          this.CURRENT_BLOCK_LIST(currList);
-          this.SOURCE_LIST(sourceLists);
-
         }
+
       }
   }
 </script>

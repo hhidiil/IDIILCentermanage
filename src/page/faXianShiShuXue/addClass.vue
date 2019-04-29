@@ -34,6 +34,9 @@
                           <span>{{blockList.name}}</span>
                           <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
                         </div>
+                        <!--<div class="blockListDelete">-->
+                          <!--<span><i class="icon iconfont el-icon-dustbin_icon"></i></span>-->
+                        <!--</div>-->
                       </li>
                     </transition-group>
                   </draggable>
@@ -221,7 +224,7 @@
       * */
       saveAllInfo(){
         if(this.sourceLists.classList.name == '' || this.sourceLists.classList.target == ''){
-          this.promptMessage('课程名称和课程目标不能为空哦^o^', 'error');
+          this.promptMessage('课程名称和课程目标不能为空哦^o^', 'warning');
         }else{
           if(this.sourceLists.blockLists.length>0){
             this.sourceLists.blockLists.forEach((item, index) => {
@@ -235,7 +238,7 @@
               return currentValue.validate == true
             });
              if(validatorsFail.length>0){
-               this.promptMessage('区块名称和区块目标不能为空哦^o^', 'error');
+               this.promptMessage('区块名称和区块目标不能为空哦^o^', 'warning');
              }else{
                setStore("sourceLists",this.sourceLists);
                this.promptMessage('保存成功^_^', 'success');
@@ -321,7 +324,17 @@
           margin-bottom: 5px;
           color: #606266;
           cursor: pointer;
-
+          display: flex;
+          justify-content: space-between;
+          .blockListDelete{
+            width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .el-icon-dustbin_icon{
+              font-size: 22px;
+            }
+          }
         }
         .flip-list-move {
           transition: transform 0.5s;

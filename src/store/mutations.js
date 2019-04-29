@@ -6,7 +6,8 @@ import {
   ADD_COUNT,
   SOURCE_LIST,
   CURRENT_BLOCK_KEY,
-  CURRENT_BLOCK_LIST
+  CURRENT_BLOCK_LIST,
+  UPDATE_MENUACTIVENAME
 } from './mutation-types'
 import {setStore,getStore} from '../config/publicMethod'
 export default{
@@ -27,5 +28,8 @@ export default{
   //---储存当前的区块列表
   [CURRENT_BLOCK_LIST](state,key){
     state.currentBlockList=key;
+  },
+  [UPDATE_MENUACTIVENAME](state, name){
+    state.menuActiveName = name
   }
 }

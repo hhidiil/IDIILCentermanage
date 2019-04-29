@@ -23,26 +23,21 @@
 </template>
 <script>
     export default {
-        props: ['tagType','toDynamicTags'],
+        props: ['tagType','dynamicTags'],
         data(){
           return{
-            dynamicTags: [],
             inputVisible: false,
             inputValue: ''
           }
         },
         created(){
-          this.dynamicTags = JSON.parse(JSON.stringify(this.toDynamicTags))
         },
         watch:{
-          toDynamicTags(newVal, oldVal){
-            this.dynamicTags = JSON.parse(JSON.stringify(newVal));
-          }
+
         },
         methods: {
           handleTagClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
-            this.sendMsgToParent();
           },
 
           showTagInput() {
@@ -59,10 +54,6 @@
             }
             this.inputVisible = false;
             this.inputValue = '';
-            this.sendMsgToParent();
-          },
-          sendMsgToParent(){
-            this.$emit("listenToChildTagLists", this.dynamicTags)
           }
         }
     }

@@ -18,7 +18,7 @@
     </el-row>
     <el-row style="height: 100%;">
       <el-col :span="3"  style="min-height: 100%; background-color: #324057;">
-        <el-menu default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
+        <el-menu :default-active="menuActiveName || '/manage'" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
             <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
@@ -30,16 +30,15 @@
         </el-menu>
       </el-col>
       <el-col :span="21" style="height: 100%;overflow: hidden;">
+
         <router-view></router-view>
-        <!--<keep-alive>-->
-          <!---->
-        <!--</keep-alive>-->
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import { mapState,mapMutations } from 'vuex'
   import {setStore,getStore,clearStore,setSession,clearSession} from '../../config/publicMethod'
   import {getCourseList} from '../../api/classes'
   export default {
@@ -48,15 +47,24 @@
       return {}
     },
     computed: {
+      ...mapState(['menuActiveName']),
       defaultActive: function(){
         return this.$router.path.replace('/', '');
       }
+
     },
     mounted(){
       //进入首页的时候存储一个课程列表
       this.getCourseList();
     },
+    created(){
+      this.routerHandle(this.$route)
+    },
+    watch:{
+      $route:'routerHandle'
+    },
     methods:{
+      ...mapMutations(['UPDATE_MENUACTIVENAME']),
       async getCourseList(){
         let classList = [];
         let userInfo = JSON.parse(getStore("userInfo"));
@@ -74,6 +82,9 @@
           this.$router.replace({path:'/'})
         }
       },
+      routerHandle(route){
+        this.UPDATE_MENUACTIVENAME(route.path);
+      }
     }
   }
 </script>

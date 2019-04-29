@@ -24,7 +24,8 @@ const state = {
     blockLists:[]
   },
   currentBlockKey:'', //选择的当前区块key
-  currentBlockList:[] //选择的当前区块的列表
+  currentBlockList:[], //选择的当前区块的列表
+  menuActiveName: '' //侧边栏显示
 
 };
 export default new Vuex.Store({

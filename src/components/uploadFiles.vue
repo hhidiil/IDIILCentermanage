@@ -14,7 +14,6 @@
         :on-success="UploadOnSuccess"
         :on-error="UploadOnError">
         <el-button slot="trigger" size="mini" type="primary">上传文件</el-button>
-        <!--<el-button style="margin-left: 10px;" size="mini" type="success" @click="submitUpload">上传到服务器</el-button>-->
       </el-upload>
     </div>
     <div class="file-list">
@@ -41,22 +40,13 @@
 <script>
   import draggable from 'vuedraggable'
     export default {
-        props: ['group','fileList'],
+        props: ['group','fileLists'],
         data(){
           return{
-            fileLists: []
           }
         },
         components:{
           draggable
-        },
-        created(){
-          this.fileLists = JSON.parse(JSON.stringify(this.fileList));
-        },
-        watch:{
-          fileList(newVal, oldVal){
-            this.fileLists = JSON.parse(JSON.stringify(newVal));
-          }
         },
         methods:{
           /*
@@ -79,7 +69,6 @@
                   item.pgStatus = 'success'
                 }
               })
-              this.sendFilesToParent();
             } else if (file.status == 'fail') {
               this.fileLists.forEach((item, index) => {
                 if(item.name == file.name){
@@ -124,7 +113,6 @@
             }).then(() => {
               this.promptMessage( '删除成功', 'success');
               this.fileLists.splice(i, 1);
-              this.sendFilesToParent()
             }).catch(() => {
                 this.promptMessage( '已取消删除', 'info')
             });
@@ -140,14 +128,7 @@
             });
           },
           log(evt){
-            console.log(evt);
-            this.sendFilesToParent();
-          },
-          /*
-          *向父组件传递参数
-          * */
-          sendFilesToParent(){
-            this.$emit("listenChildFiles", this.fileLists)
+            console.log('dragtoright---'+evt);
           }
 
         }
