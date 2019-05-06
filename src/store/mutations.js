@@ -7,15 +7,16 @@ import {
   SOURCE_LIST,
   CURRENT_BLOCK_KEY,
   CURRENT_BLOCK_LIST,
-  UPDATE_MENUACTIVENAME
+  UPDATE_MENUACTIVENAME,
+  UPDATE_LESSIONS_STATUS
 } from './mutation-types'
 import {setStore,getStore} from '../config/publicMethod'
 export default{
   [SOURCE_LIST](state,newList){
     console.log('save---mutation');
-    state.sourceListsInfo=newList;
+    state.sourceListsInfo=newList.val;
     //存入localStorage
-    //setStore('sourceLists',JSON.stringify(state.sourceListsInfo))
+    setStore(`sourceLists-${newList.key}`,newList.val)
 
   },
   [ADD_COUNT](state){
@@ -31,5 +32,8 @@ export default{
   },
   [UPDATE_MENUACTIVENAME](state, name){
     state.menuActiveName = name
+  },
+  [UPDATE_LESSIONS_STATUS](state, status){
+    state.prepareLessonsStatus = status
   }
 }

@@ -1,76 +1,52 @@
 <template>
-  <div class="row">
-    <div class="col-3">
-      <h3>Draggable 1</h3>
-      <draggable
-        class="dragArea list-group"
-        :list="list1"
-        :group="{ name: 'people', pull: 'clone', put: false }"
-        :clone="cloneDog"
-        @change="log"
-      >
-        <div class="list-group-item" v-for="element in list1" :key="element.id">
-          {{ element.name }}
-        </div>
-      </draggable>
-    </div>
-
-    <div class="col-3">
-      <h3>Draggable 2</h3>
-      <draggable
-        class="dragArea list-group"
-        :list="list2"
-        group="people"
-        @change="log"
-      >
-        <div class="list-group-item" v-for="element in list2" :key="element.id">
-          {{ element.name }}
-        </div>
-      </draggable>
-    </div>
-
-    <!--<rawDisplayer class="col-3" :value="list1" title="List 1" />-->
-
-    <!--<rawDisplayer class="col-3" :value="list2" title="List 2" />-->
-  </div>
+  <el-upload
+    class="upload-demo"
+    ref="upload"
+    action="/api/file/upload"
+    :data="uploadData"
+    :on-preview="handlePreview"
+    :on-remove="handleRemove"
+    :file-list="fileList"
+    :on-success="UploadOnSuccess"
+    :auto-upload="false">
+    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+    <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+  </el-upload>
 </template>
 
 <script>
-  import draggable from "vuedraggable";
-  let idGlobal = 8;
+  import {setStore,getStore} from '../../config/publicMethod'
   export default {
-    name: "custom-clone",
-    display: "Custom Clone",
-    order: 3,
-    components: {
-      draggable
-    },
     data() {
       return {
-        list1: [
-          { name: "dog 1", id: 1 },
-          { name: "dog 2", id: 2 },
-          { name: "dog 3", id: 3 },
-          { name: "dog 4", id: 4 }
-        ],
-        list2: [
-          { name: "cat 5", id: 5 },
-          { name: "cat 6", id: 6 },
-          { name: "cat 7", id: 7 }
-        ]
+        fileList: []
       };
     },
-    methods: {
-      log: function(evt) {
-        window.console.log(evt);
-      },
-      cloneDog({ id }) {
+    computed:{
+      uploadData(){
         return {
-          id: idGlobal++,
-          name: `cat ${id}`
-        };
+          "username":JSON.parse(getStore('userInfo')).userName
+        }
       }
+    },
+    methods: {
+
+      submitUpload() {
+        this.$refs.upload.submit(); //上传文件 "/api/file/upload"
+
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      UploadOnSuccess(response, file, fileLists){
+        console.log(response);
+        this.fileList.push({url:response.file, data:file, name:file.name})
+      }
+
     }
-  };
+  }
 </script>
-<style scoped></style>

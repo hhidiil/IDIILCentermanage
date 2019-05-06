@@ -1,37 +1,38 @@
 <template>
   <section>
-    <div>
-      <el-form  class="textForm" label-width="formLabelWidth">
-        <el-form-item label="课程名称:">
-          <span>{{sourceListsInfo.classList.name}}</span>
-        </el-form-item>
-        <el-form-item label="课程目标:">
-          <span>{{sourceListsInfo.classList.target}}</span>
-        </el-form-item>
-        <el-form-item label="课程时长:">
-          <span>{{sourceListsInfo.classList.duration}}</span>
-        </el-form-item>
-        <el-form-item label="对应版本:">
-          <el-tag
-            v-for="tag in sourceListsInfo.classList.version"
-            :key="tag">
-            {{tag}}
-          </el-tag>
-        </el-form-item>
-        <el-form-item label="教学参考:">
-          <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists"></upload-files>
-        </el-form-item>
-        <el-form-item>
-          <div class="btnBox">
-            <el-button size="mini" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </div>
+    <el-card class="classListCard">
+      <div slot="header" class="clearfix">
+        <span>课程细节</span>
+        <el-button v-if="prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="editClass(sourceListsInfo.classList)">编辑</el-button>
+      </div>
+      <div>
+        <el-form  class="textForm" label-width="formLabelWidth">
+          <el-form-item label="课程名称:">
+            <span>{{sourceListsInfo.classList.name}}</span>
+          </el-form-item>
+          <el-form-item label="课程目标:">
+            <span>{{sourceListsInfo.classList.target}}</span>
+          </el-form-item>
+          <el-form-item label="课程时长:">
+            <span>{{sourceListsInfo.classList.duration}}</span>
+          </el-form-item>
+          <el-form-item label="对应版本:">
+            <el-tag
+              v-for="tag in sourceListsInfo.classList.version"
+              :key="tag">
+              {{tag}}
+            </el-tag>
+          </el-form-item>
+          <el-form-item label="教学参考:">
+            <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
 
     <!-- 课程编辑弹出框 -->
     <el-dialog
-      title="编辑课程信息"
+      title="编辑课程细节"
       v-dialogDrag
       :visible.sync="editVisible"
       width="40%">
@@ -42,7 +43,7 @@
         <el-form-item label="课程目标:" prop="target">
           <el-input type="textarea" v-model="classForm.target" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="课程时长:" prop="duration">
+        <el-form-item label="课程时长:">
           <el-input v-model="classForm.duration" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="对应版本:">
@@ -62,7 +63,7 @@
   import uploadFiles from './uploadFiles.vue'
   import addTags from './addTags.vue'
   export default{
-    props:[],
+    props:['guid'],
     data(){
       let validClassName=(rule, value, callback)=>{
         if(!value){
@@ -88,7 +89,6 @@
           }
         }
       }
-
       return{
         editVisible:false, //编辑弹出框
         //新增表单的验证规则
@@ -113,77 +113,83 @@
         },
         formLabelWidth: '90px'
       }
-
     },
     components:{
       uploadFiles,
       addTags
     },
-    created(){
-
-    },
-    mounted(){
-
-    },
     computed:{
       ...mapState([
-        'sourceListsInfo'
+        'sourceListsInfo',
+        'prepareLessonsStatus'
       ])
-  },
-  methods:{
-  ...mapMutations([
-      'SOURCE_LIST'
-    ]),
-
-    /*
-     * 初始化弹框数据
-     * */
-    editClass(items){
-      var item=JSON.parse(JSON.stringify(items));
-      this.classForm = {
-        name: item.name,
-        target: item.target,
-        duration: item.duration,
-        version: item.version
-      };
-      this.editVisible = true;
-      this.clearValidate('classForm');
     },
-    /*
-     * 移除整个表单的校验结果
-     * */
-    clearValidate(formName){
-      this.$nextTick(function(){
-        this.$refs[formName].clearValidate();
-      });
-
-    },
+    methods:{
+    ...mapMutations([
+        'SOURCE_LIST'
+      ]),
       /*
-       * 弹框区块内容编辑保存
+       * 初始化弹框数据
        * */
-      saveBlockEdit(formName){
-        this.$refs[formName].validate((valid) => {
-          if(valid){
-            let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-              sourceLists.classList.name=this.classForm.name;
-              sourceLists.classList.target=this.classForm.target;
-              sourceLists.classList.duration=this.classForm.duration;
-              sourceLists.classList.version=this.classForm.version;
+      editClass(items){
+        var item=JSON.parse(JSON.stringify(items));
+        this.classForm = {
+          name: item.name,
+          target: item.target,
+          duration: item.duration,
+          version: item.version
+        };
+        this.editVisible = true;
+        this.clearValidate('classForm');
+      },
+      /*
+       * 移除整个表单的校验结果
+       * */
+      clearValidate(formName){
+        this.$nextTick(function(){
+          this.$refs[formName].clearValidate();
+        });
+      },
+        /*
+         * 弹框课程内容编辑保存
+         * */
+        saveBlockEdit(formName){
+          this.$refs[formName].validate((valid) => {
+            if(valid){
+              let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+                sourceLists.classList.name=this.classForm.name;
+                sourceLists.classList.target=this.classForm.target;
+                sourceLists.classList.duration=this.classForm.duration;
+                sourceLists.classList.version=this.classForm.version;
+              this.SOURCE_LIST({val:sourceLists, key:this.guid});
+              this.editVisible = false;
+            }else{
+              console.log('error submit!!');
+            }
+        })
+      },
+      /*
+       * 从子组件接收参数并触发该事件
+       * */
+      sendFilesInfo(data){
+        let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+        sourceLists.classList.fileLists=data;
+        this.SOURCE_LIST({val:sourceLists, key:this.guid});
+      }
 
-            this.SOURCE_LIST(sourceLists);
-            this.editVisible = false;
-
-          }else{
-            console.log('error submit!!');
-          }
-      })
     }
-
-  }
   }
 </script>
 <style scoped lang="less">
-
+  .classListCard{
+    margin-bottom: 20px;
+    .button-group{
+      text-align: right;
+    }
+    .el-tag {
+      margin-right: 10px;
+    }
+  }
   .btnBox{
     text-align: right;
   }

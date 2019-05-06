@@ -18,10 +18,10 @@
     </el-row>
     <el-row style="height: 100%;">
       <el-col :span="3"  style="min-height: 100%; background-color: #324057;">
-        <el-menu :default-active="menuActiveName || '/manage'" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
+        <el-menu default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
-            <el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>
+            <!--<el-menu-item index="/manage/addClassManager">添加备课</el-menu-item>-->
             <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
             <el-menu-item index="/manage/classTeam">派课列表</el-menu-item>
             <el-menu-item index="/manage/practice">练习44</el-menu-item>

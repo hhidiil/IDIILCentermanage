@@ -13,10 +13,12 @@ const fileDeal = express.Router()
  * 文件上传接口
  * */
 fileDeal.post('/upload',async(req, res) => {
+    console.log("reqreqreq@@@@@@@@@@@@@@@@=",req.body);
     var Files = req.files.file;
     var filename = Files.name;
     var filetype = Files.mimetype;
     var foldername=req.body.username;//用户名作为文件名
+  console.log("@@@@@@@@@@@@@@@@=",foldername);
     var dateString='',target_path='';
     var dir = path.join(__dirname, ''); //文件路径，__dirname为当前运行js文件的目录
     var sep = path.sep;//不同系统的文件路径分隔符

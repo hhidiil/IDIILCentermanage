@@ -10,22 +10,11 @@ Vue.use(Vuex);
 
 const state = {
   count:0,
-  sourceListsInfo:{
-    classList:{
-      classId:"",
-      name:"",
-      datetime: "",
-      target: "",
-      duration:"",
-      version:[],
-      fileLists: [],
-      commits: ""
-    },
-    blockLists:[]
-  },
+  sourceListsInfo:{},
   currentBlockKey:'', //选择的当前区块key
   currentBlockList:[], //选择的当前区块的列表
-  menuActiveName: '' //侧边栏显示
+  menuActiveName: '', //侧边栏显示
+  prepareLessonsStatus: '' //备课状态
 
 };
 export default new Vuex.Store({

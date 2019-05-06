@@ -1,30 +1,33 @@
 <template>
-  <section>
-    <div>
-      <el-form  class="textForm" label-width="formLabelWidth">
-        <el-form-item label="区块名称:">
-          <span>{{currentBlockList[0].name}}</span>
-        </el-form-item>
-        <el-form-item label="教学目标:">
-          <span>{{currentBlockList[0].target}}</span>
-        </el-form-item>
-        <el-form-item label="课程时长:">
-          <span>{{currentBlockList[0].duration}}</span>
-        </el-form-item>
-        <el-form-item label="课程内容:">
-          <span>{{currentBlockList[0].name}}</span>
-        </el-form-item>
-        <el-form-item label="教学参考:">
-          <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists"></upload-files>
-        </el-form-item>
-        <el-form-item>
-          <div class="btnBox">
-            <el-button size="mini" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
-            <el-button size="mini" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </div>
+  <section class="blockContainerCard">
+    <el-card class="blockContainerCard">
+      <div slot="header" class="clearfix">
+        <span>区块内容</span>
+        <span v-if="prepareLessonsStatus != 'check'">
+            <el-button style="float: right; padding: 3px 0" type="text" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
+            <el-button style="float: right; padding: 3px 0; margin-right: 15px" type="text" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
+        </span>
+      </div>
+      <div>
+        <el-form  class="textForm" label-width="formLabelWidth">
+          <el-form-item label="区块名称:">
+            <span>{{currentBlockList[0].name}}</span>
+          </el-form-item>
+          <el-form-item label="教学目标:">
+            <span>{{currentBlockList[0].target}}</span>
+          </el-form-item>
+          <el-form-item label="课程时长:">
+            <span>{{currentBlockList[0].duration}}</span>
+          </el-form-item>
+          <el-form-item label="课程内容:">
+            <span>{{currentBlockList[0].name}}</span>
+          </el-form-item>
+          <el-form-item label="教学参考:">
+            <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-card>
 
     <!-- 区块编辑弹出框 -->
     <el-dialog
@@ -57,7 +60,7 @@
   import { mapState,mapMutations } from 'vuex'
   import uploadFiles from './uploadFiles.vue'
   export default{
-      props:[],
+      props:['guid'],
       data(){
         let validBlockName=(rule, value, callback) => {
           if (!value) {
@@ -92,34 +95,18 @@
               duration: ''
             },
             formLabelWidth: '90px'
-
         }
-
       },
       components:{
         uploadFiles
-      },
-      created(){
-
-      },
-      mounted(){
-
       },
       computed:{
         ...mapState([
           'sourceListsInfo',
           'currentBlockKey',
-          'currentBlockList'
-        ]),
-        proStatus(){ //上传状态
-          if(this.pass){
-            return 'success'
-          } else if (this.pass === false){
-            return 'exception'
-          } else {
-            return 'text'
-          }
-        }
+          'currentBlockList',
+          'prepareLessonsStatus'
+        ])
       },
 
       methods:{
@@ -137,23 +124,20 @@
                   sourceLists.blockLists.splice(index, 1);
                 }
               })
-
               let cBlockKey=sourceLists.blockLists[0].key;
               let cBlockList=sourceLists.blockLists.filter((currentValue,index,arr) => {
                   return currentValue.key ==  sourceLists.blockLists[0].key;
                 });
-              this.SOURCE_LIST(sourceLists);
+              this.SOURCE_LIST({val:sourceLists, key:this.guid});
               this.CURRENT_BLOCK_KEY(cBlockKey);
               this.CURRENT_BLOCK_LIST(cBlockList);
             }else{
               sourceLists.blockLists.splice(0, 1);
-              this.SOURCE_LIST(sourceLists);
+              this.SOURCE_LIST({val:sourceLists, key:this.guid});
               this.CURRENT_BLOCK_KEY("");
               this.CURRENT_BLOCK_LIST([]);
             }
-
         },
-
         /*
         * 初始化弹框数据
         * */
@@ -173,7 +157,6 @@
           this.$nextTick(function(){
             this.$refs[formName].clearValidate();
           });
-
         },
         /*
         * 弹框区块内容编辑保存
@@ -195,7 +178,7 @@
                 }
               })
               this.CURRENT_BLOCK_LIST(currList);
-              this.SOURCE_LIST(sourceLists);
+              this.SOURCE_LIST({val:sourceLists, key:this.guid});
               this.editVisible = false;
 
             }else{
@@ -203,7 +186,6 @@
             }
           })
         },
-
         /*
          * 提示信息
          * */
@@ -213,12 +195,30 @@
             message: text,
             type: type
           });
+        },
+        /*
+        * 从子组件接收参数并触发该事件
+        * */
+        sendFilesInfo(data){
+          let currList=JSON.parse(JSON.stringify(this.currentBlockList));
+          currList[0].fileLists=data;
+          let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
+          sourceLists.blockLists.forEach((item) => {
+              if(item.key == this.currentBlockKey){
+              item.fileLists=data;
+            }
+          })
+          this.CURRENT_BLOCK_LIST(currList);
+          this.SOURCE_LIST({val:sourceLists, key:this.guid});
         }
 
       }
   }
 </script>
 <style scoped lang="less">
+  .blockContainerCard{
+    height: 100%;
+  }
   .btnBox{
     text-align: right;
   }

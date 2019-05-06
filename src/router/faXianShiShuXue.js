@@ -33,7 +33,7 @@ const routes = [
         component: defaultPage,
         meta: []
       }, {
-        path: 'addClassManager',
+        path: '/addClassManager',
         name: 'addClassManager',
         component: addClassManager,
         meta: ['备课管理', '添加备课']
