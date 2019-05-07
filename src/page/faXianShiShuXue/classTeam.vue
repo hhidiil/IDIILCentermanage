@@ -2,42 +2,55 @@
   <div>
     <head-top></head-top>
     <section class="classManagerList_section">
-      <div class="block">
-        <span class="demonstration">选择日期</span>
-        <el-date-picker
-          v-model="selectedDate"
-          type="daterange"
-          align="right"
-          unlink-panels
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :picker-options="pickerOptions2"
-          @change="changeStatus">
-        </el-date-picker>
-      </div>
-      <el-checkbox-group v-model="checkedSearchTypes" @change="handleCheckedSearchTypesChange">
-        <el-checkbox v-for="searchType in searchTypes" :label="searchType" :key="searchType">{{searchType}}</el-checkbox>
-      </el-checkbox-group>
-      选择状态：
-      <el-radio-group :disabled="cannotScreeningByStatus" v-model="status" @change="changeStatus">
-
-        <el-radio label="未开始">未开始</el-radio>
-        <el-radio label="进行中">进行中</el-radio>
-        <el-radio label="已完成">已完成</el-radio>
-      </el-radio-group>
-      <el-card class="box-card" style="height: 600px">
-        <div slot="header" class="clearfix">
-          <span>派课列表</span>
-        </div>
-        <div>
+      <el-row>
+        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
+          <div class="block">
+            <span class="demonstration">选择日期</span>
+            <el-date-picker
+              v-model="selectedDate"
+              type="daterange"
+              align="right"
+              unlink-panels
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              :picker-options="pickerOptions2"
+              @change="changeStatus">
+            </el-date-picker>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
+          <el-checkbox-group v-model="checkedSearchTypes" @change="handleCheckedSearchTypesChange">
+            <el-checkbox v-for="searchType in searchTypes" :label="searchType" :key="searchType">{{searchType}}</el-checkbox>
+          </el-checkbox-group>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
+          选择状态：
+          <el-radio-group :disabled="cannotScreeningByStatus" v-model="status" @change="changeStatus">
+            <el-radio label="未开始">未开始</el-radio>
+            <el-radio label="进行中">进行中</el-radio>
+            <el-radio label="已完成">已完成</el-radio>
+          </el-radio-group>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24" style="text-align: right;margin-bottom: 10px">
+          <el-button type="primary" round @click="sendLessionsAdd('add')" >新增派课</el-button>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
           <el-table
             :data="tableData"
             border
             style="width: 100%;text-align: center"
             :cell-style = 'statusStyle'
             :row-style='showStyle'
-            >
+          >
             <el-table-column
               prop="date"
               label="日期">
@@ -61,8 +74,8 @@
               </template>
             </el-table-column>
           </el-table>
-        </div>
-      </el-card>
+        </el-col>
+      </el-row>
     </section>
     <el-dialog
       title="派课信息"
@@ -320,6 +333,14 @@
       },
       changeStatus(){
         this.handleCheckedSearchTypesChange(this.checkedSearchTypes)
+      },
+
+
+      /*
+      * 点击进行派课
+      * */
+      sendLessionsAdd(){
+        this.$router.push({path:'/sendLessons'})
       }
     }
   }

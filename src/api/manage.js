@@ -1,7 +1,7 @@
 import fetch_requset from '../config/fetch'
 
-const API_CONFIG = '/api/manage';
-
+//const API_CONFIG = '/api/manage';
+const API_CONFIG = 'http://nwprodsub.idiil.com.cn:9999/api/manage';
 /**
  * [查询各个中心的管理员列表信息]
  */
@@ -35,5 +35,19 @@ export const addClassInfo = (data) => {
  */
 export const deleteClassInfo = (data) => {
   const url = `${API_CONFIG}/deleteClassInfo`;
+  return fetch_requset(url,data,'POST')
+}
+/**
+ * [获取班级列表]
+ */
+export const getSchoolClasses = (data) => {
+  const url = `${API_CONFIG}/getSchoolClasses`;
+  return fetch_requset(url,data,'POST')
+}
+/**
+ * [获取班级下的所有学生列表]
+ */
+export const getClassCenterUser = (data) => {
+  const url = `${API_CONFIG}/getClassCenterUser`;
   return fetch_requset(url,data,'POST')
 }

@@ -80,59 +80,6 @@
           <!--</el-pagination>-->
         </el-col>
       </el-row>
-      <!--查看课程弹框-->
-      <el-dialog
-        title="课程描述"
-        :visible.sync="dialogVisible"
-        width="30%"
-        :before-close="handleClose">
-        <div class="text item">
-          <table width="100%" height="500px" border="0" cellpadding="10">
-            <tbody>
-            <tr>
-              <td width="100px">课程名:</td>
-              <td>{{tableData.name}}</td>
-            </tr>
-            <tr>
-              <td>教学目标:</td>
-              <td>{{tableData.target}}</td>
-            </tr>
-            <tr>
-              <td>对应教材:</td>
-              <td>{{tableData.aaa}}</td>
-            </tr>
-            <tr>
-              <td>IDIIL课件:</td>
-              <td>
-                <div v-if="sourceData.length>0">
-                  <li class="resoucelist"
-                      v-for="item1 in sourceData">
-                    {{item1.name}}
-                  </li>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>课外资料:</td>
-              <td>
-                <div v-if="otherSource.length>0">
-                  <li class="resoucelist"
-                      v-for="item2 in otherSource">
-                    <span>{{item2.name}}</span>
-                    <a :href="'/' + item2.response.file" :download="item2.name">下载</a>
-                  </li>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>备注:</td>
-              <td>{{tableData.commits}}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <span slot="footer" class="dialog-footer"></span>
-      </el-dialog>
     </section>
   </div>
 </template>
@@ -153,11 +100,6 @@
       let classList = JSON.parse(getStore("classList"));
 
       return {
-        classList: classList,
-        tableData: classList.length > 0 ? classList[0] : classData.classList,
-        currentindex: 0,//当前选择的爱迪乐探究课程列表
-        currentindex1: -1,//当前选择的自定义探究课程列表
-        isCollapse: false,
         dialogEditVisible: false,
         formLabelWidth: '90px',
         datetimes: '',
@@ -177,23 +119,12 @@
     },
     activated() {
       //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
-      this.getClassListInfo()
     },
     mounted() {
       this.getCurriculumLists();
 
     },
-    computed: {
-      sourceData() {
-        let source = toJson(this.tableData.source);
-        return source;
-      },
-      otherSource() {
-        let othersource = this.tableData.otherSource ? this.tableData.otherSource : this.tableData.othersource
-        let othersource2 = toJson(othersource);
-        return othersource2;
-      },
-    },
+
     methods: {
       // 获取课程列表
       async getCurriculumLists(){
@@ -211,71 +142,17 @@
           this.$message({type: 'success', message: '删除成功!'});
         }
       },
-
-      async getClassListInfo() {
-        let userInfo = JSON.parse(getStore("userInfo"));
-        let classList2 = await getCourseList({teacherId: userInfo.userId});//数据库获取教师的派课列表
-        console.log("数据库获取教师的派课列表---classList2----->>", classList2)
-        if (classList2.data.length > 0) {
-          this.classList = classList2.data;
-          this.tableData = classList2.data[this.currentindex];
-        }
-        console.log("this.tableData--->>", this.tableData)
-      },
+      /*
+      * 表头单元格的 style 的回调方法
+      * */
       tableHeaderColor({ row, column, rowIndex, columnIndex }) {
         if (rowIndex === 0) {
           return 'background-color: #EFF2F7;color: #000000;font-weight: 500;'
         }
       },
-      handleClick(row){
-        this.dialogVisible=!this.dialogVisible;
-        this.target=row.target;
-        this.name=row.name;
-      },
+
       toJson: function (str) {
         return toJson(str)
-      },
-      closeDialogHandle() {
-        console.log("closeDialogHandle");
-        //关闭修改弹框的之后重新加载一遍数据，刷新视图
-        this.getClassListInfo()
-      },
-      clickItem(item, index) {
-        console.log(item, index);
-        this.currentindex1 = -1;
-        this.currentindex = index;
-        this.tableData = this.classList[index]
-      },
-
-      async goToClass(tableData) {
-        console.log("跳转链接", tableData);
-        const result1 = await updateDoingCourseInfo(tableData);//更新数据库数据，保存当前正在做的课件信息
-        if (result1.code == 200) {
-          if (result1.type == '1') {
-            this.$alert("当前（ " + result1.data[0].name + " ）的课程还未讲完!", '提示：');
-            return
-          }
-        }
-        //将派课的参数上传。写入JSON中
-        const result = await writeFileJson(tableData);
-        if (result.code == 200) {
-          console.log("本地写入当前准备讲的课程的信息---writeFileJson--->", result.data)
-        } else {
-          console.error("写入当前准备讲的课程的信息---writeFileJson-- 失败->", result)
-          return
-        }
-        //设置缓存，刚才派课的json数据
-        setStore("ClassUserList", result.data);
-        let dataParams = {};
-        dataParams.teacherId = JSON.parse(getStore('userInfo')).userId;
-        dataParams.centerId = result.data.CenterID;
-        dataParams.performanceID = result.data.classList.courseId;//课程ID
-        let url = baseUrl_dev + '/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID=' + dataParams.teacherId + '&sCenterID=' + dataParams.centerId + '&sPerformanceID=' + dataParams.performanceID;
-        console.warn("老师上课的地址url-->", url)
-        window.open(url)
-      },
-      handleClose(){
-
       },
       /*
       * 添加课程

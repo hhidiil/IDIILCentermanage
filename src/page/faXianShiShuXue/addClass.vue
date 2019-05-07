@@ -1,6 +1,5 @@
 <template>
   <div class="addClass">
-
     <section class="data_section">
         <el-row :gutter="20" class="mainContainer">
           <el-col :span="8">
@@ -72,8 +71,6 @@
           <div v-else class="btnBox">
             <el-button type="primary" size="small" @click="saveAllInfo('check')">返回</el-button>
           </div>
-
-
         </el-col>
       </el-row>
     </section>

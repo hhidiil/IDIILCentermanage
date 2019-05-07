@@ -2,7 +2,7 @@
   <div class="classManager">
     <head-top></head-top>
     <section class="data_section">
-      <addClass :data="noneData" type="add" :addFlag="addFlag" key="add"></addClass>
+      <addClass></addClass>
     </section>
   </div>
 </template>
