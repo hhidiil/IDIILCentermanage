@@ -57,19 +57,28 @@
             <div class="classItem">
               <span>分组列表:</span>
               <div class="subgroupLists">
-                <el-collapse>
-                  <el-collapse-item v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">
-                    <template slot="title">
-                      {{item.subgroupName}}
-                    </template>
-                    <div v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">
+                <!--<el-collapse>-->
+                  <!--<el-collapse-item v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">-->
+                    <!--<template slot="title">-->
+                      <!--{{item.subgroupName}}-->
+                    <!--</template>-->
+                    <!--<div v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">-->
+                      <!--{{val.key}}&#45;&#45;{{val.UserName}}-->
+                    <!--</div>-->
+                  <!--</el-collapse-item>-->
+                <!--</el-collapse>-->
+                <ul>
+                  <li v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">
+                    <span> {{item.subgroupName}}{{index+1}}:</span>
+                    <span  v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">
                       {{val.key}}--{{val.UserName}}
-                    </div>
-                  </el-collapse-item>
-                </el-collapse>
+                    </span>
+                  </li>
+                </ul>
               </div>
             </div>
             <div v-if="sendLessonsType != 'check'" class="classItem">
+             <el-button size="small" type="primary" @click="sendLessensSave('back')">取消并返回</el-button>
              <el-button size="small" type="primary" @click="sendLessensSave('save')">保存</el-button>
              <el-button size="small" type="success" @click="sendLessensSave('upload')">上传</el-button>
             </div>
@@ -135,19 +144,9 @@
   import headTop from '../../components/headTop.vue'
   import {getCurriculumList, saveTempAssignment, getTempAssignment} from '../../api/exploration'
   import {getSchoolClasses, getClassCenterUser} from '../../api/manage'
-  import {setStore,getStore} from '../../config/publicMethod'
+  import {setStore,getStore,removeStore} from '../../config/publicMethod'
   let Base64 = require('js-base64').Base64;
-  let sendLessonsListsInfo={
-    culumLists: [],
-    currentList: null,
-    currentRow: null,
-    classOptions: [],
-    selectValue: '',
-    subgroupData: [],
-    subgroupValue: [],
-    sendSubgroupLists: [],
-    currentClassID:''
-  };
+
   export default {
     props:[],
     data(){
@@ -156,7 +155,17 @@
         sendLessonsType:'',
         guid:'',
         userInfo:JSON.parse(getStore('userInfo')),
-        sendLessonsLists:sendLessonsListsInfo,
+        sendLessonsLists:{
+          culumLists: [],
+          currentList: null,
+          currentRow: null,
+          classOptions: [],
+          selectValue: '',
+          subgroupData: [],
+          subgroupValue: [],
+          sendSubgroupLists: [],
+          currentClassID:''
+        },
         renderFunc(h, option) {
           return <span>{ option.key } - { option.label }</span>;
         }
@@ -201,7 +210,17 @@
           if(object){
             this.sendLessonsLists=object;
           }else {
-            this.sendLessonsLists=sendLessonsListsInfo;
+            this.sendLessonsLists={
+              culumLists: [],
+              currentList: null,
+              currentRow: null,
+              classOptions: [],
+              selectValue: '',
+              subgroupData: [],
+              subgroupValue: [],
+              sendSubgroupLists: [],
+              currentClassID:''
+            };
           }
         }else{
           let object=JSON.parse(getStore(`sendLessonsLists-${this.guid}`));
@@ -327,7 +346,7 @@
       confirmGrouping(){
         this.sendLessonsLists.currentClassID=this.sendLessonsLists.selectValue;
         var subgroupItem={
-          subgroupName: '新增组',
+          subgroupName: '组',
           subgroupMembers:[]
         };
         for(let i= this.sendLessonsLists.subgroupData.length-1;i>=0;i--){
@@ -351,7 +370,11 @@
           this.$router.push({name:'classTeam'})
         } else if(type == "save"){
           this.saveLessensLists('doing','');
-        }else {
+        } else if(type == "back"){
+          removeStore(`sendLessonsLists-${this.guid}`);
+          this.$router.push({name:'classTeam'});
+
+        } else {
           if(!this.sendLessonsLists.currentRow){
             this.promptMessage('课程名称和课程目标不能为空哦^o^', 'warning')
           } else if(this.sendLessonsLists.sendSubgroupLists.length == 0 ){
@@ -446,12 +469,14 @@
   }
 
  .subgroupLists{
-   background: #cee4fd;
-   .textItem{
-     /*padding: 2px 4px;*/
-     /*background: #ecf5ff;*/
-     /*border-bottom: 1px solid #c2dcf9;*/
+   li{
+     border-bottom: 1px solid #d6e7f9;
+    .textItem{
+      padding: 0 5px;
+      /*color: #00a8e6;*/
+    }
    }
+
   }
 
 </style>

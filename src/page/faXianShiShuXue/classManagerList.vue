@@ -1,7 +1,7 @@
 <template>
   <div>
     <head-top></head-top>
-    <section class="classManagerList_section">
+    <section class="data_section">
       <el-row>
         <el-col :span="24" style="text-align: left;margin-bottom: 10px"><el-button type="primary" round @click="curriculumAdd('add')" >新增备课</el-button></el-col>
       </el-row>
@@ -73,11 +73,17 @@
               </template>
             </el-table-column>
           </el-table>
-          <!--<el-pagination-->
-            <!--background-->
-            <!--layout="prev, pager, next"-->
-            <!--:total="totalItem">-->
-          <!--</el-pagination>-->
+
+          <el-pagination
+            v-if="culumLists.length>0"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[5,10, 20, 30]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalNum">
+          </el-pagination>
         </el-col>
       </el-row>
     </section>
@@ -99,7 +105,6 @@
     data() {
       let classList = JSON.parse(getStore("classList"));
       return {
-        dialogEditVisible: false,
         formLabelWidth: '90px',
         datetimes: '',
         formInline: {
@@ -107,9 +112,10 @@
           Name: '',
           CourseType1:''
         },
-        dialogVisible:false,
-        totalItem:classList.length,
-        culumLists:[]
+        culumLists:[], //总课程列表
+        currentPage:1, //默认显示第一页
+        pageSize:5, //默认每页显示1条
+        totalNum:10 //总页数
       }
     },
     components: {
@@ -120,8 +126,9 @@
       //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
     },
     mounted() {
+      const Wh = $(window).height();
+      $(".data_section").css("height",(Wh-150)+'px');
       this.getCurriculumLists();
-
     },
 
     methods: {
@@ -129,6 +136,7 @@
       async getCurriculumLists(){
         let result=await getCurriculumList();
         this.culumLists=result.data;
+        this.totalNum=this.culumLists.length;
         console.log(this.culumLists)
       },
       //删除课程列表
@@ -191,6 +199,20 @@
         }).catch(() => {
           this.$message({type: 'info', message: '已取消删除'});
         });
+      },
+      /*
+      * pageSize 改变时会触发
+      * */
+      handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+        this.pageSize = val;
+      },
+      /*
+       * currentPage 改变时会触发
+       * */
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+        this.currentPage = val;
       }
 
     }
@@ -198,65 +220,15 @@
 </script>
 
 <style scoped lang="less" type="text/less">
-  .classManagerList_section {
+  .data_section {
     padding: 20px;
     margin-bottom: 40px;
     height:800px;
     overflow: scroll;
-
-    .resoucelist {
-      text-decoration: underline;
-      margin: 5px 0;
-    }
-
-    .righttable table {
-      border: 1px solid #999;
-
-      tr td {
-        border-top: 0;
-        border-right: 1px solid #999;
-        border-bottom: 1px solid #999;
-        border-left: 0;
-
-      }
-    }
-
-    .text {
-      font-size: 14px;
-      text-align: left;
-    }
-
-    .classlist {
-      padding: 7px 4px;
-      cursor: pointer;
-      border-radius: 2px;
-    }
-
-    .item {
-      margin-bottom: 5px;
-    }
-
-    .car_header {
-      background-color: #67c4ed;
-    }
-
-    .listcolor {
-      background-color: #ebeece;
-    }
-
-    .clearfix:before,
-    .clearfix:after {
-      display: table;
-      content: "";
-    }
-
-    .clearfix:after {
-      clear: both
-    }
-
-    .box-card {
-      width: 100%;
+    .el-pagination {
+      padding: 15px 5px;
     }
 
   }
+
 </style>

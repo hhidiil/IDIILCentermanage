@@ -65,6 +65,7 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div v-if="prepareLessonsStatus != 'check'" class="btnBox">
+            <el-button type="primary" size="small" @click="saveAllInfo('back')">取消并返回</el-button>
             <el-button type="primary" size="small" @click="saveAllInfo('save')">保存</el-button>
             <el-button type="success" size="small" @click="saveAllInfo('upload')">上传</el-button>
           </div>
@@ -96,7 +97,7 @@
   import selectClass from '../../components/selectClassDom.vue'
   import classData from '../../data/classlist'
   import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
-  import {setStore,getStore} from '../../config/publicMethod'
+  import {setStore,getStore,removeStore} from '../../config/publicMethod'
   import {uploadFile} from '../../api/upload'
   import {addClassListInfo,updateClassListInfo} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
@@ -276,7 +277,11 @@
         } else if(type == "save"){
           this.SOURCE_LIST({val:this.sourceLists, key:this.guid});
           this.saveClassLists('doing','');
-        }else{
+        } else if(type == "back"){
+          removeStore(`sourceLists-${this.guid}`);
+          this.$router.push({name:'classManagerList'});
+
+        } else {
           if(this.sourceLists.classList.name == '' || this.sourceLists.classList.target == ''){
             this.promptMessage('上传课程名称和课程目标不能为空哦^o^', 'warning');
           }else{

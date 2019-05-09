@@ -48,6 +48,6 @@ export const getSchoolClasses = (data) => {
  * [获取班级下的所有学生列表]
  */
 export const getClassCenterUser = (data) => {
-  const url = `${API_CONFIG}/getClassCenterUser`;
+  const url = `${API_CONFIG}/getCenterClassUser`;
   return fetch_requset(url,data,'POST')
 }
