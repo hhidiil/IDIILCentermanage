@@ -167,7 +167,6 @@
       //获取教材数据
       async getClassLists(){
         let routeParams=this.$route.query;
-        console.log(routeParams);
         this.guid=routeParams.classId;
         this.UPDATE_LESSIONS_STATUS(routeParams.classType);
         if(routeParams.classType == "add"){
@@ -185,7 +184,7 @@
                 version: [],
                 fileLists: [],
                 commits: "",
-                status: "doing"
+//                status: "doing"
               },
               blockLists:[]
             };

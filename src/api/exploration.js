@@ -47,4 +47,35 @@ export const deleteCurriculum = (data) => {
   const url = `${API_CONFIG}/deleteCurriculum`;
   return fetch_requset(url,data,'POST')
 };
+//------------------派课接口start-------
 
+/*
+* 保存临时课程派课数据
+* */
+export const saveTempAssignment = (data) => {
+  const url = `${API_CONFIG}/saveTempAssignment`;
+  return fetch_requset(url,data,'POST')
+};
+/*
+ * 获取一条临时派课数据
+ * */
+export const getTempAssignment = (data) => {
+  const url = `${API_CONFIG}/getTempAssignment`;
+  return fetch_requset(url,data,'POST')
+};
+/*
+ * 获取派课列表
+ * */
+export const getAssignmentList = (data) => {
+  const url = `${API_CONFIG}/getAssignmentList`;
+  return fetch_requset(url,data,'POST')
+};
+/*
+ * 删除一条派课
+ * */
+export const deleteAssignment = (data) => {
+  const url = `${API_CONFIG}/deleteAssignment`;
+  return fetch_requset(url,data,'POST')
+};
+
+//------------------派课接口end-------

@@ -29,7 +29,7 @@
   import headHop from '../../components/headTop'
   import {doLogin,registerUser} from '../../api/user'
   import {getCurrentCourseInfo,getClassList} from '../../api/classes'
-  import {getStore,setStore} from '../../config/publicMethod'
+  import {getStore,setStore,removeStore} from '../../config/publicMethod'
   export default {
     data(){
       return {
@@ -40,8 +40,12 @@
     components: {
       headHop
     },
+    mounted(){
+
+    },
     methods:{
       async goPaiKe(){
+        this.removeCurriculumStorage();
         this.$router.push('manage')
       },
       async goShangKe(){
@@ -65,6 +69,17 @@
           }
         }else {
           console.error("出错了------！！！：",result.message)
+        }
+      },
+      removeCurriculumStorage(){
+        let str1='sendLessonsLists-';
+        let str2='sourceLists-';
+        for(let i=0;i<window.localStorage.length;i++){
+          let okey=window.localStorage.key(i);
+          if(okey.indexOf(str1)>-1 || okey.indexOf(str2)>-1){
+            removeStore(okey);
+            i--;
+          }
         }
       }
     }

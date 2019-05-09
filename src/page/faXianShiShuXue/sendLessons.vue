@@ -2,61 +2,79 @@
   <div class="sendLessionsManager">
     <head-top></head-top>
     <section class="data_section">
-
       <el-card class="box-card">
         <el-row>
           <el-col :span="24" style="text-align: left;margin-bottom: 10px">
             <div class="classItem">
-              <el-button type="primary" @click="lessionsVisible = true">选取课程</el-button>
+              <el-button  v-if="sendLessonsType != 'check'" type="primary" @click="lessionsVisible = true">选取课程</el-button>
             </div>
             <div class="classItem">
               <span>课程名称:</span>
-              <span v-if="this.currentList">{{this.currentList.classList.name}}</span>
+              <span v-if="this.sendLessonsLists.currentList">{{sendLessonsLists.currentList.classList.name}}</span>
             </div>
             <div class="classItem">
               <span>课程目标:</span>
-              <span v-if="this.currentList">{{this.currentList.classList.target}}</span>
+              <span v-if="this.sendLessonsLists.currentList">{{sendLessonsLists.currentList.classList.target}}</span>
             </div>
             <div class="classItem">
               <span>班级名称:</span>
-              <span>
-                <el-select v-model="value"  placeholder="请选择班级" @change="classChange">
+              <span v-if="sendLessonsType != 'check'">
+                <el-select v-model="sendLessonsLists.selectValue"  placeholder="请选择班级" @change="classChange">
                   <el-option
-                    v-for="item in classOptions"
-                    :key="item.ClassName"
+                    v-for="item in sendLessonsLists.classOptions"
+                    :key="item.ClassID"
                     :label="item.ClassName"
-                    :value="item.ClassName">
+                    :value="item.ClassID">
                   </el-option>
                 </el-select>
               </span>
+              <span v-else>
+                {{currentClassName}}
+              </span>
             </div>
-            <div class="classItem">
+            <div class="classItem" v-if="sendLessonsType != 'check'">
               <span>开始分组:</span>
               <div class="goToSubgroup">
                 <el-transfer
-                  v-model="subgroupValue"
+                  v-model="sendLessonsLists.subgroupValue"
                   :render-content="renderFunc"
                   :titles="['学生列表', '学生分组']"
-                  :button-texts="['到左边', '到右边']"
+                  :button-texts="['返回', '分组']"
                   :format="{
                         noChecked: '${total}',
                         hasChecked: '${checked}/${total}'
                       }"
                   @change="subgroupChange"
-                  :data="subgroupData">
-                  <el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
-                  <el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button>
+                  :data="sendLessonsLists.subgroupData">
+                  <span class="transfer-footer" slot="left-footer">
+                  </span>
+                  <span  class="transfer-footer" slot="right-footer">
+                    <el-button v-if="sendLessonsLists.subgroupValue.length>0" size="small"  @click="confirmGrouping">确定分组</el-button>
+                  </span>
                 </el-transfer>
               </div>
-              {{subgroupValue}}
             </div>
             <div class="classItem">
               <span>分组列表:</span>
               <div class="subgroupLists">
-                <ul>
-                  <li>11111</li>
-                </ul>
+                <el-collapse>
+                  <el-collapse-item v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">
+                    <template slot="title">
+                      {{item.subgroupName}}
+                    </template>
+                    <div v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">
+                      {{val.key}}--{{val.UserName}}
+                    </div>
+                  </el-collapse-item>
+                </el-collapse>
               </div>
+            </div>
+            <div v-if="sendLessonsType != 'check'" class="classItem">
+             <el-button size="small" type="primary" @click="sendLessensSave('save')">保存</el-button>
+             <el-button size="small" type="success" @click="sendLessensSave('upload')">上传</el-button>
+            </div>
+            <div v-else class="classItem">
+              <el-button size="small" type="primary" @click="sendLessensSave('check')">返回</el-button>
             </div>
           </el-col>
         </el-row>
@@ -74,7 +92,7 @@
       <section>
         <el-table
           ref="CurriculumTable"
-          :data="culumLists"
+          :data="sendLessonsLists.culumLists"
           highlight-current-row
           :header-cell-style="tableHeaderStyle"
           @current-change="handleCurrentChange"
@@ -115,49 +133,48 @@
 <script type="text/ecmascript-6">
   import { mapState,mapMutations } from 'vuex'
   import headTop from '../../components/headTop.vue'
-  import {getCurriculumList} from '../../api/exploration'
+  import {getCurriculumList, saveTempAssignment, getTempAssignment} from '../../api/exploration'
   import {getSchoolClasses, getClassCenterUser} from '../../api/manage'
+  import {setStore,getStore} from '../../config/publicMethod'
   let Base64 = require('js-base64').Base64;
-
+  let sendLessonsListsInfo={
+    culumLists: [],
+    currentList: null,
+    currentRow: null,
+    classOptions: [],
+    selectValue: '',
+    subgroupData: [],
+    subgroupValue: [],
+    sendSubgroupLists: [],
+    currentClassID:''
+  };
   export default {
     props:[],
     data(){
-      const generateData = _ => {
-        const data = [];
-        for (let i = 1; i <= 15; i++) {
-          data.push({
-            key: i,
-            label: `备选项 ${ i }`
-          });
-        }
-        return data;
-      };
       return {
         lessionsVisible:false,
-        culumLists: [],
-        currentList: null,
-        currentRow: null,
-        classOptions: [],
-        value: '',
-        subgroupData: [],
-        subgroupValue: [],
+        sendLessonsType:'',
+        guid:'',
+        userInfo:JSON.parse(getStore('userInfo')),
+        sendLessonsLists:sendLessonsListsInfo,
         renderFunc(h, option) {
-          console.log(option);
-          if(option){
-            console.log(option)
-          }else{
-            console.log(false)
-          }
-//          return <span>{ option.key } - { option.key }</span>;
-//          return <span>{ option.ClassID } - { option.UserName }</span>;
-//          return <span>111</span>;
+          return <span>{ option.key } - { option.label }</span>;
         }
       }
     },
-
-
     computed: {
+      currentClassName(){
+        if(this.sendLessonsLists.classOptions.length>0 && this.sendLessonsLists.currentClassID!=""){
+          var obj={};
+          obj=this.sendLessonsLists.classOptions.find((item)=>{//这里的userList就是上面遍历的数据源
+               if(item.ClassID === this.sendLessonsLists.currentClassID){
+                 return item;
+               }//筛选出匹配数据
+            });
+          return obj.ClassName;
+        }
 
+      }
     },
     watch:{
       //当监听的属性值变化的时候 会执行对应的处理逻辑
@@ -170,35 +187,68 @@
 
     },
     mounted(){
-        this.getCurriculumLists();
+        const Wh = $(window).height();
+        $(".data_section").css("height",(Wh-150)+'px');
+        this.getTempAssignment();
     },
     methods: {
+      async getTempAssignment(){
+        let routeParams=this.$route.query;
+        this.guid=routeParams.sendLessonsId;
+        this.sendLessonsType=routeParams.sendLessonsType;
+        if(this.sendLessonsType == "add"){
+          let object=JSON.parse(getStore(`sendLessonsLists-${this.guid}`));
+          if(object){
+            this.sendLessonsLists=object;
+          }else {
+            this.sendLessonsLists=sendLessonsListsInfo;
+          }
+        }else{
+          let object=JSON.parse(getStore(`sendLessonsLists-${this.guid}`));
+          if(object){
+            this.sendLessonsLists=object;
+          }else{
+            let result = await getTempAssignment({AssignID:this.guid}); //获取一条临时派课数据
+            if (result.code == 200) {
+              this.sendLessonsLists=JSON.parse(Base64.decode(result.data[0].GroupContent));
+            }
+          }
+        }
+        this.getCurriculumLists();
+
+      },
       // 获取课程列表
       async getCurriculumLists(){
         let result = await getCurriculumList();
         let originalResult = result.data;
-        this.culumLists = originalResult.filter((currentValue, index, arr)=>{
+        this.sendLessonsLists.culumLists = originalResult.filter((currentValue, index, arr)=>{
           return currentValue.Status == 'done';
         });
         let result1 = await getSchoolClasses({SchoolID:'001'});
-        this.classOptions = result1.data;
-        console.log(  `this.classOptions---${this.classOptions}`);
+        this.sendLessonsLists.classOptions = result1.data;
+        this.setLessonsStore();
+
       },
-      async getClassCenterUser(){
-        let result2 = await getClassCenterUser({ClassID:'001001001'});
-
-        this.$nextTick(function(){
-          this.subgroupData = JSON.parse(JSON.stringify(result2.data));
-          console.log( this.subgroupData);
-        })
-
+      //根据班级获取学生列表
+      async getClassCenterUser(ClassID){
+          let parameters={
+            ClassID:ClassID
+          };
+          let result2 = await getClassCenterUser(parameters);
+          let originalResult2 = result2.data;
+          originalResult2.forEach((item, index)=>{
+            item.label = item.UserName;
+            item.key = index+1;
+          });
+        this.sendLessonsLists.subgroupData = originalResult2;
+        this.setLessonsStore();
       },
       setCurrent(row) {
         this.$refs.CurriculumTable.setCurrentRow(row);
       },
       handleCurrentChange(currentRow, oldCurrentRow) {
         console.log(currentRow);
-        this.currentRow = currentRow;
+        this.sendLessonsLists.currentRow = currentRow;
       },
       /*
       * 表头单元格的 style 的回调方法
@@ -210,29 +260,148 @@
       * 确定选中的课程
       * */
       selectCurriculum(){
-          if(this.currentRow){
-            console.log('true')
-            let currentList=this.currentRow.CurriculumnContent;
-            this.currentList=JSON.parse(Base64.decode(currentList));
-            console.log(this.currentList)
+          if(this.sendLessonsLists.currentRow){
+            let currentList=this.sendLessonsLists.currentRow.CurriculumnContent;
+            this.sendLessonsLists.currentList=JSON.parse(Base64.decode(currentList));
+            console.log(this.sendLessonsLists.currentList)
 
           }else{
-            console.log('false');
-            this.currentList=null;
+            this.sendLessonsLists.currentList=null;
           }
         this.lessionsVisible = false;
+        this.setLessonsStore();
       },
       /*
       * 选中的班级发生变化时显示对应学生
       * */
-      classChange(){
-        this.getClassCenterUser()
+      showStudentLists(vId){
+        this.sendLessonsLists.currentClassID="";
+        this.sendLessonsLists.sendSubgroupLists=[];
+        this.sendLessonsLists.subgroupValue=[];
+        let obj = {};
+        obj = this.sendLessonsLists.classOptions.find((item)=>{//这里的userList就是上面遍历的数据源
+          return item.ClassID === vId;//筛选出匹配数据
+        });
+        this.getClassCenterUser(obj.ClassID);
+
+      },
+      /*
+      * 是否切换班级判断
+      * */
+      classChange(vId){
+        if(vId == this.sendLessonsLists.currentClassID){
+          return;
+        }
+        if(this.sendLessonsLists.sendSubgroupLists.length>0){
+            this.$confirm('切换班级则之前分组记录将丢失, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.showStudentLists(vId);
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消切换班级'
+              });
+              this.sendLessonsLists.selectValue=this.sendLessonsLists.currentClassID;
+              this.setLessonsStore();
+
+            });
+        }else{
+          this.showStudentLists(vId);
+        }
       },
       /*
       * 右侧列表元素变化时触发
       * */
       subgroupChange(value, direction, movedKeys) {
         console.log(value, direction, movedKeys);
+        if(direction === "right") {}
+        if(direction === "left") {}
+        this.setLessonsStore();
+      },
+      /*
+      * 确定分组
+      * */
+      confirmGrouping(){
+        this.sendLessonsLists.currentClassID=this.sendLessonsLists.selectValue;
+        var subgroupItem={
+          subgroupName: '新增组',
+          subgroupMembers:[]
+        };
+        for(let i= this.sendLessonsLists.subgroupData.length-1;i>=0;i--){
+          let value=this.sendLessonsLists.subgroupData[i];
+          if(this.sendLessonsLists.subgroupValue.indexOf(value.key)>-1){
+            subgroupItem.subgroupMembers.unshift(value);
+            this.sendLessonsLists.subgroupData.splice(i, 1);
+          }
+        }
+        this.sendLessonsLists.sendSubgroupLists.push(subgroupItem);
+        this.sendLessonsLists.subgroupValue=[];
+        this.setLessonsStore();
+      },
+
+      /*
+      * 保存
+      * */
+      sendLessensSave(type){
+        this.setLessonsStore();
+        if(type == "check"){
+          this.$router.push({name:'classTeam'})
+        } else if(type == "save"){
+          this.saveLessensLists('doing','');
+        }else {
+          if(!this.sendLessonsLists.currentRow){
+            this.promptMessage('课程名称和课程目标不能为空哦^o^', 'warning')
+          } else if(this.sendLessonsLists.sendSubgroupLists.length == 0 ){
+            this.promptMessage('需要对班级学生进行分组哦^o^', 'warning')
+          } else {
+            if(this.sendLessonsLists.sendSubgroupLists.length > 0 && this.sendLessonsLists.subgroupData.length == 0 && this.sendLessonsLists.subgroupValue.length == 0){
+              this.saveLessensLists('done');
+            } else{
+              this.promptMessage('需要将该班级所有学生进行分组哦^o^', 'warning')
+            }
+          }
+        }
+
+      },
+      /*
+      * 保存数据接口
+      * */
+      async saveLessensLists(status){
+        let CurriculumID='', AssignName = '', AssignMemo = '';
+        if(this.sendLessonsLists.currentList){
+          CurriculumID = this.sendLessonsLists.currentList.classList.classId;
+          AssignName = this.sendLessonsLists.currentList.classList.name;
+          AssignMemo = this.sendLessonsLists.currentList.classList.target;
+        }
+        let GroupContent = Base64.encode(JSON.stringify(this.sendLessonsLists));
+        let ClassID=this.sendLessonsLists.selectValue;
+        let inputJson = {
+          AssignID: this.guid,  //--派课ID
+          SchoolID: '001', //SchoolID--学校ID
+          CurriculumID: CurriculumID, //CurriculumID--所选课程ID,
+          AssignName: AssignName, //AssignName--派课名称
+          AssignMemo: AssignMemo, //AssignMemo--派课备注
+          GroupContent: GroupContent, //GroupContent--分组信息
+          ClassID:ClassID, //ClassID--班级ID
+          UserID: this.userInfo.userId, //UserID--派课教师ID,
+          Status: status //Status--状态
+        };
+        let result = await saveTempAssignment(inputJson);
+        if(result.code == 200){
+          this.promptMessage('派课保存成功^_^', 'success');
+          this.$router.push({name:'classTeam'})
+        }else{
+          this.promptMessage('派课保存失败^o^', 'error');
+        }
+      },
+      /*
+      * 将派课列表存入本地
+      * */
+      setLessonsStore(){
+        setStore(`sendLessonsLists-${this.guid}`,this.sendLessonsLists);
       },
       /*
        * 保存时的提示信息
@@ -257,7 +426,6 @@
       padding: 20px;
       overflow: auto;
       margin-bottom: 40px;
-
     }
   }
   .el-col{
@@ -269,12 +437,21 @@
       span:nth-child(1){
         color: #006699;
       }
+      .el-collapse-item__header{
+        background: #ecf5ff;
+        padding: 0 0 0 10px;
+      }
 
     }
   }
 
  .subgroupLists{
    background: #cee4fd;
- }
+   .textItem{
+     /*padding: 2px 4px;*/
+     /*background: #ecf5ff;*/
+     /*border-bottom: 1px solid #c2dcf9;*/
+   }
+  }
 
 </style>

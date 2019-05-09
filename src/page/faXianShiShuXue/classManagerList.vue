@@ -30,7 +30,8 @@
             :data="culumLists"
             style="width: 100%"
             empty-text="还没有课程哦^_^"
-            :header-cell-style="tableHeaderColor">
+            :header-cell-style="tableHeaderColor"
+            :cell-style="statusStyle">
             <el-table-column
               label="更改日期"
               align="center">
@@ -68,7 +69,6 @@
               <template slot-scope="scope">
                 <el-button v-if="scope.row.Status == 'doing'" size="mini" @click="curriculumEdit(scope.$index, scope.row, 'edit')" title="编辑">编辑</el-button>
                 <el-button v-else size="mini" @click="curriculumEdit(scope.$index, scope.row, 'check')" title="查看">查看</el-button>
-                <!--<el-button size="mini" type="primary" icon="el-icon-document" @click="goToPK(scope.row)" title="上课">上课</el-button>-->
                 <el-button size="mini" type="danger" @click="curriculumDelete(scope.$index, scope.row)" title="删除">删除</el-button>
               </template>
             </el-table-column>
@@ -87,7 +87,7 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import addClass from './addClass'
-  import {setStore, getStore, removeStore} from '../../config/publicMethod'
+  import {setStore, getStore, removeStore, createGuid} from '../../config/publicMethod'
   import {toJson} from '../../config/methods'
   import {writeFileJson, doTestLogin} from '../../api/user'
   import {getCourseList, updateDoingCourseInfo, deleteCourseListInfo} from '../../api/classes'
@@ -98,7 +98,6 @@
   export default {
     data() {
       let classList = JSON.parse(getStore("classList"));
-
       return {
         dialogEditVisible: false,
         formLabelWidth: '90px',
@@ -150,23 +149,28 @@
           return 'background-color: #EFF2F7;color: #000000;font-weight: 500;'
         }
       },
-
-      toJson: function (str) {
-        return toJson(str)
+      /*
+       * 单元格的 style 的回调方法
+       * */
+      statusStyle({row, column, rowIndex, columnIndex}) {
+        if(columnIndex==3){
+          if(row.Status==="doing"){
+            return {"text-align":"center",color:"#E6A23C"};
+          }else if(row.Status==="done"){
+            return {"text-align":"center",color:"#67c23a"};
+          }
+        }else{
+          return {"text-align":"center"}
+        }
       },
       /*
       * 添加课程
       * */
       curriculumAdd(type){
-        let classId=this.createGuid();
+        let classId=createGuid();
         this.$router.push({path:'/addClassManager', query:{classType:type, classId:classId}})
       },
-      /*
-      * 跳转到上课
-      * */
-      goToPK(){
-        this.$router.push({name:'classTeam',params:{tableData:JSON.stringify(this.tableData)}})
-      },
+
       /*
       * 编辑课程
       * */
@@ -187,23 +191,6 @@
         }).catch(() => {
           this.$message({type: 'info', message: '已取消删除'});
         });
-      },
-
-      /*
-       * 创建guid
-       * */
-      createGuid() {
-        var s = [];
-        var hexDigits = "0123456789abcdef";
-        for (var i = 0; i < 36; i++) {
-          s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-        }
-        s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-        s[8] = s[13] = s[18] = s[23] = "-";
-
-        var uuid = s.join("");
-        return uuid;
       }
 
     }

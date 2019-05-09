@@ -45,105 +45,64 @@
       <el-row>
         <el-col :span="24" style="text-align: center;margin-bottom: 10px">
           <el-table
-            :data="tableData"
-            border
-            style="width: 100%;text-align: center"
-            :cell-style = 'statusStyle'
-            :row-style='showStyle'
-          >
+            :data="sendLessonsLists"
+            style="width: 100%"
+            empty-text="还没有派课记录哦^_^"
+            :header-cell-style="tableHeaderColor"
+            :cell-style="statusStyle">
             <el-table-column
-              prop="date"
-              label="日期">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="课程">
-            </el-table-column>
-            <el-table-column
-              prop="status"
-              label="状态">
-            </el-table-column>
-            <el-table-column
-              fixed="right"
-              label="操作">
+              label="更改日期">
               <template slot-scope="scope">
-                <el-button-group>
-                  <el-button type="primary" icon="el-icon-edit" @click="handleClick(scope.row)"></el-button>
-                  <el-button type="primary" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)"></el-button>
-                </el-button-group>
+                <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope.row.LastUpdateTime }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="派课名称"
+              width="180">
+              <template slot-scope="scope">
+                <span>{{ scope.row.AssignName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="派课标识">
+              <template slot-scope="scope">
+                <span>{{ scope.row.AssignID }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="派课状态"
+              width="180">
+              <template slot-scope="scope">
+                <span>{{ scope.row.Status }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作"
+              align="center">
+              <template slot-scope="scope">
+                <el-button v-if="scope.row.Status == 'doing'" size="mini" @click="sendLessonsEdit(scope.$index, scope.row, 'edit')" title="编辑">编辑</el-button>
+                <el-button v-else size="mini" @click="sendLessonsEdit(scope.$index, scope.row, 'check')" title="查看">查看</el-button>
+                <el-button size="mini" type="danger" @click="sendLessonsDelete(scope.$index, scope.row)" title="删除">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-col>
       </el-row>
     </section>
-    <el-dialog
-      title="派课信息"
-      :visible.sync="dialogVisible"
-      width="50%"
-      :before-close="handleClose">
-      <div class="text item">
-        <table width="100%" height="" border="0" cellpadding="10">
-          <tbody>
-          <tr>
-            <td width="100px">课程名:</td>
-            <td>{{name}}</td>
-          </tr>
-          <tr>
-            <td>教学目标:</td>
-            <td>{{target}}</td>
-          </tr>
-          </tbody>
-        </table>
-        <class-team></class-team>
-      </div>
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-  </span>
-    </el-dialog>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
-  import classTeam from '../../components/classTeam'
-  import {setStore, getStore} from '../../config/publicMethod'
-  import {toJson} from '../../config/methods'
-  import {writeFileJson, doTestLogin} from '../../api/user'
-  import {getCourseList, updateDoingCourseInfo, deleteCourseListInfo} from '../../api/classes'
-  import classData from '../../data/classlist'
-  import {baseUrl_dev} from '../../config/env'
+  import {setStore, getStore, removeStore, createGuid} from '../../config/publicMethod'
+  import {getAssignmentList, deleteAssignment} from '../../api/exploration'
+
   const searchTypeOptions = ['查看全部','按时间', '按状态'];
   export default {
     data() {
-      let classList = JSON.parse(getStore("classList"))
+      let classList = JSON.parse(getStore("classList"));
       return {
-        tableData: [{
-          date: '2019-04-02',
-          name: '分数的认识-班级1',
-          target:"提高学生的自主学习能力",
-          status: '未开始',
-          show:'Y'
-        }, {
-          date: '2019-04-03',
-          name: '分数的认识-班级2',
-          target:"提高学生的自主学习能力",
-          status: '进行中',
-          show:'Y'
-        }, {
-          date: '2019-04-03',
-          name: '因数与倍数',
-          target:"提高学生的自主学习能力",
-          status: '未开始',
-          show:'Y'
-        }, {
-          date: '2019-04-06',
-          name: '乘法的意义',
-          target:"提高学生的自主学习能力",
-          status: '已完成',
-          show:'Y'
-        }],
         dialogVisible:false,
         tableSelectedData:'',
         target:"",
@@ -188,66 +147,88 @@
         checkAll: false,
         checkedSearchTypes: ['查看全部'],
         searchTypes: searchTypeOptions,
-         //classList: classList
-        cannotScreeningByStatus:true
+        cannotScreeningByStatus:true,
+        sendLessonsLists:[]
       }
     },
     components: {
-      headTop,
-      classTeam
+      headTop
     },
     activated() {
       //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
-      this.getClassListInfo()
+      this.getAssignmentList()
     },
     mounted() {
-      $('.el-card__header').css('backgroundColor', '#67c4ed');
-      this.getClassListInfo()
+      this.getAssignmentList();
     },
-    computed: {
-      // sourceData() {
-      //   let source = toJson(this.tableData.source);
-      //   return source;
-      // },
-      // otherSource() {
-      //   let othersource = this.tableData.otherSource ? this.tableData.otherSource : this.tableData.othersource
-      //   let othersource2 = toJson(othersource);
-      //   return othersource2;
-      // },
-    },
+
     methods: {
-      async getClassListInfo() {
-        let userInfo = JSON.parse(getStore("userInfo"));
-        let classList2 = await getCourseList({teacherId: userInfo.userId});//数据库获取教师的派课列表
-        console.log("数据库获取教师的派课列表---classList2----->>", classList2)
-        if (classList2.data.length > 0) {
-          this.classList = classList2.data
+      //获取派课列表
+      async getAssignmentList() {
+        let inputJson={
+          AssignID:'', //AssignID--派课ID
+          SchoolID:'', // SchoolID--学校ID
+          UserID:'', //UserID--教师ID
+          Status:'' // Status--状态
+        };
+        let result=await getAssignmentList(inputJson);
+        this.sendLessonsLists=result.data;
+        console.log(this.sendLessonsLists)
+      },
+      //删除一条派课
+      async deleteAssignment(index,row) {
+        let delParams={AssignID: row.AssignID};
+        let result=await deleteAssignment(delParams);
+        if (result.code == 200) {
+          this.getAssignmentList();
+          removeStore(`sendLessonsLists-${row.AssignID}`);
+          this.$message({type: 'success', message: '删除成功!'});
         }
-        console.log("this.tableData--->>", this.tableData)
       },
-      toJson: function (str) {
-        return toJson(str)
+      /*
+       * 点击进行派课
+       * */
+      sendLessionsAdd(type){
+        let sendLessonsId=createGuid();
+        this.$router.push({path:'/sendLessons', query:{sendLessonsType:type, sendLessonsId:sendLessonsId}})
       },
-      handleClick(row){
-        this.dialogVisible=true;
-        this.target=row.target;
-        this.name=row.name;
+      /*
+      *编辑派课
+      * */
+      sendLessonsEdit(index, row, type){
+        this.$router.push({path:'/sendLessons', query:{sendLessonsType:type, sendLessonsId:row.AssignID}})
       },
-      handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
+      /*
+       * 删除课程
+       * */
+      sendLessonsDelete(index, row) {
+        this.$confirm('此操作将永久删除该课件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteAssignment(index,row);
+        }).catch(() => {
+          this.$message({type: 'info', message: '已取消删除'});
+        });
       },
+      /*
+       * 表头单元格的 style 的回调方法
+       * */
+      tableHeaderColor({ row, column, rowIndex, columnIndex }) {
+        if (rowIndex === 0) {
+          return 'background-color: #EFF2F7;color: #000000;font-weight: 500;'
+        }
+      },
+      /*
+      * 单元格的 style 的回调方法
+      * */
       statusStyle({row, column, rowIndex, columnIndex}) {
-        if(columnIndex==2){
-          if(row.status==="未开始"){
-            return {"text-align":"center",color:"#67C23A"};
-          }else if(row.status==="进行中"){
+        if(columnIndex==3){
+         if(row.Status==="doing"){
             return {"text-align":"center",color:"#E6A23C"};
-          }else if(row.status==="已完成"){
-            return {"text-align":"center",color:"#F56C6C"};
+          }else if(row.Status==="done"){
+            return {"text-align":"center",color:"#67c23a"};
           }
         }else{
           return {"text-align":"center"}
@@ -260,9 +241,7 @@
           return {display:"none"};
         }
       },
-      handleDelete(index, row) {
-        this.tableData.splice(index,1)
-      },
+
       handleCheckedSearchTypesChange(value) {
         debugger
         if(value[value.length-1]==="查看全部"){
@@ -333,14 +312,6 @@
       },
       changeStatus(){
         this.handleCheckedSearchTypesChange(this.checkedSearchTypes)
-      },
-
-
-      /*
-      * 点击进行派课
-      * */
-      sendLessionsAdd(){
-        this.$router.push({path:'/sendLessons'})
       }
     }
   }
