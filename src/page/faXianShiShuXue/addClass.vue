@@ -2,57 +2,59 @@
   <div class="addClass">
     <section class="data_section">
         <el-row :gutter="20" class="mainContainer">
-          <el-col :span="8">
+          <el-col :span="6">
               <custom-list v-if="sourceListsInfo.classList" :guid="guid"></custom-list>
-              <el-card class="blockListCard">
-                <div slot="header" class="clearfix">
-                  <span>区块列表</span>
-                  <el-button v-if="prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
-                </div>
-                <div v-if="prepareLessonsStatus != 'check'" class="list-group-box">
-                  <draggable
-                    class="list-group"
-                    tag="ul"
-                    v-model="sourceListsInfo.blockLists"
-                    v-bind="dragOptions"
-                    @start="isDragging = true"
-                    @end="isDraggingHandle"
-                  >
-                    <transition-group type="transition" name="flip-list">
-                      <li
-                        class="list-group-item blockListItem"
-                        v-for="(blockList,index) in sourceListsInfo.blockLists"
-                        :key="blockList.key"
-                        :class="{activeBlockStyle: blockList.key==currentBlockKey}"
-                        @click="showBlock(blockList.key)"
-                      >
-                        <div class="blockListInfo">
-                          <span>{{blockList.name}}</span>
-                          <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
-                        </div>
-                      </li>
-                    </transition-group>
-                  </draggable>
-                </div>
-                <div v-else class="list-group-box">
-                    <ul>
-                      <li
-                        class="list-group-item blockListItem"
-                        v-for="(blockList,index) in sourceListsInfo.blockLists"
-                        :key="blockList.key"
-                        :class="{activeBlockStyle: blockList.key==currentBlockKey}"
-                        @click="showBlock(blockList.key)"
-                      >
-                        <div class="blockListInfo">
-                          <span>{{blockList.name}}</span>
-                          <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
-                        </div>
-                      </li>
-                    </ul>
-                </div>
-              </el-card>
           </el-col>
-          <el-col :span="16">
+          <el-col :span="6">
+            <el-card class="blockListCard">
+              <div slot="header" class="clearfix">
+                <span>区块列表</span>
+                <el-button v-if="prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
+              </div>
+              <div v-if="prepareLessonsStatus != 'check'" class="list-group-box">
+                <draggable
+                  class="list-group"
+                  tag="ul"
+                  v-model="sourceListsInfo.blockLists"
+                  v-bind="dragOptions"
+                  @start="isDragging = true"
+                  @end="isDraggingHandle"
+                >
+                  <transition-group type="transition" name="flip-list">
+                    <li
+                      class="list-group-item blockListItem"
+                      v-for="(blockList,index) in sourceListsInfo.blockLists"
+                      :key="blockList.key"
+                      :class="{activeBlockStyle: blockList.key==currentBlockKey}"
+                      @click="showBlock(blockList.key)"
+                    >
+                      <div class="blockListInfo">
+                        <span>{{blockList.name}}</span>
+                        <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
+                      </div>
+                    </li>
+                  </transition-group>
+                </draggable>
+              </div>
+              <div v-else class="list-group-box">
+                <ul>
+                  <li
+                    class="list-group-item blockListItem"
+                    v-for="(blockList,index) in sourceListsInfo.blockLists"
+                    :key="blockList.key"
+                    :class="{activeBlockStyle: blockList.key==currentBlockKey}"
+                    @click="showBlock(blockList.key)"
+                  >
+                    <div class="blockListInfo">
+                      <span>{{blockList.name}}</span>
+                      <span v-if="blockList.validate" style="color: #f56c6c;"><i class="icon iconfont el-icon-warn"></i></span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
               <default-list v-if="currentBlockList[0]" :guid="guid"></default-list>
               <el-card v-else class="blockContainerCard">
                 <div slot="header" class="clearfix">
@@ -185,7 +187,7 @@
                 version: [],
                 fileLists: [],
                 commits: "",
-                scoreRatio:"", //得分占比得分占比
+                scoreRatio:"", //得分占比
                 explore:"", //探究
                 cooperation:"", //协作
                 summary:"", //总结
@@ -285,15 +287,15 @@
         } else if(type == "back"){
           removeStore(`sourceLists-${this.guid}`);
           this.$router.push({name:'classManagerList'});
-
         } else {
-          if(this.sourceLists.classList.name == '' || this.sourceLists.classList.target == ''){
-            this.promptMessage('上传课程名称和课程目标不能为空哦^o^', 'warning');
+
+          if(this.sourceLists.classList.name == '' || this.sourceLists.classList.target == '' || this.sourceLists.classList.scoreRatio == ''){
+            this.promptMessage('课程名称、课程目标以及各占比不能为空哦^o^', 'warning');
           }else{
             if(this.sourceLists.blockLists.length>0){
               this.sourceLists.blockLists.forEach((item, index) => {
                 item.validate = false;
-                if(item.name == '' || item.target==''){
+                if(item.name == '' || item.target=='' || item.scoreRatio==''){
                   item.validate = true;
                 }
               });
@@ -302,14 +304,13 @@
                 return currentValue.validate == true
               });
               if(validatorsFail.length>0){
-                this.promptMessage('上传区块名称和区块目标不能为空哦^o^', 'warning');
+                this.promptMessage('区块名称、区块目标以及各占比不能为空哦^o^', 'warning');
               }else{
                 this.SOURCE_LIST({val:this.sourceLists, key:this.guid});
                 this.saveClassLists('done');
               }
             }else{
-              this.SOURCE_LIST({val:this.sourceLists, key:this.guid});
-              this.saveClassLists('done');
+              this.promptMessage('需要先添加哦^o^', 'warning');
             }
           }
         }
@@ -365,7 +366,7 @@
         margin: 0;
       }
     }
-    .blockContainerCard{
+    .blockListCard,.blockContainerCard{
       height: 100%;
     }
   }
@@ -428,5 +429,7 @@
       }
     }
   }
-
+.el-progress-bar{
+  width: 80%;
+}
 </style>

@@ -16,11 +16,31 @@
           <el-form-item label="教学目标:">
             <span>{{currentBlockList[0].target}}</span>
           </el-form-item>
-          <el-form-item label="课程时长:">
+          <el-form-item label="区块时长:">
             <span>{{currentBlockList[0].duration}}</span>
           </el-form-item>
           <el-form-item label="课程内容:">
             <span>{{currentBlockList[0].name}}</span>
+          </el-form-item>
+          <el-form-item label="得分占比:">
+            <!--<span>{{currentBlockList[0].scoreRatio | ratioUnit}}</span>-->
+              <el-progress v-if="currentBlockList[0].scoreRatio" :percentage="Number(currentBlockList[0].scoreRatio)"></el-progress>
+          </el-form-item>
+          <el-form-item label="探究占比:">
+            <!--<span>{{currentBlockList[0].explore | ratioUnit}}</span>-->
+            <el-progress v-if="currentBlockList[0].explore" :percentage="Number(currentBlockList[0].explore)"></el-progress>
+          </el-form-item>
+          <el-form-item label="协作占比:">
+            <!--<span>{{currentBlockList[0].cooperation | ratioUnit}}</span>-->
+            <el-progress v-if="currentBlockList[0].cooperation" :percentage="Number(currentBlockList[0].cooperation)"></el-progress>
+          </el-form-item>
+          <el-form-item label="总结占比:">
+            <!--<span>{{currentBlockList[0].summary | ratioUnit}}</span>-->
+            <el-progress v-if="currentBlockList[0].summary" :percentage="Number(currentBlockList[0].summary)"></el-progress>
+          </el-form-item>
+          <el-form-item label="讨论占比:">
+            <!--<span>{{currentBlockList[0].discuss | ratioUnit}}</span>-->
+            <el-progress v-if="currentBlockList[0].discuss" :percentage="Number(currentBlockList[0].discuss)"></el-progress>
           </el-form-item>
           <el-form-item label="教学参考:">
             <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
@@ -34,18 +54,31 @@
       title="编辑区块内容"
       v-dialogDrag
       :visible.sync="editVisible"
-      width="40%">
+      width="50%">
       <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" :label-width="formLabelWidth">
-          <el-form-item label="区块名称:"
-                        prop="name">
+          <el-form-item label="区块名称:" prop="name">
             <el-input v-model="blockForm.name" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="教学目标:"
-                        prop="target">
+          <el-form-item label="教学目标:" prop="target">
             <el-input type="textarea" v-model="blockForm.target" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="区块时长:">
             <el-input v-model="blockForm.duration" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="得分占比:" prop="scoreRatio">
+            <el-input v-model="blockForm.scoreRatio" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="探究占比:" prop="explore">
+            <el-input v-model="blockForm.explore" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="协作占比:" prop="cooperation">
+            <el-input v-model="blockForm.cooperation" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="总结占比:" prop="summary">
+            <el-input v-model="blockForm.summary" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="讨论占比:" prop="discuss">
+            <el-input v-model="blockForm.discuss" auto-complete="off"></el-input>
           </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -76,6 +109,23 @@
             callback();
           }
         }
+        let validClassRatio=(rule, value, callback)=>{
+          let reg = /^(?:0|[1-9][0-9]?|100)$/;
+          if(!reg.test(Number(value))){
+            callback(new Error('占比需是0到100之间的正整数，例如：25'))
+          }else {
+            if(value.length>1){
+              if(value==0){
+                this.blockForm[rule.field]=0;
+              }else{
+                var regex=/^[0]+/;
+                this.blockForm[rule.field]=this.blockForm[rule.field].replace(regex,"");
+              }
+            }
+            callback();
+          }
+
+        }
         return{
             editVisible:false, //编辑弹出框
             //新增表单的验证规则
@@ -87,12 +137,37 @@
               target: [
                 {required: true, message: '请输入教学目标', trigger: 'blur'},
                 {validator: validBlockTarget, trigger: 'blur'}
+              ],
+              scoreRatio:[
+                { required:true, message:'请输入得分占比', trigger:'blur'},
+                { validator: validClassRatio, trigger: 'blur' }
+              ],
+              explore:[
+                { required:true, message:'请输入探究占比', trigger:'blur'},
+                { validator: validClassRatio, trigger: 'blur' }
+              ],
+              cooperation:[
+                { required:true, message:'请输入协作占比', trigger:'blur'},
+                { validator: validClassRatio, trigger: 'blur' }
+              ],
+              summary:[
+                { required:true, message:'请输入总结占比', trigger:'blur'},
+                { validator: validClassRatio, trigger: 'blur' }
+              ],
+              discuss:[
+                { required:true, message:'请输入讨论占比', trigger:'blur'},
+                { validator: validClassRatio, trigger: 'blur' }
               ]
             },
             blockForm: {
               name: '',
               target: '',
-              duration: ''
+              duration: '',
+              scoreRatio:"", //得分占比得分占比
+              explore:"", //探究
+              cooperation:"", //协作
+              summary:"", //总结
+              discuss:"" //讨论
             },
             formLabelWidth: '90px'
         }
@@ -108,7 +183,12 @@
           'prepareLessonsStatus'
         ])
       },
-
+      filters:{
+        ratioUnit: function (value) {
+          if (!value) return '';
+          return value + '%';
+        }
+      },
       methods:{
       ...mapMutations([
           'SOURCE_LIST',
@@ -145,7 +225,12 @@
           this.blockForm = {
             name: item.name,
             target: item.target,
-            duration: item.duration
+            duration: item.duration,
+            scoreRatio:item.scoreRatio,
+            explore:item.explore,
+            cooperation:item.cooperation,
+            summary:item.summary,
+            discuss:item.discuss
           };
           this.editVisible = true;
           this.clearValidate('moreRules');
@@ -162,24 +247,49 @@
         * 弹框区块内容编辑保存
         * */
         saveBlockEdit(formName){
+          let that=this;
           this.$refs[formName].validate((valid) => {
+            let scoreRatio=that.blockForm.scoreRatio;
+            let explore=that.blockForm.explore;
+            let cooperation=that.blockForm.cooperation;
+            let summary=that.blockForm.summary;
+            let discuss=that.blockForm.discuss;
+            let sum=Number(scoreRatio)+Number(explore)+Number(cooperation)+Number(summary)+Number(discuss);
             if(valid){
-              let currList=JSON.parse(JSON.stringify(this.currentBlockList));
-                currList[0].name=this.blockForm.name
-                currList[0].target=this.blockForm.target
-                currList[0].duration=this.blockForm.duration
+              if(sum!=100){
+                that.$message({
+                  showClose: true,
+                  message: '占比总和需是100哦^o^',
+                  type: 'warning'
+                });
+              }else{
+                let currList=JSON.parse(JSON.stringify(that.currentBlockList));
+                currList[0].name=that.blockForm.name;
+                currList[0].target=that.blockForm.target;
+                currList[0].duration=that.blockForm.duration;
+                currList[0].scoreRatio=that.blockForm.scoreRatio;
+                currList[0].explore=that.blockForm.explore;
+                currList[0].cooperation=that.blockForm.cooperation;
+                currList[0].summary=that.blockForm.summary;
+                currList[0].discuss=that.blockForm.discuss;
 
-              let sourceLists=JSON.parse(JSON.stringify(this.sourceListsInfo));
-              sourceLists.blockLists.forEach((item) => {
-                if(item.key == this.currentBlockKey){
-                  item.name=this.blockForm.name
-                  item.target=this.blockForm.target
-                  item.duration=this.blockForm.duration
-                }
-              })
-              this.CURRENT_BLOCK_LIST(currList);
-              this.SOURCE_LIST({val:sourceLists, key:this.guid});
-              this.editVisible = false;
+                let sourceLists=JSON.parse(JSON.stringify(that.sourceListsInfo));
+                sourceLists.blockLists.forEach((item) => {
+                    if(item.key == that.currentBlockKey){
+                    item.name=that.blockForm.name;
+                    item.target=that.blockForm.target;
+                    item.duration=that.blockForm.duration;
+                    item.scoreRatio=that.blockForm.scoreRatio;
+                    item.explore=that.blockForm.explore;
+                    item.cooperation=that.blockForm.cooperation;
+                    item.summary=that.blockForm.summary;
+                    item.discuss=that.blockForm.discuss;
+                  }
+                })
+                that.CURRENT_BLOCK_LIST(currList);
+                that.SOURCE_LIST({val:sourceLists, key:this.guid});
+                that.editVisible = false;
+              }
 
             }else{
                 console.log('error submit!!');

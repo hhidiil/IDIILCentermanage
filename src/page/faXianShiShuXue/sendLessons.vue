@@ -57,16 +57,6 @@
             <div class="classItem">
               <span>分组列表:</span>
               <div class="subgroupLists">
-                <!--<el-collapse>-->
-                  <!--<el-collapse-item v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">-->
-                    <!--<template slot="title">-->
-                      <!--{{item.subgroupName}}-->
-                    <!--</template>-->
-                    <!--<div v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">-->
-                      <!--{{val.key}}&#45;&#45;{{val.UserName}}-->
-                    <!--</div>-->
-                  <!--</el-collapse-item>-->
-                <!--</el-collapse>-->
                 <ul>
                   <li v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">
                     <span> {{item.subgroupName}}{{index+1}}:</span>
@@ -93,7 +83,7 @@
     <el-dialog
       width="60%"
       v-dialogDrag
-      title="IDIIL教材"
+      title="已完成课程"
       :visible.sync="lessionsVisible"
       :close-on-click-modal="false"
       append-to-body
@@ -113,25 +103,25 @@
           </el-table-column>
           <el-table-column
             property="LastUpdateTime"
-            label="日期"
+            label="更改日期"
             width="120"
             align="center">
           </el-table-column>
           <el-table-column
             property="CurriculumName"
-            label="姓名"
+            label="课程名称"
             width="120"
             align="center">
           </el-table-column>
           <el-table-column
             property="CurriculumID"
-            label="地址"
+            label="课程标识"
             align="center">
           </el-table-column>
         </el-table>
         <div style="margin-top: 20px">
           <el-button @click="setCurrent()">取消选择</el-button>
-          <el-button @click="selectCurriculum()">确定</el-button>
+          <el-button type="primary" @click="selectCurriculum()">确定</el-button>
         </div>
       </section>
     </el-dialog>
