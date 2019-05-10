@@ -185,7 +185,12 @@
                 version: [],
                 fileLists: [],
                 commits: "",
-//                status: "doing"
+                scoreRatio:"", //得分占比得分占比
+                explore:"", //探究
+                cooperation:"", //协作
+                summary:"", //总结
+                discuss:"" //讨论
+
               },
               blockLists:[]
             };
