@@ -3,38 +3,88 @@
     <el-header class="register">
       <el-row>
         <el-col :span="12"><div class="logoSection"><img src="../../../static/images/logo.png"></div></el-col>
-        <el-col :span="12"><div class="backSection"><el-button round icon="el-icon-back" @click="BackHandle">圆角按钮</el-button></div></el-col>
+        <el-col :span="12"><div class="backSection"><el-button round icon="el-icon-back" @click="BackHandle">返回登录页</el-button></div></el-col>
       </el-row>
     </el-header>
     <el-main>
       <section class="form_contianer_register">
         <div class="senctionblock">
-          <el-form :model="ruleForm" status-icon :rules="rules" ref="registerForm" label-width="80px" class="demo-ruleForm">
-            <el-form-item label="中心号" prop="centerId">
-              <el-input type="text" v-model="ruleForm.centerId"></el-input>
-            </el-form-item>
-            <el-form-item label="角色类型" prop="role">
-              <el-radio-group v-model="ruleForm.role">
+        <!--  :rules="rules"-->
+          <el-form :model="ruleForm" status-icon  ref="registerForm" label-width="80px" class="demo-ruleForm">
+
+            <el-form-item label="角色类型:" prop="role">
+              <el-radio-group v-model="ruleForm.role" @change="changeRole">
+                <el-radio label="0">普通会员</el-radio>
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">教师</el-radio>
                 <el-radio label="3">管理员</el-radio>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="用户名" prop="userName">
-              <el-input type="text" v-model="ruleForm.userName"></el-input>
+            <el-form-item label="用户名:" prop="UserName">
+              <el-input type="text" v-model="ruleForm.UserName"></el-input>
             </el-form-item>
-            <el-form-item label="班级" prop="classId">
-              <el-input type="text" v-model="ruleForm.classId"></el-input>
+            <el-form-item class="area" label="区域:" prop="DistinctName">
+              <template style="display: flex;margin-left: 0;">
+                <el-select v-model="provinceDate" placeholder="请选择省" @change="selectProvince" @visible-change="visibleChangeProvince">
+                  <el-option
+                    v-for="(item,index) in provinceOptions"
+                    :key="index"
+                    :label="item.Name"
+                    :value="item.ID">
+                  </el-option>
+                </el-select>
+                <el-select v-model="cityDate" placeholder="请选择市" @change="selectCity" @visible-change="visibleChangeCity">
+                  <el-option
+                    v-for="item in cityOptions"
+                    :key="item.MergerName"
+                    :label="item.Name"
+                    :value="item.ID">
+                  </el-option>
+                </el-select>
+                <el-select v-model="areaDate" value-key="ID" placeholder="请选择市" @change="selectArea" >
+                  <el-option v-for="item in areaOptions"
+                             :key="item.Name" :label="item.Name"
+                             :value="item">
+                  </el-option>
+                </el-select>
+              </template>
             </el-form-item>
-            <el-form-item label="年级" prop="grade">
-              <el-input type="text" v-model="ruleForm.grade"></el-input>
+            <el-form-item label="地址:" prop="Address">
+              <el-input placeholder="请输入具体 地址" type="text" v-model="ruleForm.Address"></el-input>
             </el-form-item>
-            <el-form-item label="学科" prop="subject">
-              <el-input type="text" v-model="ruleForm.subject"></el-input>
+
+            <el-form-item label="昵称:" prop="NickName">
+              <el-input placeholder="请输入昵称" type="text" v-model="ruleForm.NickName"></el-input>
             </el-form-item>
-            <el-form-item label="手机号" prop="phone">
-              <el-input type="number" v-model="ruleForm.phone"></el-input>
+            <el-form-item label="密码:" prop="Password">
+              <el-input type="password" placeholder="请输入密码" v-model="ruleForm.Password" show-password></el-input>
             </el-form-item>
+            <el-form-item label="真实名字:" prop="ActualName">
+              <el-input placeholder="请输入真实姓名" type="text" v-model="ruleForm.ActualName"></el-input>
+            </el-form-item>
+
+            <hr>
+            <div class="massage_append">
+              <el-form-item class="AddInput AddInput_show" label="Tel:" prop="ContactInfo.Tel">
+                <el-input v-model="classInfo.Tel">
+                  <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(1)"></el-button>
+                  <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(1)"></el-button>
+                </el-input>
+              </el-form-item>
+              <el-form-item class="AddInput" label="WeChat:" prop="ContactInfo.WeChat">
+                <el-input v-model="classInfo.WeChat">
+                  <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(2)"></el-button>
+                  <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(2)"></el-button>
+                </el-input>
+              </el-form-item>
+              <el-form-item class="AddInput" label="QQ:" prop="ContactInfo.QQ">
+                <el-input v-model="classInfo.QQ">
+                  <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(3)"></el-button>
+                  <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(3)"></el-button>
+                </el-input>
+              </el-form-item>
+            </div>
+
             <el-button @click="Register('registerForm')" class="enterButton">提 交</el-button>
           </el-form>
         </div>
@@ -44,9 +94,11 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {registerUser} from '../../api/user'
+  import {registerMember} from '../../api/user'
   import {getClassInfo} from '../../api/classes'
   import {setStore,getStore,clearStore,setSession,getSession} from '../../config/publicMethod'
+  import {getAreaList} from '../../api/common'
+
   export default {
     name: 'door',
     data () {
@@ -58,47 +110,77 @@
         }
       };
       return {
+        DistinctName:'',
+        provinceDate:[],cityDate:[],areaDate:[],
+        provinceOptions:[],cityOptions:[],areaOptions:[],
+        ContactInfo:[],
         ruleForm: {
-          userName:'',
-          centerId:'',
-          classId:'',
-          grade:'',
-          subject:'',
-          phone:'',
+          UserName:'',
+          NickName:'',
+          ActualName:'',
+          Password:'',
+          DistinctID:'',
+          DistinctName:'',
+          Address:'',
+          ContactInfo:'',
+          UserType:''
+         /* domains: [{
+            value: ''
+          }],
+          email: ''*/
         },
         rules: {
+          UserName: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+          ],
           role: [
             {required: true,  message: '请选择角色', trigger: 'blur' }
           ],
-          centerId: [
-            { required: true, message: '请输入中心号', trigger: 'blur' },
+          NickName: [
+            { required: true, message: '请输入昵称', trigger: 'blur' },
           ],
-          userName: [
-            { required: true, message: '请输入用户名', trigger: 'blur' },
+          ActualName: [
+            { required: true, message: '请输入真实姓名', trigger: 'blur' },
           ],
-          classId: [
+          Password: [
+            { required: true, message: '请输入密码', trigger: 'blur' },
+          ],
+          DistinctID: [
             {required: true,  message: '请输入班级', trigger: 'blur' }
           ],
-          grade: [
+          DistinctName: [
             { required: true, message: '请选择年级', trigger: 'blur' },
           ],
-          subject: [
+          Address: [
             {required: true,  message: '请选择用户学科', trigger: 'blur' }
           ],
-          phone: [
+          ContactInfo: [
             {required: true,  validator: validatePass, trigger: 'blur' }
           ],
-        }
+        },
+        show_len:1,
+        msg:['Tel','WeChat','QQ','Email'],
+        classInfo:{
+          Tel:'',WeChat:'',Email:''
+        },
       }
+    },
+    mounted(){
+      this.getAllProvince();
     },
     methods:{
       async Register(formName){
+        this.ruleForm.ContactInfo ='QQ:5648696568'// JSON.stringify(this.classInfo);
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
-            let params = this.ruleForm;
-            let result = await registerUser(params);
-            console.log("注册结果------->",params,result)
+            let params =JSON.parse( JSON.stringify( this.ruleForm ) ) ;
+            params.CenterID = null
+            params.SchoolID = null;
+            let result = await registerMember(params);
+            console.log("所有的列表",result.data.UserID);
             if(result.code == 200){
+              setStore('UserID',result.data.UserID)
+              this.$message({message: '注册成功！',type:'success'});
               this.$router.push('/');
             }else {
               alert('注册信息出错')
@@ -111,7 +193,91 @@
       },
       BackHandle(){
         this.$router.back();
-      }
+      },
+      async selectProvince(val){//选择了省份
+        this.cityOptions=[];
+        let result = await getAreaList();
+        result.data.map( (item,index)=>{
+          if( item.ParentId == val ){//省
+            this.cityOptions.push( item )
+          }
+        })
+      },
+      visibleChangeProvince(){
+        this.cityDate=null;
+        this.areaDate=null;
+      },
+      visibleChangeCity(){
+        this.areaDate=null;
+      },
+      async selectCity(val){
+        this.areaOptions=[];
+        let result = await getAreaList();
+        result.data.map( (item,index)=>{
+          if( item.ParentId == val ){//市
+            this.areaOptions.push( item )
+          }
+        })
+      },
+      async selectArea(row){
+        this.ruleForm.DistinctName = null;
+        this.ruleForm.DistinctID =null;
+
+        this.DistinctName=row.Name;
+        this.ruleForm.DistinctName = row.MergerName;
+        this.ruleForm.DistinctID = row.ID
+        console.log(row)
+      },
+      async getAllProvince(){
+        let result = await getAreaList();
+        //this.provinceOptions = result.data;
+        result.data.map( (item,index)=>{
+          if( item.LevelType==1 ){//省
+            this.provinceOptions.push( item )
+          }
+        })
+      },
+
+      changeRole(row){
+        switch(row) {
+          case '0':
+            this.ruleForm.UserType = 'M';
+            break;
+          case '1':
+            this.ruleForm.UserType = 'S';
+            break;
+          case '2':
+            this.ruleForm.UserType = 'T';
+            break;
+          case '3':
+            this.ruleForm.UserType = 'A';
+            break;
+          default:
+            return false;
+        }
+        console.log( this.ruleForm.UserType)
+      },
+      appendClass(i){
+        var add_len=$('.AddInput').length;
+        if( this.show_len >=add_len ){
+          alert('QQ、微信、电话中填写信息即可，无需其他联系方式')
+          return false;
+        }
+        $('.AddInput').eq(i-1).addClass('AddInput_show')
+        this.show_len = Number(this.show_len)+1;
+        console.log( this.show_len )
+        $('.AddInput').eq(add_len-this.show_len+1).css('display','inline-table')
+      },
+      removeClass(i){
+        this.show_len = Number(this.show_len)-1;
+        if( this.show_len <= 0 ){
+          alert('QQ、微信、电话中至少保留一种联系方式')
+          return false;
+        }
+        console.log(this)
+        $('.AddInput').eq(i-1).css('display','none');
+        $('.AddInput').eq(i-1).removeClass('AddInput_show');
+      },
     }
   }
 </script>
@@ -157,5 +323,11 @@
     cursor: pointer;
     color: white;
   }
+  }
+  .AddInput{
+    display: none;
+  }
+  .AddInput:first-child{
+    display:inline-table;
   }
 </style>
