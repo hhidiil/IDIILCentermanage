@@ -6,18 +6,18 @@
         <!--  :rules="rules"-->
           <el-form :model="ruleForm" status-icon  ref="registerForm" label-width="80px" class="demo-ruleForm">
 
-            <el-form-item label="角色类型:" prop="role">
+            <!--<el-form-item label="角色类型:" prop="role">
               <el-radio-group v-model="ruleForm.role" @change="changeRole">
                 <el-radio label="0">普通会员</el-radio>
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">教师</el-radio>
                 <el-radio label="3">管理员</el-radio>
               </el-radio-group>
-              <el-radio-group v-model="ruleForm.Status">
-                <el-radio label="1">开启</el-radio>
-                <el-radio label="0">关闭</el-radio>
-              </el-radio-group>
-            </el-form-item>
+            </el-form-item>-->
+            <el-radio-group v-model="ruleForm.Status">
+              <el-radio label="1">开启</el-radio>
+              <el-radio label="0">关闭</el-radio>
+            </el-radio-group>
             <el-form-item label="用户名:" prop="UserName">
               <el-input type="text" v-model="ruleForm.UserName"></el-input>
             </el-form-item>
