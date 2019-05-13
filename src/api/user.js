@@ -3,6 +3,25 @@ import fetch_requset from '../config/fetch'
 const API_CONFIG = '/api/user';
 
 /**
+ * [注册新会员]
+ */
+export const registerMember = (data)=>{
+  const url = `${API_CONFIG}/registerMember`;
+  return fetch_requset(url,data,'POST')
+}
+
+/**
+ * [修改会员信息]
+ */
+export const updateMemberInfo = (data)=>{
+  const url = `${API_CONFIG}/updateMemberInfo`;
+  return fetch_requset(url,data,'POST')
+}
+
+
+
+
+/**
  * [doLogin 登录]
  * @return {[type]}  [description]
  */
@@ -16,7 +35,7 @@ export const writeFileJson = (data) => {
   return fetch_requset(url,data,'GET')
 }
 
-//测试接口 获取本地的登录数据
+// 测试接口 获取本地的登录数据
 export const doTestLogin = (url) => {
   return fetch_requset(url)
 }
@@ -53,5 +72,12 @@ export const updateStudentUser = (data) => {
  */
 export const deleteStudentUser = (data) => {
   const url = `${API_CONFIG}/deleteStudentUser`;
+  return fetch_requset(url,data,'POST')
+}
+/**
+ * [修改会员信息]
+ */
+export const getMemberList = (data)=>{
+  const url = `${API_CONFIG}/getMemberList`;
   return fetch_requset(url,data,'POST')
 }
