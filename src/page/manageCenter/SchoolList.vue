@@ -173,7 +173,9 @@
                    :visible.sync="dialogTwoVisible" :closeOnClickModal="modalClickOther">
           <el-row>
             <el-col :span="24">
-              <registerRole :msg="msg"></registerRole>
+              <div style="min-height:400px">
+                <registerRole :msg="msg"></registerRole>
+              </div>
 
               <!--<el-form :model="addForm" status-icon  ref="alterFormTwo" label-width="80px" class="demo-ruleForm">
                 <el-form-item>
