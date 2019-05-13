@@ -343,6 +343,9 @@ let aa=getStore('allData')
       },
       handleEdit(index, row) {
         console.log(index, row);
+        alert('编辑还没做')
+        return false;
+
         this.dialogVisible = true;
         this.alterFlag = false;
         this.ruleForm ={
