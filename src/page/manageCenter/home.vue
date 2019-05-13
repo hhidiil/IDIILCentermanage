@@ -19,13 +19,20 @@
     <el-row style="height: 100%;">
       <el-col :span="3"  style="min-height: 100%; background-color: #324057;">
         <el-menu default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
-          <el-submenu index="1">
+          <el-submenu index="1" v-if="isSchoolManage">
             <template slot="title"><i class="el-icon-menu"></i><span>中心管理</span></template>
-            <el-menu-item index="/home/teacherManage">班级管理</el-menu-item>
-            <el-menu-item index="/home/studentManage">学生管理</el-menu-item>
-            <el-menu-item index="/home/projectManage">me</el-menu-item>
+            <el-menu-item v-if="isSub" index="/home/generalCenterList">总中心管理</el-menu-item>
+            <!--<el-menu-item index="/home/subCenterList?name=children"> <router-link :to="{path:'/home/subCenterList',query:{name:'children'}}"  tag="li">分中心管理</router-link> </el-menu-item>-->
+            <el-menu-item index="/home/subCenterList">分中心管理</el-menu-item>
+            <el-menu-item v-if="isSub" index="/home/centerManage">管理员列表</el-menu-item>
           </el-submenu>
-          <el-menu-item v-if="isTrue" index="/home/centerManage"><i class="el-icon-menu"></i>总中心管理</el-menu-item>
+          <el-submenu index="2">
+            <template slot="title"><i class="el-icon-service"></i><span>学校管理</span></template>
+            <el-menu-item index="/home/schoolList">学校列表</el-menu-item>
+            <el-menu-item index="/home/classList">班级管理</el-menu-item>
+            <el-menu-item index="/home/schoolUserManage">学校用户管理</el-menu-item>
+          </el-submenu>
+          <el-menu-item index="/home/reportManage"><i class="el-icon-tickets"></i>报表管理</el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="21" style="height: 100%;overflow: hidden;">
@@ -41,7 +48,9 @@
     //data中放入初始默认值
     data() {
       return {
-        isTrue:false
+        centerId: JSON.parse(getStore('manageUser')).centerId,
+        isSub:false,
+        isSchoolManage:true
       }
     },
     computed: {
@@ -49,9 +58,14 @@
     beforeMount(){
       let userInfo = JSON.parse(getStore('manageUser'));
       console.log('传过来的参数--1111》》',userInfo)
+
       if(userInfo.permissionLevel == '1'){
-        this.isTrue = true;
+        this.isSub = true;
+      }else{
+        //this.isSub = false;
       }
+
+
     },
     mounted(){
       //进入首页的时候存储一个课程列表

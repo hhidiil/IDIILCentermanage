@@ -154,8 +154,8 @@
                       <el-option size="100%"
                         v-for="(item,index) in classOptions"
                         :key="index"
-                        :label="item.name"
-                        :value="item.path">
+                        :label="item.ProgramName"
+                        :value="item.ProgramCode">
                       </el-option>
                     </el-select>
                   </el-form-item>
@@ -203,11 +203,10 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import registerRole from '../../components/registerCom'
-  import {getAllCenter,updateCenter,addCenter,deleteCenter,  addCenterSchool,addCenterSchoolUser ,getCenterSchool } from '../../api/manage'
+  import {getAllCenter,updateCenter,addCenter,deleteCenter,  addCenterSchool,addCenterSchoolUser ,getCenterSchool,getCenterProgram } from '../../api/manage'
   import {getAreaList} from '../../api/common'
   import {setStore,getStore,clearStore,setSession,getSession} from '../../config/publicMethod'
 
-  import adminDate_Test from '../../data/admin.json'
   export default{
     data(){
       return{
@@ -232,10 +231,10 @@
         modalClickOther:false,
         alertFlag:false,
         provinceDate:[],cityDate:[],areaDate:[],CenterOfSchoolData:[],
-        provinceOptions:[],cityOptions:[],areaOptions:[],centerOfSchoolOptions:adminDate_Test,
+        provinceOptions:[],cityOptions:[],areaOptions:[],
         DistinctName:'',
         chooseCenterOption:[],chooseCenterListData:[],
-        classAdd:'',classDate:[],classOptions:adminDate_Test[0].msg,
+        classAdd:'',classDate:[],classOptions:[],
         contactInfo:{
           Tel:'',WeChat:'',QQ:''
         },
@@ -291,6 +290,13 @@
       this.getAllProvince();
     },
     methods:{
+      async getClass(center){
+        var inputJson = {
+          CenterID:center
+        }
+        let result = await getCenterProgram(inputJson);
+        this.classOptions = result.data
+      },
       handleCheckChange( data,checked,indeterminate ){
         console.log(data,checked,indeterminate)
         //this.handleNodeClicks( data )
@@ -364,10 +370,7 @@
       },
       async handleDelete(index, row) {
         console.log(index, row);
-        let result = await deleteCenter({CenterID:row.CenterID});
-        if(result.code == 200){
-          this.$message({message: '删除成功！',type:'success'});
-        }
+       alert('删除还没做')
       },
       async handleAdd(index, row){
         this.dialogTwoVisible = true;
@@ -393,6 +396,7 @@
         console.log( result.data )
         this.allData = result.data;
         this.currentData = this.allData.slice(0,this.pageSize);
+        this.getClass(center)
       },
       async chooseCenterOfSchool(row){//选择学校所属中心
         this.CenterOfSchoolData=row.CenterID;

@@ -20,8 +20,10 @@
             <el-form-item label="密码" prop="pass">
               <el-input type="password" v-model="ruleForm.pass"></el-input>
             </el-form-item>
-            <el-button @click="loginEnter('ruleForm')" class="enterButton">登 录</el-button>
+            <el-button @click="loginEnter('ruleForm')" class="enterButton" >登 录</el-button>
+            <!--<router-link :to="{path:'/home',query:{name:'children'}}" class="enterButton"  tag="button" @click="loginEnter('ruleForm')">登录</router-link>-->
             <el-button @click="register()" class="registerButton">注 册</el-button>
+            <div>忘记密码？点击 <span @click="linkToEdit()">修改密码</span></div>
           </el-form>
         </div>
       </section>
@@ -33,6 +35,11 @@
   import {doLogin,registerUser} from '../../api/user'
   import {getClassInfo} from '../../api/classes'
   import {setStore,getStore,clearStore,setSession,getSession} from '../../config/publicMethod'
+  import Vue from 'vue'
+  import Router from 'vue-router'
+
+  Vue.use(Router);
+//let routes = JSON.parse( getSession('routes') );
   export default {
     name: 'door',
     data () {
@@ -61,6 +68,7 @@
     },
     methods:{
       async loginEnter(formName){
+        debugger;
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
             let params = this.ruleForm;
@@ -71,6 +79,9 @@
               if(result.data[0]){
                 setSession('accessToken',true);//登录标志
                 setStore('manageUser',result.data[0])
+                setStore('permissionLevel',result.data[0].permissionLevel)
+//                this.$router.addRoutes( routes[0].rootList[0].router ) //动态添加路由
+//                this.$router.push({path:'/'});
                 this.$router.replace('home');
               }else {
                 alert("用户名或密码错误")
@@ -84,6 +95,10 @@
       },
       register(formName){
         this.$router.push('register');
+      },
+      linkToEdit(){
+        setSession('accessToken',true);//登录标志
+        this.$router.push({name:'editMember'});
       }
     }
   }
@@ -142,5 +157,12 @@
       color: white;
       margin: 0 !important;
     }
+    .editPwdButton{
+      background-color: #3cacab;
+      font-size: 20px;
+      width: 100%;
+      cursor: pointer;
+      color: white;
+      margin: 0 !important;}
   }
 </style>
