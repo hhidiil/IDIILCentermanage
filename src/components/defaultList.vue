@@ -23,23 +23,18 @@
             <span>{{currentBlockList[0].name}}</span>
           </el-form-item>
           <el-form-item label="得分占比:">
-            <!--<span>{{currentBlockList[0].scoreRatio | ratioUnit}}</span>-->
               <el-progress v-if="currentBlockList[0].scoreRatio" :percentage="Number(currentBlockList[0].scoreRatio)"></el-progress>
           </el-form-item>
           <el-form-item label="探究占比:">
-            <!--<span>{{currentBlockList[0].explore | ratioUnit}}</span>-->
             <el-progress v-if="currentBlockList[0].explore" :percentage="Number(currentBlockList[0].explore)"></el-progress>
           </el-form-item>
           <el-form-item label="协作占比:">
-            <!--<span>{{currentBlockList[0].cooperation | ratioUnit}}</span>-->
             <el-progress v-if="currentBlockList[0].cooperation" :percentage="Number(currentBlockList[0].cooperation)"></el-progress>
           </el-form-item>
           <el-form-item label="总结占比:">
-            <!--<span>{{currentBlockList[0].summary | ratioUnit}}</span>-->
             <el-progress v-if="currentBlockList[0].summary" :percentage="Number(currentBlockList[0].summary)"></el-progress>
           </el-form-item>
           <el-form-item label="讨论占比:">
-            <!--<span>{{currentBlockList[0].discuss | ratioUnit}}</span>-->
             <el-progress v-if="currentBlockList[0].discuss" :percentage="Number(currentBlockList[0].discuss)"></el-progress>
           </el-form-item>
           <el-form-item label="教学参考:">

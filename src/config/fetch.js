@@ -5,7 +5,7 @@
 import { baseUrl } from './env'
 //import {bodyUrlencoded} from './methods'
 
-export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
+export default async(url = '', data = {}, type = 'GET', method = 'fetch',AcceptType='application/json') => {
   type = type.toUpperCase();
   url = baseUrl + url;
 
@@ -25,7 +25,7 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
       //credentials: 'include',
       method: type,
       headers: {
-        'Accept': 'application/json',
+        'Accept':AcceptType, //'application/json',
         'Content-Type': 'application/json'
       },
       mode: "cors",
@@ -37,10 +37,15 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
         value: JSON.stringify(data)
       })
     }
-    console.log('请求的参数：：：',url,requestConfig)
+    console.log('请求的参数：：：',url,requestConfig);
     try {
       const response = await fetch(url, requestConfig);
-      const responseJson = await response.json();
+      let responseJson=null;
+      if(AcceptType=="text/html"){
+        responseJson=await response.text();
+      } else {
+        responseJson = await response.json();
+      }
       return responseJson
     } catch (error) {
       throw new Error(error)

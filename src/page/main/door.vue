@@ -124,7 +124,8 @@
                   userinfo = {
                     userId:result.data[0].userId,
                     userName: result.data[0].userName,
-                    centerId:result.data[0].centerId
+                    centerId:result.data[0].centerId,
+                    TeacherType:'IDIIL'
                   };
                   if(this.ruleForm.role == '1'){//学生登录
                     setSession("accessToken",true);//设置登录状态的值

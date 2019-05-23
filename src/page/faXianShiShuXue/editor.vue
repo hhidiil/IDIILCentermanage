@@ -26,11 +26,12 @@
 
 <script>
   import headTop from '../../components/headTop'
-  import { quillEditor } from 'vue-quill-editor'
-  // require styles 引入样式
+  // require styles
   import 'quill/dist/quill.core.css'
   import 'quill/dist/quill.snow.css'
   import 'quill/dist/quill.bubble.css'
+
+  import { quillEditor } from 'vue-quill-editor'
   export default {
     data(){
       return {
@@ -41,7 +42,7 @@
             toolbar:[
               [{ 'list': 'ordered'}],
               [{ 'script': 'sub'}, { 'script': 'super' }],
-              ['underline'],        // toggled buttons
+              ['underline'],        // togg led buttons
               ['code-block','link','image']
             ]
           }

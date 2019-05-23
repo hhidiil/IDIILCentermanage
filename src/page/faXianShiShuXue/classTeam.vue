@@ -2,44 +2,49 @@
   <div>
     <head-top></head-top>
     <section class="classManagerList_section">
-      <el-row>
-        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
-          <div class="block">
-            <span class="demonstration">选择日期</span>
-            <el-date-picker
-              v-model="selectedDate"
-              type="daterange"
-              align="right"
-              unlink-panels
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :picker-options="pickerOptions2"
-              @change="changeStatus">
-            </el-date-picker>
-          </div>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
-          <el-checkbox-group v-model="checkedSearchTypes" @change="handleCheckedSearchTypesChange">
-            <el-checkbox v-for="searchType in searchTypes" :label="searchType" :key="searchType">{{searchType}}</el-checkbox>
-          </el-checkbox-group>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="24" style="text-align: center;margin-bottom: 10px">
-          选择状态：
-          <el-radio-group :disabled="cannotScreeningByStatus" v-model="status" @change="changeStatus">
-            <el-radio label="未开始">未开始</el-radio>
-            <el-radio label="进行中">进行中</el-radio>
-            <el-radio label="已完成">已完成</el-radio>
-          </el-radio-group>
-        </el-col>
-      </el-row>
+      <!--<el-row>-->
+        <!--<el-col :span="24" style="text-align: center;margin-bottom: 10px">-->
+          <!--<div class="block">-->
+            <!--<span class="demonstration">选择日期</span>-->
+            <!--<el-date-picker-->
+              <!--v-model="selectedDate"-->
+              <!--type="daterange"-->
+              <!--align="right"-->
+              <!--unlink-panels-->
+              <!--range-separator="至"-->
+              <!--start-placeholder="开始日期"-->
+              <!--end-placeholder="结束日期"-->
+              <!--:picker-options="pickerOptions2"-->
+              <!--@change="changeStatus">-->
+            <!--</el-date-picker>-->
+          <!--</div>-->
+        <!--</el-col>-->
+      <!--</el-row>-->
+      <!--<el-row>-->
+        <!--<el-col :span="24" style="text-align: center;margin-bottom: 10px">-->
+          <!--<el-checkbox-group v-model="checkedSearchTypes" @change="handleCheckedSearchTypesChange">-->
+            <!--<el-checkbox v-for="searchType in searchTypes" :label="searchType" :key="searchType">{{searchType}}</el-checkbox>-->
+          <!--</el-checkbox-group>-->
+        <!--</el-col>-->
+      <!--</el-row>-->
+      <!--<el-row>-->
+        <!--<el-col :span="24" style="text-align: center;margin-bottom: 10px">-->
+          <!--选择状态：-->
+          <!--<el-radio-group :disabled="cannotScreeningByStatus" v-model="status" @change="changeStatus">-->
+            <!--<el-radio label="未开始">未开始</el-radio>-->
+            <!--<el-radio label="进行中">进行中</el-radio>-->
+            <!--<el-radio label="已完成">已完成</el-radio>-->
+          <!--</el-radio-group>-->
+        <!--</el-col>-->
+      <!--</el-row>-->
       <el-row>
         <el-col :span="24" style="text-align: right;margin-bottom: 10px">
-          <el-button type="primary" round @click="sendLessionsAdd('add')" >新增派课</el-button>
+          <div class="controlInfo">
+            <curriculum-search></curriculum-search>
+            <div class="curriculumAdd">
+              <el-button type="primary" round @click="sendLessionsAdd('add')" >新增派课</el-button>
+            </div>
+          </div>
         </el-col>
       </el-row>
       <el-row>
@@ -54,7 +59,8 @@
               label="更改日期">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
-                <span style="margin-left: 10px">{{ scope.row.LastUpdateTime }}</span>
+                <span>{{ scope.row.LastUpdateTime | lineFeed(0) }}</span><br/>
+                <span>{{ scope.row.LastUpdateTime | lineFeed(1) }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -65,7 +71,8 @@
               </template>
             </el-table-column>
             <el-table-column
-              label="派课标识">
+              label="派课标识"
+              v-if="false">
               <template slot-scope="scope">
                 <span>{{ scope.row.AssignID }}</span>
               </template>
@@ -97,6 +104,7 @@
   import headTop from '../../components/headTop'
   import {setStore, getStore, removeStore, createGuid} from '../../config/publicMethod'
   import {getAssignmentList, deleteAssignment} from '../../api/exploration'
+  import curriculumSearch from '../../components/curriculumSearch.vue'
 
   const searchTypeOptions = ['查看全部','按时间', '按状态'];
   export default {
@@ -152,7 +160,8 @@
       }
     },
     components: {
-      headTop
+      headTop,
+      curriculumSearch
     },
     activated() {
       //当切换路由的时候 如果需要 vue保存缓存的话，但是部分的值不需要，则可以在这里面重新赋值，如果没有keep-alive,则每次都会重新加载所有数据
@@ -161,7 +170,12 @@
     mounted() {
       this.getAssignmentList();
     },
-
+    filters: {
+      lineFeed(value,num){
+        if (!value) return '';
+        return value.split(/\s+/)[num];
+      }
+    },
     methods: {
       //获取派课列表
       async getAssignmentList() {
@@ -224,7 +238,7 @@
       * 单元格的 style 的回调方法
       * */
       statusStyle({row, column, rowIndex, columnIndex}) {
-        if(columnIndex==3){
+        if(columnIndex==2){
          if(row.Status==="doing"){
             return {"text-align":"center",color:"#E6A23C"};
           }else if(row.Status==="done"){
@@ -321,7 +335,10 @@
   .classManagerList_section {
     padding: 20px;
     margin-bottom: 40px;
-
+  .controlInfo{
+    display:flex;
+    justify-content: space-between;
+  }
     .resoucelist {
       text-decoration: underline;
       margin: 5px 0;

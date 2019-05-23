@@ -49,7 +49,9 @@
         this.$router.push('manage')
       },
       async goShangKe(){
-        let userid = JSON.parse(getStore('userInfo')).userId
+        this.removeCurriculumStorage();
+        this.$router.push('manage/attendClass');
+ /*       let userid = JSON.parse(getStore('userInfo')).userId
         //获取上次上课的内容
         const result = await getCurrentCourseInfo({teacherId:userid})
         console.log("getCurrentCourseInfo----->>>>>上课信息",result)
@@ -69,7 +71,7 @@
           }
         }else {
           console.error("出错了------！！！：",result.message)
-        }
+        }*/
       },
       removeCurriculumStorage(){
         let str1='sendLessonsLists-';

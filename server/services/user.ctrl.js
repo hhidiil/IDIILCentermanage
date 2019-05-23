@@ -13,7 +13,7 @@ const userRouter = express.Router()
 
 userRouter.post('/login',async(req, res) => {
   var props = req.body;
-  props.pass = Helper.getMD5(req.body.pass);
+  props.pass =req.body.pass;// Helper.getMD5(req.body.pass);
   var user = new User({props: props});
   const result = await user.getUser();
   if(result){

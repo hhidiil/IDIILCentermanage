@@ -9,7 +9,7 @@
             <el-card class="blockListCard">
               <div slot="header" class="clearfix">
                 <span>区块列表</span>
-                <el-button v-if="prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
+                <el-button v-if="userInfo.TeacherType == 'IDIIL' && prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
               </div>
               <div v-if="prepareLessonsStatus != 'check'" class="list-group-box">
                 <draggable
@@ -100,7 +100,6 @@
   import classData from '../../data/classlist'
   import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
   import {setStore,getStore,removeStore} from '../../config/publicMethod'
-  import {uploadFile} from '../../api/upload'
   import {addClassListInfo,updateClassListInfo} from '../../api/classes'
   import {getAllClassesOfCenter} from '../../api/manage'
   import {getOnLineData, getTempCurriculum, saveTempCurriculum} from '../../api/exploration'
@@ -113,7 +112,6 @@
     props:[],
     data(){
       return {
-        showDelete: -1,
         DialogIdiilVisible:false,
         formLabelWidth: '90px',
         userInfo:JSON.parse(getStore('userInfo')),
@@ -158,7 +156,8 @@
       defaultList
     },
     mounted(){
-
+      const Wh = $(window).height();
+      $(".list-group-box").css("max-height",(Wh-150-100)+'px');
     },
     methods: {
       ...mapMutations([
@@ -179,19 +178,17 @@
           }else{
             this.sourceLists={
               classList:{
-                classId: this.guid,
+//                classId: this.guid,
                 name: "",
-                datetime: "",
                 target: "",
                 duration: "",
                 version: [],
                 fileLists: [],
-                commits: "",
-                scoreRatio:"", //得分占比
-                explore:"", //探究
-                cooperation:"", //协作
-                summary:"", //总结
-                discuss:"" //讨论
+                scoreRatio:60, //得分占比
+                explore:10, //探究
+                cooperation:10, //协作
+                summary:10, //总结
+                discuss:10 //讨论
 
               },
               blockLists:[]
@@ -215,27 +212,39 @@
       async getBlockNum(param){
         const onlinePra={FileName:'Math--'+param.GlobalID,Action:'get',Content:'',Function:'OnlineMathBaseData'};
         let result2=await getOnLineData(onlinePra);
+        if(!result2){
+          this.promptMessage('该章节暂无区块，换个章节试试^o^','warning');
+          return;
+        }
         result2=JSON.parse(Base64.decode(result2));
         if(result2.length>0){
           result2.forEach(item => {
             let urlJson= {
               name: param.selectUnitName + item.id,
+              blockID: item.id,
               target: "",
               duration: '',
               validate: false,
               editFlag:false,
               fileLists: [],
+              scoreRatio:60, //得分占比
+              explore:10, //探究
+              cooperation:10, //协作
+              summary:10, //总结
+              discuss:10, //讨论
+              param:param,
               uid: new Date().getTime(),
               key: new Date().getTime() + item.index.toString()
             };
             this.sourceLists.blockLists.push(urlJson);
-          })
+          });
+          this.promptMessage('添加成功^_^', 'success');
+          this.initBlcokShow();
         }
-        this.initBlcokShow();
+
       },
       //初始化区块显示信息
       initBlcokShow(){
-        console.log("所有的列表",this.sourceLists);
         if(this.sourceLists.blockLists.length>0){
           let cBlockKey=this.sourceLists.blockLists[0].key;
           let cBlockList=this.sourceLists.blockLists.filter((currentValue,index,arr) => {
@@ -255,7 +264,7 @@
       selectClassHandle(param){
         this.DialogIdiilVisible=false;
         this.getBlockNum(param);
-        this.promptMessage('添加成功^_^', 'success');
+
       },
 
     /*
@@ -318,8 +327,12 @@
       //保存临时教材数据
       async saveClassLists(status){
         let CurriculumName=this.sourceLists.classList.name;
+        let SourceType='IDIIL';
         if(!CurriculumName){
           CurriculumName='';
+        }
+        if(this.userInfo.TeacherType != 'IDIIL'){
+          SourceType='CUSTOM';
         }
         let CurriculumnContent = Base64.encode(JSON.stringify(this.sourceLists));
         let inputJson = {
@@ -328,6 +341,7 @@
           CurriculumName: CurriculumName,
           CurriculumnContent: CurriculumnContent,
           UserID: this.userInfo.userId,
+          SourceType: SourceType,
           Status: status
         };
         let result = await saveTempCurriculum(inputJson);
@@ -354,6 +368,21 @@
 </script>
 
 <style scoped  lang="less" type="text/less">
+
+  .list-group-box::-webkit-scrollbar {/*滚动条整体样式*/
+    width: 4px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 1px;
+  }
+  .list-group-box::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    background: #96C2F1;
+  }
+  .list-group-box::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    background: #EDEDED;
+  }
 
   i{
     font-size: 16px;
@@ -383,26 +412,12 @@
         .blockListItem{
           border: 1px solid #cceff5;
           background: #fafcfd;
+          border-radius: 4px;
           padding: 10px;
           margin-bottom: 5px;
           color: #606266;
           cursor: pointer;
           position: relative;
-          .blockListDelete{
-            width: 35px;
-            height: 100%;
-            position: absolute;
-            right: 0;
-            top: 0;
-            background: #b3d9ff;
-            color: #06c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            .el-icon-dustbin_icon{
-              font-size: 22px;
-            }
-          }
         }
         .flip-list-move {
           transition: transform 0.5s;
@@ -415,11 +430,10 @@
           background: #c8ebfb;
         }
         .list-group-box{
-          max-height:450px;
           overflow: auto;
           .list-group {
             min-height: 20px;
-
+            padding: 0 2px;
           }
         }
         .activeBlockStyle{

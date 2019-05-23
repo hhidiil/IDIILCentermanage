@@ -13,8 +13,9 @@ const fileDeal = express.Router()
  * 文件上传接口
  * */
 fileDeal.post('/upload',async(req, res) => {
-    console.log("reqreqreq@@@@@@@@@@@@@@@@=",req.body);
+    console.log("reqreqreq@@@@@@@@@@@@@@@@=",req);
     var Files = req.files.file;
+  console.log("xxxxxxxxxxxx--",Files);
     var filename = Files.name;
     var filetype = Files.mimetype;
     var foldername=req.body.username;//用户名作为文件名

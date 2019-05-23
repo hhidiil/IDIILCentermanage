@@ -10,7 +10,7 @@
     </header>
     <div class="centerDiv">
       <el-row style="position: relative">
-        <el-col :span="12" class="leftsection">
+        <el-col :span="8" class="leftsection">
           <el-card class="box-card">
             <div class="headerbgcolor">
             </div>
@@ -19,12 +19,22 @@
             </div>
           </el-card>
         </el-col>
-        <el-col :span="12" class="rightsection">
+        <el-col :span="8" class="rightsection">
           <el-card class="box-card">
             <div class="headerbgcolor">
             </div>
             <div class="content">
-              <div class="centertext" @click="goSys('2')">教师派课系统</div>
+              <!--<div class="centertext" @click="goSys('2')">教师派课系统</div>-->
+              <div class="centertext" @click="goSys('2')">探究发现式数学</div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8" class="rightsection">
+          <el-card class="box-card">
+            <div class="headerbgcolor">
+            </div>
+            <div class="content">
+              <div class="centertext">英语活动课程</div>
             </div>
           </el-card>
         </el-col>
@@ -64,7 +74,7 @@
             break;
           case '2':
             let userInfo = this.userInfo;
-            console.log("用户信息参数---222222222222--》",userInfo)
+            console.log("用户信息参数---222222222222--》",userInfo);
             const dataUserList = await doTestLogin('/static/ClassUserList.json');
             setStore("ClassUserList",dataUserList);
             window.location.href = origin + "/faXianShiShuXue.html#/home";//跳转到数学派课系统
@@ -106,7 +116,7 @@
     transform: translate(-50%,-50%);
   .leftsection{
     height: 500px;
-    padding: 50px 100px;
+    padding: 50px 25px;
   .headerbgcolor{
     height: 40px;
     background-color: #71b7ee;
@@ -114,7 +124,7 @@
   }
   .rightsection{
     height: 500px;
-    padding: 50px 100px;
+    padding: 50px 25px;
   .headerbgcolor{
     height: 40px;
     background-color: #cd85e2;

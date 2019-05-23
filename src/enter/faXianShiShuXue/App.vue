@@ -32,7 +32,7 @@ export default {
     min-width: 100px !important;
   }
   .el-dialog__body{
-    max-height: 500px;
+    max-height: 550px;
     overflow: auto;
   }
 
@@ -44,5 +44,10 @@ export default {
          color:rgb(0, 102, 153);
        }
     }
+  }
+
+  .edit_container .ql-toolbar.ql-snow + .ql-container.ql-snow {
+    display: flex;
+    flex-direction: column;
   }
 </style>

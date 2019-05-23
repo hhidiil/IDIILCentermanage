@@ -17,23 +17,18 @@
             <span>{{sourceListsInfo.classList.duration}}</span>
           </el-form-item>
           <el-form-item label="得分占比:">
-            <!--<span>{{sourceListsInfo.classList.scoreRatio}}</span>-->
             <el-progress v-if="sourceListsInfo.classList.scoreRatio" :percentage="Number(sourceListsInfo.classList.scoreRatio)"></el-progress>
           </el-form-item>
           <el-form-item label="探究占比:">
-            <!--<span>{{sourceListsInfo.classList.explore}}</span>-->
             <el-progress v-if="sourceListsInfo.classList.explore" :percentage="Number(sourceListsInfo.classList.explore)"></el-progress>
           </el-form-item>
           <el-form-item label="协作占比:">
-            <!--<span>{{sourceListsInfo.classList.cooperation}}</span>-->
             <el-progress v-if="sourceListsInfo.classList.cooperation" :percentage="Number(sourceListsInfo.classList.cooperation)"></el-progress>
           </el-form-item>
           <el-form-item label="总结占比:">
-            <!--<span>{{sourceListsInfo.classList.summary}}</span>-->
             <el-progress v-if="sourceListsInfo.classList.summary" :percentage="Number(sourceListsInfo.classList.summary)"></el-progress>
           </el-form-item>
           <el-form-item label="讨论占比:">
-            <!--<span>{{sourceListsInfo.classList.discuss}}</span>-->
             <el-progress v-if="sourceListsInfo.classList.discuss" :percentage="Number(sourceListsInfo.classList.discuss)"></el-progress>
           </el-form-item>
           <el-form-item label="对应版本:">
@@ -44,7 +39,9 @@
             </el-tag>
           </el-form-item>
           <el-form-item label="教学参考:">
+
             <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
+
           </el-form-item>
         </el-form>
       </div>

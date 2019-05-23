@@ -13,7 +13,6 @@ import {
 import {setStore,getStore} from '../config/publicMethod'
 export default{
   [SOURCE_LIST](state,newList){
-    console.log('save---mutation');
     state.sourceListsInfo=newList.val;
     //存入localStorage
     setStore(`sourceLists-${newList.key}`,newList.val)

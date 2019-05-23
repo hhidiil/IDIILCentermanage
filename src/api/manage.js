@@ -1,7 +1,7 @@
 import fetch_requset from '../config/fetch'
 
 //const API_CONFIG = '/api/manage';
-const API_CONFIG = 'http://nwprodsub.idiil.com.cn:9999/api/manage';
+const API_CONFIG = 'https://nwprodsub.idiil.com.cn:9999/api/manage';
 /**
  * [查询各个中心的管理员列表信息]
  */

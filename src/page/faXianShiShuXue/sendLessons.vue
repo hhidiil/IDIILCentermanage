@@ -6,7 +6,7 @@
         <el-row>
           <el-col :span="24" style="text-align: left;margin-bottom: 10px">
             <div class="classItem">
-              <el-button  v-if="sendLessonsType != 'check'" type="primary" @click="lessionsVisible = true">选取课程</el-button>
+              <el-button  v-if="sendLessonsType != 'check'" type="primary" @click="showCurriculumList">选取课程</el-button>
             </div>
             <div class="classItem">
               <span>课程名称:</span>
@@ -29,9 +29,10 @@
                 </el-select>
               </span>
               <span v-else>
-                {{currentClassName}}
+                {{sendLessonsLists.currentClassName}}
               </span>
             </div>
+
             <div class="classItem" v-if="sendLessonsType != 'check'">
               <span>开始分组:</span>
               <div class="goToSubgroup">
@@ -39,7 +40,7 @@
                   v-model="sendLessonsLists.subgroupValue"
                   :render-content="renderFunc"
                   :titles="['学生列表', '学生分组']"
-                  :button-texts="['返回', '分组']"
+                  :button-texts="['取消', '分组']"
                   :format="{
                         noChecked: '${total}',
                         hasChecked: '${checked}/${total}'
@@ -59,7 +60,7 @@
               <div class="subgroupLists">
                 <ul>
                   <li v-for="(item,index) in sendLessonsLists.sendSubgroupLists" :key="index+'group'">
-                    <span> {{item.subgroupName}}{{index+1}}:</span>
+                    <span> {{item.subgroupName}}:</span>
                     <span  v-for="(val,i) in item.subgroupMembers" :key="i+'member'" class="textItem">
                       {{val.key}}--{{val.UserName}}
                     </span>
@@ -120,7 +121,7 @@
           </el-table-column>
         </el-table>
         <div style="margin-top: 20px">
-          <el-button @click="setCurrent()">取消选择</el-button>
+          <el-button @click="setCurrent()">取消</el-button>
           <el-button type="primary" @click="selectCurriculum()">确定</el-button>
         </div>
       </section>
@@ -154,7 +155,8 @@
           subgroupData: [],
           subgroupValue: [],
           sendSubgroupLists: [],
-          currentClassID:''
+          currentClassID:'',
+          currentClassName:'',
         },
         renderFunc(h, option) {
           return <span>{ option.key } - { option.label }</span>;
@@ -162,18 +164,7 @@
       }
     },
     computed: {
-      currentClassName(){
-        if(this.sendLessonsLists.classOptions.length>0 && this.sendLessonsLists.currentClassID!=""){
-          var obj={};
-          obj=this.sendLessonsLists.classOptions.find((item)=>{//这里的userList就是上面遍历的数据源
-               if(item.ClassID === this.sendLessonsLists.currentClassID){
-                 return item;
-               }//筛选出匹配数据
-            });
-          return obj.ClassName;
-        }
 
-      }
     },
     watch:{
       //当监听的属性值变化的时候 会执行对应的处理逻辑
@@ -209,7 +200,8 @@
               subgroupData: [],
               subgroupValue: [],
               sendSubgroupLists: [],
-              currentClassID:''
+              currentClassID:'',
+              currentClassName:'',
             };
           }
         }else{
@@ -252,8 +244,11 @@
         this.sendLessonsLists.subgroupData = originalResult2;
         this.setLessonsStore();
       },
+      //取消课程选择
       setCurrent(row) {
-        this.$refs.CurriculumTable.setCurrentRow(row);
+        this.$refs.CurriculumTable.setCurrentRow(null);
+        this.sendLessonsLists.currentRow = null;
+        this.lessionsVisible = false;
       },
       handleCurrentChange(currentRow, oldCurrentRow) {
         console.log(currentRow);
@@ -266,19 +261,26 @@
         return {'background-color': '#EFF2F7','color': '#000000','font-weight': '500'}
       },
       /*
+      * 点击选择课程按钮弹出课程列表
+      * */
+      showCurriculumList(){
+        this.lessionsVisible = true;
+        this.sendLessonsLists.currentRow = null;
+        console.log( this.sendLessonsLists.currentRow )
+      },
+      /*
       * 确定选中的课程
       * */
       selectCurriculum(){
-          if(this.sendLessonsLists.currentRow){
-            let currentList=this.sendLessonsLists.currentRow.CurriculumnContent;
-            this.sendLessonsLists.currentList=JSON.parse(Base64.decode(currentList));
-            console.log(this.sendLessonsLists.currentList)
+        if(!this.sendLessonsLists.currentRow){
+          this.promptMessage('还没有选择课程哦^o^', 'warning');
+        }else{
+          let currentList=this.sendLessonsLists.currentRow.CurriculumnContent;
+          this.sendLessonsLists.currentList=JSON.parse(Base64.decode(currentList));
+          this.lessionsVisible = false;
+          this.setLessonsStore();
+        }
 
-          }else{
-            this.sendLessonsLists.currentList=null;
-          }
-        this.lessionsVisible = false;
-        this.setLessonsStore();
       },
       /*
       * 选中的班级发生变化时显示对应学生
@@ -336,9 +338,10 @@
       confirmGrouping(){
         this.sendLessonsLists.currentClassID=this.sendLessonsLists.selectValue;
         var subgroupItem={
-          subgroupName: '组',
+          subgroupName: '',
           subgroupMembers:[]
         };
+        subgroupItem.subgroupName='组'+(this.sendLessonsLists.sendSubgroupLists.length+1);
         for(let i= this.sendLessonsLists.subgroupData.length-1;i>=0;i--){
           let value=this.sendLessonsLists.subgroupData[i];
           if(this.sendLessonsLists.subgroupValue.indexOf(value.key)>-1){
@@ -350,12 +353,21 @@
         this.sendLessonsLists.subgroupValue=[];
         this.setLessonsStore();
       },
-
+      computedCurrentClassName(){
+        if(this.sendLessonsLists.classOptions.length>0 && this.sendLessonsLists.currentClassID!=""){
+          var obj={};
+          obj=this.sendLessonsLists.classOptions.find((item)=>{//这里的userList就是上面遍历的数据源
+            if(item.ClassID === this.sendLessonsLists.currentClassID){
+              return item;
+            }//筛选出匹配数据
+          });
+          return obj.ClassName;
+        }
+      },
       /*
       * 保存
       * */
       sendLessensSave(type){
-        this.setLessonsStore();
         if(type == "check"){
           this.$router.push({name:'classTeam'})
         } else if(type == "save"){
@@ -363,21 +375,21 @@
         } else if(type == "back"){
           removeStore(`sendLessonsLists-${this.guid}`);
           this.$router.push({name:'classTeam'});
-
         } else {
-          if(!this.sendLessonsLists.currentRow){
+          if(!this.sendLessonsLists.currentList){
             this.promptMessage('课程名称和课程目标不能为空哦^o^', 'warning')
           } else if(this.sendLessonsLists.sendSubgroupLists.length == 0 ){
-            this.promptMessage('需要对班级学生进行分组哦^o^', 'warning')
+            this.promptMessage('需要选择班级并对该班学生进行分组哦^o^', 'warning')
           } else {
             if(this.sendLessonsLists.sendSubgroupLists.length > 0 && this.sendLessonsLists.subgroupData.length == 0 && this.sendLessonsLists.subgroupValue.length == 0){
+              this.sendLessonsLists.currentClassName=this.computedCurrentClassName();
               this.saveLessensLists('done');
             } else{
               this.promptMessage('需要将该班级所有学生进行分组哦^o^', 'warning')
             }
           }
         }
-
+        this.setLessonsStore();
       },
       /*
       * 保存数据接口

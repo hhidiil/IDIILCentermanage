@@ -8,7 +8,7 @@ import fetch_requset from '../config/fetch'
  * [获取线上数学列表]
  */
 const sCenterWebUrl="https://nwprodsub.idiil.com.cn";
-const API_CONFIG = 'http://nwprodsub.idiil.com.cn:9999/api/curriculum';
+const API_CONFIG = 'https://nwprodsub.idiil.com.cn:9999/api/curriculum';
 
 export const getOnLineData = (data) => {
     const url = sCenterWebUrl + "/SYSTEM/PUBLIC(MATH)/SaveAndGetOnLineData.jsp";
@@ -79,3 +79,11 @@ export const deleteAssignment = (data) => {
 };
 
 //------------------派课接口end-------
+
+
+//-------文件上传start----------
+export const getEditorUrl = (url, data) => {
+
+  return fetch_requset(url,{},'GET','fetch','text/html')
+};
+//-------文件上传end----------

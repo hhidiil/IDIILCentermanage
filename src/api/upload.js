@@ -1,6 +1,7 @@
 /*
  * 文件上传接口
  * */
+
 export const uploadFile = (data,callback)=>{
   const url = '/api/file/upload';
   return fetch(url,{method:'POST',body:data}).then((response) => {

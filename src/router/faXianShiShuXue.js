@@ -11,6 +11,7 @@ import classManagerList from './../page/faXianShiShuXue/classManagerList'
 import classTeam from './../page/faXianShiShuXue/classTeam'
 import editorVue from './../page/faXianShiShuXue/editor'
 import sendLessons from './../page/faXianShiShuXue/sendLessons'
+import attendClass from './../page/faXianShiShuXue/attendClass'
 import practice from './../page/faXianShiShuXue/practice'
 
 Vue.use(Router);
@@ -53,6 +54,11 @@ const routes = [
         name: 'sendLessons',
         component: sendLessons,
         meta: ['备课管理', '派课列表']
+      }, {
+        path: 'attendClass',
+        name: 'attendClass',
+        component: attendClass,
+        meta: ['备课管理', '上课列表']
       }, {
         path: 'practice',
         name: 'practice',
