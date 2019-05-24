@@ -14,11 +14,9 @@ import vHtmlPanel from '../../components/HtmlPanel.vue'
 import '../../../static/js/directives.js';
 Vue.component("vHtmlPanel", vHtmlPanel);
 
-
 Vue.prototype.$layer = layer(Vue, {
   msgtime: 3//目前只有一项，即msg方法的默认消失时间，单位：秒
 });
-
 Vue.prototype.fromFlag = false;//本地或者数据库标志,//true为真实数据，false为本地数据
 Vue.config.debug = true;
 Vue.config.productionTip = false;

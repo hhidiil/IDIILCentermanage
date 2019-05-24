@@ -16,21 +16,25 @@
         </div>
       </el-col>
     </el-row>
-    <el-row style="height: 100%;">
-      <el-col :span="3"  style="min-height: 100%; background-color: #324057;">
-        <el-menu default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
+    <el-row v-if="userInfo.TeacherType != 'IDIIL' && userInfo.classType == 'sendClass'" style="height: 100%;">
+      <el-col :span="3"  style=" min-height: 100%; background-color: #324057;">
+        <el-menu  default-active="1" background-color="rgb(50, 64, 87)" text-color="#bfcbd9" hover-text-color="red" active-text-color="#20a0ff" router>
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-menu"></i><span>备课管理</span></template>
-            <el-menu-item index="/manage/classManagerList">课程列表</el-menu-item>
+            <el-menu-item index="/manage/classManagerList">备课列表</el-menu-item>
             <el-menu-item index="/manage/classTeam">派课列表</el-menu-item>
-            <el-menu-item index="/manage/attendClass">上课列表</el-menu-item>
-            <el-menu-item index="/manage/practice">练习</el-menu-item>
+            <!--<el-menu-item index="/manage/attendClass">上课列表</el-menu-item>-->
+            <!--<el-menu-item index="/manage/practice">练习</el-menu-item>-->
           </el-submenu>
-          <el-menu-item index="/manage/editor"><i class="el-icon-menu"></i>编辑器管理</el-menu-item>
         </el-menu>
       </el-col>
       <el-col :span="21" style="height: 100%;overflow: hidden;">
+        <router-view></router-view>
+      </el-col>
+    </el-row>
 
+    <el-row v-else style="height: 100%;">
+      <el-col :span="24" style="height: 100%;overflow: hidden;">
         <router-view></router-view>
       </el-col>
     </el-row>
@@ -44,7 +48,9 @@
   export default {
     //data中放入初始默认值
     data() {
-      return {}
+      return {
+        userInfo:JSON.parse(getStore('userInfo')),
+      }
     },
     computed: {
       ...mapState(['menuActiveName']),
@@ -54,28 +60,17 @@
 
     },
     mounted(){
-      //进入首页的时候存储一个课程列表
-      this.getCourseList();
+
     },
     created(){
-      this.routerHandle(this.$route)
+
     },
     watch:{
       $route:'routerHandle'
     },
     methods:{
       ...mapMutations(['UPDATE_MENUACTIVENAME']),
-      async getCourseList(){
-        let classList = [];
-        let userInfo = JSON.parse(getStore("userInfo"));
-        let result = await getCourseList({teacherId:userInfo.userId});//数据库获取教师的派课列表
-        console.log("数据库获取教师的派课列表---classList----->>",result)
-        if(result.data.length>0){
-          setStore('classList',JSON.stringify(result.data));
-        }else {
-          setStore("classList",JSON.stringify(classList))
-        }
-      },
+
       handleCommand(command) {
         if(command == 'exit'){
           clearSession();

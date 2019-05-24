@@ -122,31 +122,33 @@
               if(result.code == 200){
                 if((result.data[0])){
                   userinfo = {
-                    userId:result.data[0].userId,
+                    userId: result.data[0].userId,
                     userName: result.data[0].userName,
-                    centerId:result.data[0].centerId,
-                    TeacherType:'IDIIL'
+                    centerId: result.data[0].centerId,
+                    TeacherType: 'IDIIL',
+                    classType: null,
                   };
                   if(this.ruleForm.role == '1'){//学生登录
                     setSession("accessToken",true);//设置登录状态的值
-                    setStore("userInfo",JSON.stringify(userinfo))
+                    setStore("userInfo",JSON.stringify(userinfo));
                     this.$router.replace({ name: 'homeStudent', params: userinfo})
                   }else if(this.ruleForm.role == '2'){//教师登录
-                    if(getStore("userInfo")){//已经有值
-                      if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
-                        clearStore();
-                        //由于清除了所有的 所以现在在存一遍需要的
-                        const dataUserList = await doTestLogin('/static/ClassUserList.json');
-                        setStore("ClassUserList",dataUserList);
-                      }
-                    }
+                    clearStore();
+//                    if(getStore("userInfo")){//已经有值
+//                      if(JSON.parse(getStore("userInfo")).userId != userinfo.userId){//和上次的登录人不一样
+//                        clearStore();
+//                        //由于清除了所有的 所以现在在存一遍需要的
+//                        const dataUserList = await doTestLogin('/static/ClassUserList.json');
+//                        setStore("ClassUserList",dataUserList);
+//                      }
+//                    }
                     setSession("accessToken",true);//设置登录状态的值
-                    setStore("userInfo",JSON.stringify(userinfo))
+                    setStore("userInfo",JSON.stringify(userinfo));
                     this.$router.replace({ name: 'homeTeacher', params: userinfo})
                   }else {
                     setSession("accessToken",true);//设置登录状态的值
-                    console.log("555555555555555555555555555555555555555555555555555",result.data[0])
-                    setStore("manageUser",result.data[0])
+                    console.log("555555555555555555555555555555555555555555555555555",result.data[0]);
+                    setStore("manageUser",result.data[0]);
                     let origin = window.location.origin;
                     window.location.href = origin + "/manage.html#/home";//跳转到数学派课系统
                   }

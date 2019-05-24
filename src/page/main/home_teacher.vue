@@ -24,7 +24,6 @@
             <div class="headerbgcolor">
             </div>
             <div class="content">
-              <!--<div class="centertext" @click="goSys('2')">教师派课系统</div>-->
               <div class="centertext" @click="goSys('2')">探究发现式数学</div>
             </div>
           </el-card>
@@ -73,11 +72,15 @@
             window.open("http://" + location.hostname + ":10008/teacher");//跳转到中考教师批改系统
             break;
           case '2':
-            let userInfo = this.userInfo;
-            console.log("用户信息参数---222222222222--》",userInfo);
-            const dataUserList = await doTestLogin('/static/ClassUserList.json');
-            setStore("ClassUserList",dataUserList);
-            window.location.href = origin + "/faXianShiShuXue.html#/home";//跳转到数学派课系统
+//            let userInfo = this.userInfo;
+//            console.log("用户信息参数---222222222222--》",userInfo);
+//            const dataUserList = await doTestLogin('/static/ClassUserList.json');
+//            setStore("ClassUserList",dataUserList);
+            if(this.userInfo.TeacherType == 'IDIIL'){
+              window.location.href = origin + "/faXianShiShuXue.html#/manage/classManagerList";//跳转到数学派课系统
+            }else{
+              window.location.href = origin + "/faXianShiShuXue.html#/home";//跳转到数学派课系统
+            }
             break;
           default:
             break;

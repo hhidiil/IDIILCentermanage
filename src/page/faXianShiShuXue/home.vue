@@ -33,7 +33,8 @@
   export default {
     data(){
       return {
-        message:"首页页面"
+        message:"首页页面",
+        userInfo:JSON.parse(getStore('userInfo')),
       }
     },
     //引入的组件
@@ -45,33 +46,16 @@
     },
     methods:{
       async goPaiKe(){
+        this.userInfo.classType = 'sendClass';
+        setStore("userInfo",this.userInfo);
         this.removeCurriculumStorage();
-        this.$router.push('manage')
+        this.$router.push('manage');
       },
       async goShangKe(){
+        this.userInfo.classType = 'attendClass';
+        setStore("userInfo",this.userInfo);
         this.removeCurriculumStorage();
         this.$router.push('manage/attendClass');
- /*       let userid = JSON.parse(getStore('userInfo')).userId
-        //获取上次上课的内容
-        const result = await getCurrentCourseInfo({teacherId:userid})
-        console.log("getCurrentCourseInfo----->>>>>上课信息",result)
-        if(result.code == 200){
-          if(result.data.length>0){
-            console.log("调准到教师上课页面--------------------参数：",result.data[0])
-            let dataParams = {};
-            dataParams.teacherId = JSON.parse(getStore('userInfo')).userId;
-            dataParams.centerId = JSON.parse(getStore('ClassUserList')).CenterID;
-            dataParams.performanceID = result.data[0].courseId;//课程ID
-            let url = 'https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/OnlineBuildDataDeal/OnlineBuildDataDeal.jsp?InstructorID='+dataParams.teacherId+'&sCenterID='+dataParams.centerId+'&sPerformanceID='+dataParams.performanceID;
-            console.warn("老师上课的地址url-->",url)
-            window.open(url);
-            return
-          }else {
-            this.$message({message: '派课已上完，请进入派课系统进行派课！',type:'warning'});
-          }
-        }else {
-          console.error("出错了------！！！：",result.message)
-        }*/
       },
       removeCurriculumStorage(){
         let str1='sendLessonsLists-';
@@ -103,7 +87,7 @@
       transform: translate(-50%,-50%);
       .leftsection{
         height: 500px;
-        padding: 50px 100px;
+        padding: 50px 50px;
         .headerbgcolor{
           height: 40px;
           background-color: #71b7ee;
@@ -111,7 +95,7 @@
       }
       .rightsection{
         height: 500px;
-        padding: 50px 100px;
+        padding: 50px 50px;
         .headerbgcolor{
           height: 40px;
           background-color: #cd85e2;

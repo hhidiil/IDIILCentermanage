@@ -43,7 +43,7 @@ const routes = [
         path: 'classManagerList',
         name: 'classManagerList',
         component: classManagerList,
-        meta: ['备课管理', '课程列表']
+        meta: ['备课管理', '备课列表']
       }, {
         path: 'classTeam',
         name: 'classTeam',

@@ -103,21 +103,24 @@
             align="center">
           </el-table-column>
           <el-table-column
-            property="LastUpdateTime"
             label="更改日期"
-            width="120"
             align="center">
+            <template slot-scope="scope">
+              <i class="el-icon-time"></i>
+              <span>{{ scope.row.LastUpdateTime | lineFeed(0) }}</span><br/>
+              <span>{{ scope.row.LastUpdateTime | lineFeed(1) }}</span>
+            </template>
           </el-table-column>
           <el-table-column
             property="CurriculumName"
             label="课程名称"
-            width="120"
             align="center">
           </el-table-column>
           <el-table-column
             property="CurriculumID"
             label="课程标识"
-            align="center">
+            align="center"
+            v-if="false">
           </el-table-column>
         </el-table>
         <div style="margin-top: 20px">
@@ -180,6 +183,12 @@
         const Wh = $(window).height();
         $(".data_section").css("height",(Wh-150)+'px');
         this.getTempAssignment();
+    },
+    filters: {
+      lineFeed(value,num){
+        if (!value) return '';
+        return value.split(/\s+/)[num];
+      }
     },
     methods: {
       async getTempAssignment(){
@@ -439,7 +448,6 @@
         });
       }
 
-
     }
   }
 </script>
@@ -466,7 +474,6 @@
         background: #ecf5ff;
         padding: 0 0 0 10px;
       }
-
     }
   }
 
@@ -475,10 +482,8 @@
      border-bottom: 1px solid #d6e7f9;
     .textItem{
       padding: 0 5px;
-      /*color: #00a8e6;*/
     }
    }
-
   }
 
 </style>

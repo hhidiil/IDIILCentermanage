@@ -148,7 +148,7 @@
     padding: 20px;
     margin-bottom: 40px;
     height:800px;
-    overflow: scroll;
+    overflow: auto;
     .controlInfo{
       display:flex;
       justify-content: space-between;
