@@ -45,7 +45,6 @@
   import curriculumSearch from '../../components/curriculumSearch.vue'
   import curriculumTable from '../../components/curriculumTable.vue'
   import {setStore, getStore, removeStore, createGuid} from '../../config/publicMethod'
-  import {getCourseList, updateDoingCourseInfo, deleteCourseListInfo} from '../../api/classes'
   import {getCurriculumList} from '../../api/exploration'
 
   export default {
@@ -82,13 +81,17 @@
       // 获取IDIIL课程列表
       async getCurriculumLists(){
         let userId=this.userInfo.userId;
+        let CourseType=this.userInfo.CourseType;
+        let ClassProgram=this.userInfo.ClassProgram;
         let SourceType='IDIIL';
         if(this.prepareLessonsWay != 'IDIIL'){
           userId=''
         }
         let jsonInfo={
           UserId:userId,
-          SourceType:SourceType
+          SourceType:SourceType,
+          CourseType:CourseType,
+          ClassProgram:ClassProgram
         };
         let result=await getCurriculumList(jsonInfo);
         this.culumLists=result.data;
@@ -102,10 +105,14 @@
       // 获取自定义课程列表
       async getCustomLists(){
         let userId=this.userInfo.userId;
+        let CourseType=this.userInfo.CourseType;
+        let ClassProgram=this.userInfo.ClassProgram;
         let SourceType='CUSTOM';
         let jsonInfo={
           UserId:userId,
-          SourceType:SourceType
+          SourceType:SourceType,
+          CourseType:CourseType,
+          ClassProgram:ClassProgram
         };
         let result=await getCurriculumList(jsonInfo);
         this.customLists=result.data;
@@ -124,7 +131,6 @@
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
         this.pageSize = val;
-//        this.culumLists=this.culumLists.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize)
       },
       /*
        * currentPage 改变时会触发
@@ -132,7 +138,6 @@
       handleCurrentChange(val) {
         console.log(`当前页: ${val}`);
         this.currentPage = val;
-//        this.culumLists=this.culumLists.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize)
       },
       /*tab页点击事件*/
       handleClick(tab, event) {

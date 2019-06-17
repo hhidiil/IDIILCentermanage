@@ -4,12 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from '../../router/faXianShiShuXue.js'
 import ElementUI from 'element-ui'
+//import BootstrapVue from 'bootstrap-vue'
 import store from '../../store/index.js';
 import '../../../node_modules/element-ui/lib/theme-chalk/index.css'
 import VueQuillEditor from 'vue-quill-editor'
 import '../../assets/font/iconfont.css'
 import layer from 'vue-layer'
 import vHtmlPanel from '../../components/HtmlPanel.vue'
+// app.js
+//import 'bootstrap/dist/css/bootstrap.css'
+//import 'bootstrap-vue/dist/bootstrap-vue.css'
 // 引入自定义指令
 import '../../../static/js/directives.js';
 Vue.component("vHtmlPanel", vHtmlPanel);
@@ -22,6 +26,8 @@ Vue.config.debug = true;
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueQuillEditor);
+//Vue.use(BootstrapVue);
+
 
 router.beforeEach((to, from, next) => {
   //to即将进入的目标路由对象，from当前导航正要离开的路由， next : 下一步执行的函数钩子

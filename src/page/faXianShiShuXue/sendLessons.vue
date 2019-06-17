@@ -144,12 +144,15 @@
   export default {
     props:[],
     data(){
+      let userInfo=JSON.parse(getStore('userInfo'));
       return {
         lessionsVisible:false,
         sendLessonsType:'',
         guid:'',
-        userInfo:JSON.parse(getStore('userInfo')),
+        userInfo:userInfo,
         sendLessonsLists:{
+          CourseType: userInfo.CourseType,
+          ClassProgram: userInfo.ClassProgram,
           culumLists: [],
           currentList: null,
           currentRow: null,
@@ -218,7 +221,14 @@
           if(object){
             this.sendLessonsLists=object;
           }else{
-            let result = await getTempAssignment({AssignID:this.guid}); //获取一条临时派课数据
+            let CourseType=this.userInfo.CourseType;
+            let ClassProgram=this.userInfo.ClassProgram;
+            let jsonInfo={
+              AssignID:this.guid,
+              CourseType:CourseType,
+              ClassProgram:ClassProgram
+            };
+            let result = await getTempAssignment(jsonInfo); //获取一条临时派课数据
             if (result.code == 200) {
               this.sendLessonsLists=JSON.parse(Base64.decode(result.data[0].GroupContent));
             }
@@ -229,20 +239,39 @@
       },
       // 获取课程列表
       async getCurriculumLists(){
-        let result = await getCurriculumList();
+        let userId=this.userInfo.userId;
+        let CourseType=this.userInfo.CourseType;
+        let ClassProgram=this.userInfo.ClassProgram;
+        let SourceType='';
+        let jsonInfo={
+          UserId:userId,
+          SourceType:SourceType,
+          CourseType:CourseType,
+          ClassProgram:ClassProgram
+        };
+        let result=await getCurriculumList(jsonInfo);
         let originalResult = result.data;
         this.sendLessonsLists.culumLists = originalResult.filter((currentValue, index, arr)=>{
           return currentValue.Status == 'done';
         });
-        let result1 = await getSchoolClasses({SchoolID:'001'});
+        let jsonInfo1={
+          SchoolID:'001',
+          CourseType:CourseType,
+          ClassProgram:ClassProgram
+        };
+        let result1 = await getSchoolClasses(jsonInfo1);
         this.sendLessonsLists.classOptions = result1.data;
         this.setLessonsStore();
 
       },
       //根据班级获取学生列表
       async getClassCenterUser(ClassID){
+          let CourseType=this.userInfo.CourseType;
+          let ClassProgram=this.userInfo.ClassProgram;
           let parameters={
-            ClassID:ClassID
+            ClassID:ClassID,
+            CourseType:CourseType,
+            ClassProgram:ClassProgram
           };
           let result2 = await getClassCenterUser(parameters);
           let originalResult2 = result2.data;
@@ -404,7 +433,9 @@
       * 保存数据接口
       * */
       async saveLessensLists(status){
-        let CurriculumID='', AssignName = '', AssignMemo = '';
+        let CurriculumID='', AssignName = '', AssignMemo = '',CourseType,ClassProgram;
+        CourseType=this.userInfo.CourseType;
+        ClassProgram=this.userInfo.ClassProgram;
         if(this.sendLessonsLists.currentList){
           CurriculumID = this.sendLessonsLists.currentList.classList.classId;
           AssignName = this.sendLessonsLists.currentList.classList.name;
@@ -421,6 +452,8 @@
           GroupContent: GroupContent, //GroupContent--分组信息
           ClassID:ClassID, //ClassID--班级ID
           UserID: this.userInfo.userId, //UserID--派课教师ID,
+          CourseType: CourseType, //CourseType--EE或MM类型,
+          ClassProgram: ClassProgram, //ClassProgram--科目类型,
           Status: status //Status--状态
         };
         let result = await saveTempAssignment(inputJson);

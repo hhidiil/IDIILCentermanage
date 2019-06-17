@@ -16,6 +16,7 @@
           :on-error="UploadOnError">
           <el-button slot="trigger" size="mini" type="primary">上传多媒体文件</el-button>
           <el-button slot="trigger" size="mini" type="primary" @click.stop="showEditor">自制文本素材</el-button>
+          <el-button v-if=" userInfo.CourseType == 'EE' && type == 'item'" slot="trigger" size="mini" type="primary" @click.stop="DialogIdiilVisible = true;">添加英语课件</el-button>
         </el-upload>
       </div>
       <div class="file-list">
@@ -54,6 +55,7 @@
       append-to-body>
       <img v-if="fileType == 'image'" @click="isEnlargeImage = false" style="width:100%;" :src="enlargeFileSrc">
       <v-html-panel v-else-if="fileType == 'html'" :url.asyc="enlargeFileSrc"></v-html-panel>
+      <iframe v-else-if="fileType == 'onLine'" frameborder=0  name="showHere" style="width: 100%;min-height: 540px;" :src="enlargeFileSrc"></iframe>
       <a v-else :href="enlargeFileSrc" style="color: #3a8ee6;">点击下载文件</a>
     </el-dialog>
 
@@ -68,6 +70,26 @@
       v-if='DialogEditorisible'>
       <v-editor @sendEditorInfo="sendEditorInfo"></v-editor>
     </el-dialog>
+
+    <!--IDIIL教材弹出框-->
+    <el-dialog
+      width="60%"
+      v-dialogDrag
+      title="IDIIL教材"
+      :visible.sync="DialogIdiilVisible"
+      :close-on-click-modal="false"
+      append-to-body
+      v-if='DialogIdiilVisible'>
+      <el-dialog
+        width="60%"
+        v-dialogDrag
+        title="预览界面"
+        :visible.sync="innerVisible"
+        append-to-body>
+        <iframe  frameborder=0  name="showHere" width="100%" style="width: 100%;min-height: 540px;" :src="enlargeFileSrc"></iframe>
+      </el-dialog>
+      <select-class v-on:selectClassHandle="selectClassHandle" v-on:previewClassHandle="previewClassHandle"></select-class>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -77,15 +99,19 @@
   import {uploadFile} from '../api/upload'
   import vEditor from './vEditor.vue'
   import {getEditorUrl} from '../api/exploration'
+  import selectClass from './selectClassDom.vue'
 
     export default {
-        props: ['group','fileLists'],
+        props: ['group','fileLists','type'],
         data(){
           return{
             isEnlargeImage:false, //放大图片
             DialogEditorisible:false,
+            DialogIdiilVisible:false,
+            innerVisible:false,
             enlargeFileSrc:'', //放大图片地址
             fileType:'', //查看文件类型
+            userInfo:JSON.parse(getStore('userInfo')),
             params: {
               action: "/api/file/upload",
               data: {
@@ -97,7 +123,8 @@
 
         components:{
           draggable,
-          vEditor
+          vEditor,
+          selectClass
         },
         computed: {
           ...mapState([
@@ -204,7 +231,6 @@
             var blob = new Blob([content], {"type":"text/html"});
             formData.append("file", blob, oName);
             formData.append("username",this.params.data.username);
-
             uploadFile(formData,function(response){
                 let data = {
                   name:oName,
@@ -219,20 +245,25 @@
             });
 
           },
-          /*
-           * 创建guid
-           * */
-          createGuid() {
-            var s = [];
-            var hexDigits = "0123456789abcdef";
-            for (var i = 0; i < 36; i++) {
-              s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-            }
-            s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-            s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-            s[8] = s[13] = s[18] = s[23] = "-";
-            var uuid = s.join("");
-            return uuid;
+          //选择完线上课程之后的处理逻辑
+          selectClassHandle(param){
+            this.DialogIdiilVisible=false;
+            let data = {
+              name:param.ChapterName+param.UID,
+//              param:param,
+              percentage: 100,
+              status: "success",
+              response:{
+                file:param.ClassUrl
+              }
+            };
+            this.fileLists.push({url:data.response.file, data:data, name:data.name,type:'onLine'});
+            this.sendFilesToParent();
+          },
+          //点击预览按钮，预览课件
+          previewClassHandle(param){
+            this.enlargeFileSrc=param;
+            this.innerVisible=true;
           }
 
         }
@@ -243,4 +274,5 @@
   .list-group{
     min-height: 45px;
   }
+
 </style>

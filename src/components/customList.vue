@@ -40,7 +40,7 @@
           </el-form-item>
           <el-form-item label="教学参考:">
 
-            <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
+            <upload-files :group="{ name: 'people', pull: 'clone', put: false }" :fileLists="sourceListsInfo.classList.fileLists" :type="'class'" @sendFilesInfo="sendFilesInfo"></upload-files>
 
           </el-form-item>
         </el-form>
@@ -58,7 +58,7 @@
           <el-input v-model="classForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="课程目标:" prop="target">
-          <el-input type="textarea" v-model="classForm.target" auto-complete="off"></el-input>
+          <el-input type="textarea" v-model="classForm.target" rows="3" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="课程时长:">
           <el-input v-model="classForm.duration" auto-complete="off"></el-input>

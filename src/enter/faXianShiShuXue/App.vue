@@ -32,10 +32,10 @@ export default {
     min-width: 100px !important;
   }
   .el-dialog__body{
+    padding: 10px 20px 30px 20px;
     max-height: 550px;
     overflow: auto;
   }
-
 
   .textForm{
     .el-form-item{

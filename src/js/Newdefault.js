@@ -1,13 +1,13 @@
-﻿
+﻿import {getStore} from '../config/publicMethod'
+var userInfo=JSON.parse(getStore('userInfo'));
 var	sMainWeb="https://nw.idiil.com.cn";
-var m_sCourseType = "MM", m_sCurriculum = "C", m_strURL = "";
+var m_sCourseType = userInfo.CourseType , m_sCurriculum = "C", m_strURL = "";
 var m_sSerachText = "";
 var m_xmldoc = null;
 var sDoExercise = "Y";    // 2016-06-07
 var nChpIndex = null;
 var nUnitIndex = null;
 var selectUnitName='';
-
 
 var sPath = location.href;
 if(sPath.split("")[4]=="s") {
@@ -24,7 +24,7 @@ function getHostName()
 
 function onSearch()
 {
-  var sCurriculum = "", sCourseType = "MM", sSearchText = "";
+  var sCurriculum = "", sCourseType = m_sCourseType, sSearchText = "";
 
   try
   {
@@ -104,6 +104,10 @@ function onNewPreview(NeedSubmitScore)
   nUnitIndex = $("#lstUnit").attr("selectedIndex");
 
   var oOption = $("#lstChp li:eq("+nChpIndex+")")[0];
+  if(!oOption){
+    alert('请在章列表选择一个！');
+    return false
+  }
   var sCName = oOption.getAttribute("Name");
   var sCID=$(oOption).attr("value");
 
@@ -120,7 +124,7 @@ function onNewPreview(NeedSubmitScore)
   var globalID= $(oOption).attr("GlobalID");
   //getData(sCName,sUName);
   if (NeedSubmitScore=="M" && isP=="Y") return;
-  // var newwin =
+  var classUrl="https://nw.idiil.com.cn/System/Preview/"+"preview.asp?ChapterName=" + sCName +"&UnitName=" + sUName +"&CourseType="+ m_sCourseType+"&CID="+ sCID+"&UID="+ sUID+"&NeedSubmitScore="+ NeedSubmitScore+"&isP=N";
   var sssjson = {
     ChapterName:sCName,
     UnitName:sUName,
@@ -132,10 +136,16 @@ function onNewPreview(NeedSubmitScore)
     OutputType:outputType,
     selectUnitName:selectUnitName,
     selectType:m_sCurriculum,
-    GlobalID:globalID
+    GlobalID:globalID,
+    ClassUrl:classUrl
+  };
+  console.log(classUrl);
+  if(NeedSubmitScore == "N"){
+    return classUrl
+  }else {
+    return sssjson
   }
-  console.log("preview.jsp?ChapterName=" + sCName +"&UnitName=" + sUName +"&CourseType="+ m_sCourseType+"&CID="+ sCID+"&UID="+ sUID+"&NeedSubmitScore="+ NeedSubmitScore+"&isP=N&DirName="+dirName+"&OutputType="+outputType+"&selectUnitName="+selectUnitName);
-  return sssjson
+
 }
 
 function FillChpList()
@@ -273,9 +283,50 @@ function toTrim(str){
   if(Right(strRet, 1) == "*"){ strRet = Left(strRet, len(strRet)-1)}
   return strRet
 }
+
+function onNewPreview1(NeedSubmitScore)
+{
+  nChpIndex = $("#lstChp").attr("selectedIndex");
+  nUnitIndex = $("#lstUnit").attr("selectedIndex");
+
+  var oOption = $("#lstChp li:eq("+nChpIndex+")")[0];
+  var sCName = oOption.getAttribute("Name");
+  var sCID=$(oOption).attr("value");
+
+  oOption = $("#lstUnit li:eq("+nUnitIndex+")")[0];
+  var sUName = oOption.getAttribute("Name");
+  var sUID = $(oOption).attr("value");
+
+
+  //getData(sCName,sUName);
+
+  if (NeedSubmitScore=="M" && isP=="Y") return;
+
+  if(NeedSubmitScore=="R"){
+    var sGlobalID=$(oOption).attr("globalid");
+    sSRC='https://nwdev.idiil.com.cn/System/General/Print/Print_Preview/PrintAndPreviewForEgrade.asp?From=OnlineMath&myType=I&PageTH=1&myCWorHW=C&ExerciseID='+sGlobalID+'-01&CenterID=&StudentID=&urlData=PEl0ZW0gR2xvYmFsSUQ9IlIwMTUwOCIgIENvdXJzZVR5cGU9Ik1NIiAgQ2hhcHRlcklEPSJSMDE1IiBDaGFwdGVyTmFtZT0iRjIiICBVbml0SUQ9IjA4IiBVbml0PSI4IiAgT3V0cHV0VHlwZT0gIlAiICBTY29yZT0iIiAgUHJpbnRJRD0iMDAwMUMiICBBc3NpZ25JRD0iMDAyMDFNTTAxSjIwMTgwODMwMDAiICBQZXJmb3JtYW5jZUlEPSIwMDAwMiIgIEFzc2lnbm1lbnREYXRlPSIwOC0zMC0yMDE4IiAgQ2xhc3N3b3JrRGF0ZT0iMjAxOC0wOS0wMSIgIFN0dWRlbnRBbnN3ZXI9IiIgIFRvdGFsV3JvbmdBbnM9IjAiICBTY29yZWQ9Ik4iICA+PC9JdGVtPg==';
+    var newwin = window.open(sSRC);
+  }else if(NeedSubmitScore=="A"){
+    var sGlobalID=$(oOption).attr("globalid");
+    sSRC='https://nwdev.idiil.com.cn/System/General/Print/Print_Preview/PrintAndPreviewForAnswer.asp?From=OnlineMath&myType=I&PageTH=1&myCWorHW=C&ExerciseID='+sGlobalID+'-01&CenterID=&StudentID=&urlData=PEl0ZW0gR2xvYmFsSUQ9IlIwMTUwOCIgIENvdXJzZVR5cGU9Ik1NIiAgQ2hhcHRlcklEPSJSMDE1IiBDaGFwdGVyTmFtZT0iRjIiICBVbml0SUQ9IjA4IiBVbml0PSI4IiAgT3V0cHV0VHlwZT0gIlAiICBTY29yZT0iIiAgUHJpbnRJRD0iMDAwMUMiICBBc3NpZ25JRD0iMDAyMDFNTTAxSjIwMTgwODMwMDAiICBQZXJmb3JtYW5jZUlEPSIwMDAwMiIgIEFzc2lnbm1lbnREYXRlPSIwOC0zMC0yMDE4IiAgQ2xhc3N3b3JrRGF0ZT0iMjAxOC0wOS0wMSIgIFN0dWRlbnRBbnN3ZXI9IiIgIFRvdGFsV3JvbmdBbnM9IjAiICBTY29yZWQ9Ik4iICA+PC9JdGVtPg==';
+    var newwin = window.open(sSRC);
+  }else{
+    if(isP=="Y"){
+      //var newwin = window.open("Preview.asp?ChapterName=" + sCName +"&UnitName=" + sUName +"&CourseType="+ m_sCourseType+"&CID="+ sCID+"&UID="+ sUID+"&NeedSubmitScore="+ NeedSubmitScore+"&isP=Y");
+    }else{
+      //var newwin = window.open("preview.asp?ChapterName=" + sCName +"&UnitName=" + sUName +"&CourseType="+ m_sCourseType+"&CID="+ sCID+"&UID="+ sUID+"&NeedSubmitScore="+ NeedSubmitScore+"&isP=N");
+      window.location='https://nwsub.idiil.com.cn/SYSTEM/ENGLISH/'+"preview.asp?ChapterName=" + sCName +"&UnitName=" + sUName +"&CourseType="+ m_sCourseType+"&CID="+ sCID+"&UID="+ sUID+"&NeedSubmitScore="+ NeedSubmitScore+"&isP=N"
+    }
+  }
+  //newwin.moveTo(0,0);
+  //
+  //newwin.resizeTo(screen.availWidth, screen.availHeight);
+
+}
 export{
   onSearch,
   onlstChp,
   onNewPreview,
+  onNewPreview1,
   onlstUnit
 }

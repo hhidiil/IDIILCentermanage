@@ -7,13 +7,9 @@
           </el-col>
           <el-col :span="6">
             <el-card class="blockListCard">
-              <div v-if="userInfo.CourseType=='MM'" slot="header" class="clearfix">
+              <div slot="header" class="clearfix">
                 <span>区块列表</span>
                 <el-button v-if="userInfo.TeacherType == 'IDIIL' && prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogIdiilVisible = true;">添加IDIIL区块</el-button>
-              </div>
-              <div v-else slot="header" class="clearfix">
-                <span>活动列表</span>
-                <el-button v-if="userInfo.TeacherType == 'IDIIL' && prepareLessonsStatus != 'check'" style="float: right; padding: 3px 0" type="text" @click="DialogActivityVisible = true;">添加活动列表</el-button>
               </div>
               <div v-if="prepareLessonsStatus != 'check'" class="list-group-box">
                 <draggable
@@ -94,26 +90,6 @@
       <select-class v-on:selectClassHandle="selectClassHandle"></select-class>
     </el-dialog>
 
-    <!--活动弹出框-->
-    <el-dialog
-      width="60%"
-      v-dialogDrag
-      title="IDIIL教材"
-      :visible.sync="DialogActivityVisible"
-      :close-on-click-modal="false"
-      append-to-body
-      v-if='DialogActivityVisible'>
-      <el-form :model="activityForm" status-icon ref="moreRules" :label-width="formLabelWidth">
-        <el-form-item label="活动名称:" prop="name">
-          <el-input v-model="activityForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-          <el-button @click="DialogActivityVisible = false">取 消</el-button>
-          <el-button type="primary" @click="saveActivityEdit">确 定</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -121,7 +97,11 @@
   import { mapState,mapMutations } from 'vuex'
   import headTop from '../../components/headTop.vue'
   import selectClass from '../../components/selectClassDom.vue'
+  import classData from '../../data/classlist'
+  import {getNowFormatDate,filterWebUrl,toJson} from '../../config/methods'
   import {setStore,getStore,removeStore} from '../../config/publicMethod'
+  import {addClassListInfo,updateClassListInfo} from '../../api/classes'
+  import {getAllClassesOfCenter} from '../../api/manage'
   import {getOnLineData, getTempCurriculum, saveTempCurriculum} from '../../api/exploration'
   import customList from '../../components/customList.vue'
   import defaultList from '../../components/defaultList.vue'
@@ -133,14 +113,10 @@
     data(){
       return {
         DialogIdiilVisible:false,
-        DialogActivityVisible:false,
         formLabelWidth: '90px',
         userInfo:JSON.parse(getStore('userInfo')),
         guid:'',
-        sourceLists:{},
-        activityForm:{
-          name:''
-        }
+        sourceLists:{}
       }
     },
     created(){
@@ -202,6 +178,7 @@
           }else{
             this.sourceLists={
               classList:{
+//                classId: this.guid,
                 name: "",
                 target: "",
                 duration: "",
@@ -223,14 +200,7 @@
             if(object){
               this.sourceLists=object;
             }else{
-              let CourseType=this.userInfo.CourseType;
-              let ClassProgram=this.userInfo.ClassProgram;
-              let jsonInfo={
-                CurriculumID: this.guid,
-                CourseType:CourseType,
-                ClassProgram:ClassProgram
-              };
-              let result = await getTempCurriculum(jsonInfo); //获取临时教材数据
+              let result = await getTempCurriculum({CurriculumID: this.guid}); //获取临时教材数据
               if (result.code == 200) {
                 this.sourceLists=JSON.parse(Base64.decode(result.data[0].CurriculumnContent));
               }
@@ -253,7 +223,6 @@
               name: param.selectUnitName + item.id,
               blockID: item.id,
               target: "",
-              task: [],
               duration: '',
               validate: false,
               editFlag:false,
@@ -273,28 +242,6 @@
           this.initBlcokShow();
         }
 
-      },
-      getActivity(param){
-        let urlJson= {
-          name: param,
-          target: "",
-          task: [],
-          duration: '',
-          validate: false,
-          editFlag:false,
-          fileLists: [],
-          scoreRatio:60, //得分占比
-          explore:10, //探究
-          cooperation:10, //协作
-          summary:10, //总结
-          discuss:10, //讨论
-          param:param,
-          uid: new Date().getTime(),
-          key: new Date().getTime() + this.sourceLists.blockLists.length.toString()
-        };
-        this.sourceLists.blockLists.push(urlJson);
-        this.promptMessage('添加成功^_^', 'success');
-        this.initBlcokShow();
       },
       //初始化区块显示信息
       initBlcokShow(){
@@ -317,18 +264,9 @@
       selectClassHandle(param){
         this.DialogIdiilVisible=false;
         this.getBlockNum(param);
+
       },
-      //创建好区块之后的处理逻辑
-      saveActivityEdit(){
-        let param=this.activityForm.name;
-        if(param.length == 0){
-          this.promptMessage('活动名称不能为空哦^o^', 'warning');
-          return
-        }
-        this.activityForm.name="";
-        this.DialogActivityVisible = false;
-        this.getActivity(param);
-      },
+
     /*
     * 显示选中的区块
     * */
@@ -375,13 +313,7 @@
                 return currentValue.validate == true
               });
               if(validatorsFail.length>0){
-                let ClassProgram=this.userInfo.ClassProgram;
-                if(ClassProgram == 'HDMY'){
-                  this.promptMessage('活动名称、活动目标以及各占比不能为空哦^o^', 'warning');
-                }else{
-                  this.promptMessage('区块名称、区块目标以及各占比不能为空哦^o^', 'warning');
-                }
-
+                this.promptMessage('区块名称、区块目标以及各占比不能为空哦^o^', 'warning');
               }else{
                 this.SOURCE_LIST({val:this.sourceLists, key:this.guid});
                 this.saveClassLists('done');
@@ -396,8 +328,6 @@
       async saveClassLists(status){
         let CurriculumName=this.sourceLists.classList.name;
         let SourceType='IDIIL';
-        let CourseType=this.userInfo.CourseType;
-        let ClassProgram=this.userInfo.ClassProgram;
         if(!CurriculumName){
           CurriculumName='';
         }
@@ -412,8 +342,6 @@
           CurriculumnContent: CurriculumnContent,
           UserID: this.userInfo.userId,
           SourceType: SourceType,
-          CourseType: CourseType,
-          ClassProgram: ClassProgram,
           Status: status
         };
         let result = await saveTempCurriculum(inputJson);
@@ -424,7 +352,6 @@
           this.promptMessage('课程保存失败^o^', 'error');
         }
       },
-
       /*
       * 保存时的提示信息
       * */

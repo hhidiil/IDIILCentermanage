@@ -63,13 +63,13 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import {setStore, getStore, removeStore, createGuid} from '../../config/publicMethod'
-  import {getAssignmentList, deleteAssignment} from '../../api/exploration'
+  import {getAssignmentList} from '../../api/exploration'
   import curriculumSearch from '../../components/curriculumSearch.vue'
   let Base64 = require('js-base64').Base64;
   export default {
     data() {
-      let classList = JSON.parse(getStore("classList"));
       return {
+        userInfo:JSON.parse(getStore('userInfo')),
         sendLessonsLists:[]
       }
     },
@@ -93,18 +93,21 @@
     methods: {
       //获取派课列表
       async getAssignmentList() {
+        let CourseType=this.userInfo.CourseType;
+        let ClassProgram=this.userInfo.ClassProgram;
         let inputJson={
           AssignID:'', //AssignID--派课ID
           SchoolID:'', // SchoolID--学校ID
           UserID:'', //UserID--教师ID
-          Status:'' // Status--状态
+          Status:'', // Status--状态
+          CourseType:CourseType, // CourseType--科目类型
+          ClassProgram:ClassProgram // CourseType--科目类型
         };
         let result=await getAssignmentList(inputJson);
          result=result.data;
         this.sendLessonsLists = result.filter((currentValue, index, arr)=>{
           return currentValue.Status == 'done';
         });
-        console.log(this.sendLessonsLists)
       },
 
       /*
@@ -133,8 +136,7 @@
       goToClass(index,row){
          console.log(row);
          let aa=JSON.parse(Base64.decode(row.GroupContent));
-         console.log(aa);
-        window.open(`https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/math1/index.html?InstructorID=01&sCenterID=002&sPerformanceID=00201MM201904005&AssignID=${row.AssignID}`);
+        window.open(`https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/math1_1/index${row.CourseType}.html?InstructorID=01&sCenterID=002&sPerformanceID=00201${row.CourseType}201904005&AssignID=${row.AssignID}&ClassProgram=${row.ClassProgram}`);
       }
 
     }

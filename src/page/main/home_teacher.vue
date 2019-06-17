@@ -1,43 +1,47 @@
 <template>
-  <section class="home_teacher_section">
-    <header>
-      <el-row>
-        <el-col :span="24">
-          <div class="headertext">教师首页</div>
-        </el-col>
-      </el-row>
-      <el-button class="returnBack" @click="returnBack()">返回</el-button>
-    </header>
-    <div class="centerDiv">
-      <el-row style="position: relative">
-        <el-col :span="8" class="leftsection">
-          <el-card class="box-card">
-            <div class="headerbgcolor">
-            </div>
-            <div class="content">
-              <div class="centertext" @click="goSys('1')">中考批改系统</div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8" class="rightsection">
-          <el-card class="box-card">
-            <div class="headerbgcolor">
-            </div>
-            <div class="content">
-              <div class="centertext" @click="goSys('2')">探究发现式数学</div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8" class="rightsection">
-          <el-card class="box-card">
-            <div class="headerbgcolor">
-            </div>
-            <div class="content">
-              <div class="centertext">英语活动课程</div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+  <section class="home_section">
+    <div class="home_section_in">
+      <header>
+        <el-row>
+          <el-col :span="24">
+            <div class="headertext">教师首页</div>
+          </el-col>
+        </el-row>
+        <el-button class="returnBack" @click="returnBack()">返回</el-button>
+      </header>
+      <div class="centerDiv">
+        <div class="centerDivIn">
+          <el-row>
+            <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8" class="btnsection">
+              <el-card class="box-card" @click.native="goSys('1')">
+                <div class="headerbgcolor">
+                </div>
+                <div class="content">
+                  <div class="centertext">中考批改系统</div>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8" class="btnsection">
+              <el-card class="box-card" @click.native="goSys('2')">
+                <div class="headerbgcolor">
+                </div>
+                <div class="content">
+                  <div class="centertext">探究发现式数学</div>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8" class="btnsection">
+              <el-card class="box-card" @click.native="goSys('3')">
+                <div class="headerbgcolor">
+                </div>
+                <div class="content">
+                  <div class="centertext">英语活动课程</div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -47,19 +51,20 @@
   import {doTestLogin} from '../../api/user'
   import {getCurrentCourseInfo,getClassList} from '../../api/classes'
   import {getStore,setStore,clearStore} from '../../config/publicMethod'
+
   export default {
     data(){
       return {
         message:"首页页面",
-        userInfo:null
+        userInfo:JSON.parse(getStore('userInfo'))
       }
     },
     //引入的组件
     components: {
-      headHop
+      headHop,
+
     },
     mounted(){
-      this.userInfo = this.$route.params;
       console.log("用户信息参数-----》",this.userInfo,this.$route.params)
     },
     methods:{
@@ -72,10 +77,19 @@
             window.open("http://" + location.hostname + ":10008/teacher");//跳转到中考教师批改系统
             break;
           case '2':
-//            let userInfo = this.userInfo;
-//            console.log("用户信息参数---222222222222--》",userInfo);
-//            const dataUserList = await doTestLogin('/static/ClassUserList.json');
-//            setStore("ClassUserList",dataUserList);
+            this.userInfo.CourseType="MM";
+            this.userInfo.ClassProgram="DSX";
+            setStore("userInfo",JSON.stringify(this.userInfo));
+            if(this.userInfo.TeacherType == 'IDIIL'){
+              window.location.href = origin + "/faXianShiShuXue.html#/manage/classManagerList";//跳转到数学派课系统
+            }else{
+              window.location.href = origin + "/faXianShiShuXue.html#/home";//跳转到数学派课系统
+            }
+            break;
+          case '3':
+            this.userInfo.CourseType="EE";
+            this.userInfo.ClassProgram="HDMY";
+            setStore("userInfo",JSON.stringify(this.userInfo));
             if(this.userInfo.TeacherType == 'IDIIL'){
               window.location.href = origin + "/faXianShiShuXue.html#/manage/classManagerList";//跳转到数学派课系统
             }else{
@@ -87,7 +101,7 @@
         }
       },
     returnBack(){
-      console.log("返回上一层")
+      console.log("返回上一层");
       this.$router.push({name:'door'});
     }
     }
@@ -96,59 +110,55 @@
 
 <style scoped lang="less" type="text/less">
   @import '../../assets/mixin.less';
-  .home_teacher_section{
-    position: relative;
+
+  .home_section{
     height: 100%;
-    background-color: rgb(50, 64, 87);
-    header .headertext{
-      font-size: 30px;
-      color: white;
-      padding: 15px;
+    width: 100%;
+    overflow: auto;
+    background-color: #324057;
+    .home_section_in{
+      display: flex;
+      flex-direction: column;
+      header .headertext{
+        font-size: 30px;
+        color: white;
+        padding: 15px;
+      }
+      .returnBack{
+        position: absolute;
+        right: 35px;
+        top: 20px;
+      }
+      .centerDiv{
+        display:flex;
+        justify-content: center;
+        .centerDivIn{
+          flex: 1;
+          max-width: 1200px;
+          .btnsection{
+            padding: 50px;
+            display:flex;
+            justify-content: center;
+            .box-card{
+              width: 100%;
+              max-width:320px;
+              cursor: pointer;
+              .headerbgcolor{
+                height: 40px;
+                background-color: #71b7ee;
+              }
+              .content{
+                height: 320px;
+                background-color: #f8f1e1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 32px;
+              }
+            }
+          }
+        }
+      }
     }
-    .returnBack{
-      position: absolute;
-      right: 35px;
-      top: 20px;
-    }
-  .centerDiv{
-    position: absolute;
-    width: 65%;
-    height: 500px;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-  .leftsection{
-    height: 500px;
-    padding: 50px 25px;
-  .headerbgcolor{
-    height: 40px;
-    background-color: #71b7ee;
-  }
-  }
-  .rightsection{
-    height: 500px;
-    padding: 50px 25px;
-  .headerbgcolor{
-    height: 40px;
-    background-color: #cd85e2;
-  }
-  }
-  .content {
-    position: relative;
-    font-size: 48px;
-    height: 350px;
-    background-color: rgba(248, 241, 225, 1);
-  .centertext{
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    text-align: center;
-    width: 240px;
-    margin-left: -120px;
-    margin-top: -60px;
-    cursor: pointer;
-  }
-  }
-  }
   }
 </style>

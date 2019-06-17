@@ -58,8 +58,8 @@
           <tr>
             <td valign=center align=center>
               <div class="btn-group" role="group" aria-label="...">
-                <el-button type="primary"size="mini" id="btnExercise" @click="handleClick">确 定</el-button>
-                <!--<button type="button" id="btnPreview" @click="onNewPreview('N')" class="btn btn-default">预览</button>-->
+                <el-button type="primary" size="mini" id="btnExercise" @click="handleClick">确 定</el-button>
+                <el-button v-if="userInfo.CourseType == 'EE'" size="mini" id="btnPreview" @click="toPreview">预览</el-button>
               </div>
             </td>
           </tr>
@@ -71,10 +71,12 @@
 
 </template>
 <script type="text/ecmascript-6">
-  import {onSearch,onNewPreview,onlstUnit} from '../js/Newdefault'
+  import {onSearch,onNewPreview,onlstUnit,onNewPreview1} from '../js/Newdefault'
+  import {getStore} from '../config/publicMethod'
   export default {
     data(){
       return {
+        userInfo:JSON.parse(getStore('userInfo')),
       }
     },
     mounted(){
@@ -90,6 +92,13 @@
           return this.$message({type:'warning',message:'添加失败！'})
         }
         this.$emit('selectClassHandle',url)
+      },
+      toPreview(){
+        let url = onNewPreview('N');
+        if(!url){
+          return this.$message({type:'warning',message:'预览失败！'})
+        }
+        this.$emit('previewClassHandle',url)
       }
     }
   }

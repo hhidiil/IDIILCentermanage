@@ -1,26 +1,30 @@
 <template>
   <section class="home_section">
-    <div class="centerDiv">
-      <el-row style="position: relative">
-        <el-col :span="12" class="leftsection">
-          <el-card class="box-card">
-            <div class="headerbgcolor">
-            </div>
-            <div class="content">
-              <div class="centertext" @click="goPaiKe()">派 课</div>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12" class="rightsection">
-          <el-card class="box-card">
-            <div class="headerbgcolor">
-            </div>
-            <div class="content">
-              <div class="centertext" @click="goShangKe()">上 课</div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+    <div class="home_section_in">
+      <div class="centerDiv">
+        <div class="centerDivIn">
+          <el-row>
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="btnsection">
+              <el-card class="box-card" @click.native="goPaiKe()">
+                <div class="headerbgcolor">
+                </div>
+                <div class="content">
+                  <div class="centertext">派 课</div>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="btnsection">
+              <el-card class="box-card" @click.native="goShangKe()">
+                <div class="headerbgcolor">
+                </div>
+                <div class="content">
+                  <div class="centertext">上 课</div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -50,6 +54,7 @@
         setStore("userInfo",this.userInfo);
         this.removeCurriculumStorage();
         this.$router.push('manage');
+
       },
       async goShangKe(){
         this.userInfo.classType = 'attendClass';
@@ -75,46 +80,45 @@
 <style scoped lang="less" type="text/less">
   @import '../../assets/mixin.less';
   .home_section{
-    position: relative;
     height: 100%;
-    background-color: rgb(50, 64, 87);
-    .centerDiv{
-      position: absolute;
-      width: 65%;
-      height: 500px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%,-50%);
-      .leftsection{
-        height: 500px;
-        padding: 50px 50px;
-        .headerbgcolor{
-          height: 40px;
-          background-color: #71b7ee;
-        }
-      }
-      .rightsection{
-        height: 500px;
-        padding: 50px 50px;
-        .headerbgcolor{
-          height: 40px;
-          background-color: #cd85e2;
-        }
-      }
-      .content {
-        position: relative;
-        font-size: 48px;
-        height: 350px;
-        background-color: rgba(248, 241, 225, 1);
-        .centertext{
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 120px;
-          height: 120px;
-          margin-left: -60px;
-          margin-top: -60px;
-          cursor: pointer;
+    width: 100%;
+    overflow: auto;
+    background-color: #324057;
+    .home_section_in{
+      /*display: flex;*/
+      /*flex-direction: column;*/
+      /*height: 100%;*/
+      .centerDiv{
+        height: 100%;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 100px;
+        .centerDivIn{
+          flex: 1;
+          max-width: 1200px;
+          .btnsection{
+            padding: 50px;
+            display:flex;
+            justify-content: center;
+            .box-card{
+              width: 100%;
+              max-width:320px;
+              cursor: pointer;
+              .headerbgcolor{
+                height: 40px;
+                background-color: #71b7ee;
+              }
+              .content{
+                height: 320px;
+                background-color: #f8f1e1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 32px;
+              }
+            }
+          }
         }
       }
     }

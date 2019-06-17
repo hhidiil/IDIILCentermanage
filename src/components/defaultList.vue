@@ -2,7 +2,7 @@
   <section class="blockContainerCard">
     <el-card class="blockContainerCard">
       <div slot="header" class="clearfix">
-        <span>区块内容</span>
+        <span>{{itemName}}内容</span>
         <span v-if="prepareLessonsStatus != 'check'">
             <el-button style="float: right; padding: 3px 0" type="text" @click.prevent="removeResource(currentBlockList[0])">删除</el-button>
             <el-button style="float: right; padding: 3px 0; margin-right: 15px" type="text" @click.prevent="editBlock(currentBlockList[0])">编辑</el-button>
@@ -10,18 +10,23 @@
       </div>
       <div>
         <el-form  class="textForm" label-width="formLabelWidth">
-          <el-form-item label="区块名称:">
+          <el-form-item :label="itemName+'名称:'">
             <span>{{currentBlockList[0].name}}</span>
           </el-form-item>
           <el-form-item label="教学目标:">
             <span>{{currentBlockList[0].target}}</span>
           </el-form-item>
-          <el-form-item label="区块时长:">
+          <el-form-item label="探究任务:">
+            <span v-for="(tag,index) in currentBlockList[0].task" :key="index" style="margin-right: 15px;">
+              {{index+1}}、{{tag}}
+            </span>
+          </el-form-item>
+          <el-form-item :label="itemName+'时长:'">
             <span>{{currentBlockList[0].duration}}</span>
           </el-form-item>
-          <el-form-item label="课程内容:">
-            <span>{{currentBlockList[0].name}}</span>
-          </el-form-item>
+          <!--<el-form-item :label="itemName+'内容:'">-->
+            <!--<span>{{currentBlockList[0].name}}</span>-->
+          <!--</el-form-item>-->
           <el-form-item label="得分占比:">
               <el-progress v-if="currentBlockList[0].scoreRatio" :percentage="Number(currentBlockList[0].scoreRatio)"></el-progress>
           </el-form-item>
@@ -38,7 +43,7 @@
             <el-progress v-if="currentBlockList[0].discuss" :percentage="Number(currentBlockList[0].discuss)"></el-progress>
           </el-form-item>
           <el-form-item label="教学参考:">
-            <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists" @sendFilesInfo="sendFilesInfo"></upload-files>
+            <upload-files :group="'people'" :fileLists="currentBlockList[0].fileLists" :type="'item'" @sendFilesInfo="sendFilesInfo"></upload-files>
           </el-form-item>
         </el-form>
       </div>
@@ -46,18 +51,21 @@
 
     <!-- 区块编辑弹出框 -->
     <el-dialog
-      title="编辑区块内容"
+      :title="'编辑'+itemName+'内容'"
       v-dialogDrag
       :visible.sync="editVisible"
       width="50%">
       <el-form :model="blockForm" status-icon :rules="moreRules"  ref="moreRules" :label-width="formLabelWidth">
-          <el-form-item label="区块名称:" prop="name">
+          <el-form-item :label="itemName+'名称:'" prop="name">
             <el-input v-model="blockForm.name" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="教学目标:" prop="target">
-            <el-input type="textarea" v-model="blockForm.target" auto-complete="off"></el-input>
+            <el-input type="textarea" v-model="blockForm.target" rows="3" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="区块时长:">
+          <el-form-item label="探究任务:">
+            <add-tags :tagType="'添加任务'" :dynamicTags="blockForm.task"></add-tags>
+          </el-form-item>
+          <el-form-item :label="itemName+'时长:'">
             <el-input v-model="blockForm.duration" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="得分占比:" prop="scoreRatio">
@@ -86,7 +94,9 @@
 </template>
 <script>
   import { mapState,mapMutations } from 'vuex'
+  import {getStore} from '../config/publicMethod'
   import uploadFiles from './uploadFiles.vue'
+  import addTags from './addTags.vue'
   export default{
       props:['guid'],
       data(){
@@ -122,6 +132,7 @@
 
         }
         return{
+            userInfo:JSON.parse(getStore('userInfo')),
             editVisible:false, //编辑弹出框
             //新增表单的验证规则
             moreRules: {
@@ -157,6 +168,7 @@
             blockForm: {
               name: '',
               target: '',
+              task: [],
               duration: '',
               scoreRatio:"", //得分占比得分占比
               explore:"", //探究
@@ -168,7 +180,8 @@
         }
       },
       components:{
-        uploadFiles
+        uploadFiles,
+        addTags
       },
       computed:{
         ...mapState([
@@ -176,7 +189,14 @@
           'currentBlockKey',
           'currentBlockList',
           'prepareLessonsStatus'
-        ])
+        ]),
+        itemName(){
+          if(this.userInfo.CourseType == 'EE'){
+            return '活动'
+          }else{
+            return '区块'
+          }
+        }
       },
       filters:{
         ratioUnit: function (value) {
@@ -216,10 +236,12 @@
         /*
         * 初始化弹框数据
         * */
-        editBlock(item){
+        editBlock(items){
+          var item=JSON.parse(JSON.stringify(items));
           this.blockForm = {
             name: item.name,
             target: item.target,
+            task: item.task,
             duration: item.duration,
             scoreRatio:item.scoreRatio,
             explore:item.explore,
@@ -261,6 +283,7 @@
                 let currList=JSON.parse(JSON.stringify(that.currentBlockList));
                 currList[0].name=that.blockForm.name;
                 currList[0].target=that.blockForm.target;
+                currList[0].task=that.blockForm.task;
                 currList[0].duration=that.blockForm.duration;
                 currList[0].scoreRatio=that.blockForm.scoreRatio;
                 currList[0].explore=that.blockForm.explore;
@@ -273,6 +296,7 @@
                     if(item.key == that.currentBlockKey){
                     item.name=that.blockForm.name;
                     item.target=that.blockForm.target;
+                    item.task=that.blockForm.task;
                     item.duration=that.blockForm.duration;
                     item.scoreRatio=that.blockForm.scoreRatio;
                     item.explore=that.blockForm.explore;
