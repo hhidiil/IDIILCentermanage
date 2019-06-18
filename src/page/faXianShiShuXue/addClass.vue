@@ -103,9 +103,9 @@
       :close-on-click-modal="false"
       append-to-body
       v-if='DialogActivityVisible'>
-      <el-form :model="activityForm" status-icon ref="moreRules" :label-width="formLabelWidth">
+      <el-form :model="activityForm" status-icon ref="moreRules" :label-width="formLabelWidth" @submit.native.prevent>
         <el-form-item label="活动名称:" prop="name">
-          <el-input v-model="activityForm.name" auto-complete="off"></el-input>
+          <el-input v-model="activityForm.name" auto-complete="off" @keyup.enter.native="saveActivityEdit"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -160,6 +160,13 @@
           disabled: false,
           ghostClass: "ghost"
         };
+      },
+      itemName(){
+        if(this.userInfo.CourseType == 'EE'){
+          return '活动'
+        }else{
+          return '区块'
+        }
       }
     },
     watch:{
@@ -375,19 +382,15 @@
                 return currentValue.validate == true
               });
               if(validatorsFail.length>0){
-                let ClassProgram=this.userInfo.ClassProgram;
-                if(ClassProgram == 'HDMY'){
-                  this.promptMessage('活动名称、活动目标以及各占比不能为空哦^o^', 'warning');
-                }else{
-                  this.promptMessage('区块名称、区块目标以及各占比不能为空哦^o^', 'warning');
-                }
+                  this.promptMessage(`${this.itemName}名称、${this.itemName}目标以及各占比不能为空哦^o^`, 'warning');
 
               }else{
                 this.SOURCE_LIST({val:this.sourceLists, key:this.guid});
                 this.saveClassLists('done');
               }
             }else{
-              this.promptMessage('需要先添加哦^o^', 'warning');
+                this.promptMessage(`需要先添加${this.itemName}哦^o^`, 'warning');
+
             }
           }
         }

@@ -135,8 +135,7 @@
       /*去上课*/
       goToClass(index,row){
          console.log(row);
-         let aa=JSON.parse(Base64.decode(row.GroupContent));
-        window.open(`https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/math1_1/index${row.CourseType}.html?InstructorID=01&sCenterID=002&sPerformanceID=00201${row.CourseType}201904005&AssignID=${row.AssignID}&ClassProgram=${row.ClassProgram}`);
+        window.open(`https://nwprodsub.idiil.com.cn/SYSTEM/MathInteractive/math1_1/index.html?InstructorID=01&sCenterID=002&sPerformanceID=00201${row.CourseType}201904005&AssignID=${row.AssignID}&ClassProgram=${row.ClassProgram}`);
       }
 
     }

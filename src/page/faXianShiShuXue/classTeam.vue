@@ -11,8 +11,6 @@
                 <el-button type="primary" @click="gotoAttendClass" >上课</el-button>
               </div>
             </div>
-
-
             <div class="curriculumAdd">
               <el-button type="primary" round @click="sendLessionsAdd('add')" >新增派课</el-button>
             </div>
