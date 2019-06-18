@@ -1,7 +1,11 @@
 import fetch_requset from '../config/fetch'
 
-const API_CONFIG = '/api/manage';
+const API_CONFIG = 'https://nwprodsub.idiil.com.cn:9999/api/manage';
 
+export const getDataFromServer=(jsondata,functionName)=>{
+  const url = `${API_CONFIG}/${functionName}`;
+  return fetch_requset(url,jsondata,'POST')
+}
 /**
  * [查询各个中心的管理员列表信息]
  */
@@ -89,8 +93,10 @@ export const getCenterProgram = (data) => {
 /**cui
  * [查询某中心班级列表信息]
  */
+
 export const getAllCenter = (data) => {
   const url = `${API_CONFIG}/getAllCenter`;
+  console.log("gggggggggg",url)
   return fetch_requset(url,data,'POST')
 }
 
@@ -156,5 +162,10 @@ export const addCenterClassUser = (data) => {
 /*获取班级yoghurt*/
 export const getCenterClassUser = (data) => {
   const url = `${API_CONFIG}/getCenterClassUser`;
+  return fetch_requset(url,data,'POST')
+}
+/*批量添加用户到班级*/
+export const addCenterClassUserList = (data) => {
+  const url = `${API_CONFIG}/addCenterClassUserList`;
   return fetch_requset(url,data,'POST')
 }

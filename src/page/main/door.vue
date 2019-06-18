@@ -22,6 +22,7 @@
             </el-form-item>
             <el-form-item label="角色" prop="role">
               <el-radio-group v-model="ruleForm.role">
+                <el-radio label="0">普通用户</el-radio>
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">教师</el-radio>
                 <el-radio label="3">管理员</el-radio>

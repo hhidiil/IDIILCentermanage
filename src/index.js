@@ -8,7 +8,9 @@ import ElementUI from 'element-ui'
 import store from './store/index';
 import '../node_modules/element-ui/lib/theme-chalk/index.css'
 import './assets/font/iconfont.css'
+import VueRouter from 'vue-router'
 
+Vue.use(VueRouter)
 Vue.prototype.fromFlag = true;//本地或者数据库标志,//true为真实数据，false为本地数据
 Vue.config.debug = true;
 Vue.config.productionTip = false;

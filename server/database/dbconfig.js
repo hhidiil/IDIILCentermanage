@@ -13,7 +13,11 @@ const pool = mysql.createPool({
 })
 console.log("database connecting......")
 
-module.exports = (opt) => {
+let db={};
+
+db.pool=pool;
+
+db.query_db=(opt) => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {
       if (err) {
@@ -32,3 +36,61 @@ module.exports = (opt) => {
     })
   })
 }
+
+// 查询所有数据
+db.selectAll=(sql,moduleName) => {
+  let opt = {};
+  opt.sql = sql;
+  opt.name = moduleName;
+  return db.query_db(opt);
+}
+
+db.insertData =(table,arrData,moduleName) => {
+  let fields = '';
+  let values = '';
+  for (let k in arrData) {
+    fields += k + ',';
+    values = values + "'" + arrData[k] + "',"
+  }
+  fields = fields.slice(0, -1);
+  values = values.slice(0, -1);
+  console.log(fields, values);
+  let sql = "INSERT INTO " + table + '(' + fields + ') VALUES(' + values + ')';
+  let opt = {};
+  opt.sql = sql;
+  opt.name = moduleName;
+
+  return db.query_db(opt);
+}
+
+db.updateData =(table,sets,where,moduleName) => {
+  let _SETS='';
+  let keys='';
+  let values='';
+  for(let k in sets){
+    _SETS+=k+"='"+sets[k]+"',";
+  }
+  _SETS=_SETS.slice(0,-1);
+
+  let sql="UPDATE "+table+" SET "+ _SETS +" WHERE "+ where;
+  console.log("----------------",sql);
+
+  let opt = {};
+  opt.sql = sql;
+  opt.name = moduleName;
+  let res=db.query_db(opt);
+
+  return  res;
+}
+
+db.deleteData =(table,where,moduleName) => {
+  let sql="DELETE  FROM "+table+' WHERE '+where;
+ console.log('delete ############## ',sql);
+  let opt = {};
+  opt.sql = sql;
+  opt.name = moduleName;
+
+  return db.query_db(opt);
+}
+
+module.exports = db;

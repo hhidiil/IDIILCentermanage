@@ -1,52 +1,44 @@
 <template>
   <div>
     <head-top></head-top>
-
     <div class="teacherManage_section">
       <header>
         <el-row>
           <el-col :span="12" class="grid-content titleSetion"><h2>中心列表</h2></el-col>
-
-          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addGeneralCenter">添加中心</el-button></el-col>
+          <el-col :span="12" class="grid-content editSetion">
+            <el-button type="primary" @click="addGeneralCenter">添加中心</el-button>
+            <el-button type="primary" @click="registerMember">注册管理员</el-button></el-col>
         </el-row>
       </header>
-
       <section class="section_table">
-      <el-table
-      ref="multipleTable"
-      :data="currentData"
-      border
-      height="450"
-      :header-row-style="headerStyle"
-      :highlight-current-row="true"
-      :cell-style="cellStyle"
-      style="width: 100%"
-      @selection-change="handleSelectionChange">
-        <el-table-column type="expand" label="详情" width="60">
-          <template slot-scope="props">
-            <el-form label-position="left" inline class="demo-table-expand">
-              <el-form-item label="真实姓名"><span>{{ props.row.ActualName }}</span></el-form-item>
-              <el-form-item label="地址"><span>{{props.row.DistinctName}},{{props.row.Address}}</span></el-form-item>
-              <el-form-item label="中心全称"><span>{{ props.row.FullName }}</span></el-form-item>
-              <el-form-item label="用户名称"><span>{{ props.row.UserName }}</span></el-form-item>
-              <el-form-item label="联系方式"><span>{{ props.row.ContactInfo }}</span></el-form-item>
-            </el-form>
-          </template>
-        </el-table-column>
-        <el-table-column prop="CenterID" sortable label="CenterID"></el-table-column>
-        <el-table-column prop="CenterName" label="中心名称" ></el-table-column>
-        <el-table-column prop="UserID" label="UserID"></el-table-column>
-        <el-table-column prop="Name" label="管理员"></el-table-column>
-        <el-table-column prop="ParentID" label="父级ID"></el-table-column>
-        <el-table-column prop="Status" label="状态"></el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">指派管理</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-row>
+        <el-table ref="multipleTable"
+          :data="currentData" border height="450" :header-row-style="headerStyle" :highlight-current-row="true"
+          :cell-style="cellStyle" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table-column type="expand" label="详情" width="60">
+            <template slot-scope="props">
+              <el-form label-position="left" inline class="demo-table-expand">
+                <el-form-item label="真实姓名"><span>{{ props.row.ActualName }}</span></el-form-item>
+                <el-form-item label="地址"><span>{{props.row.DistinctName}},{{props.row.Address}}</span></el-form-item>
+                <el-form-item label="中心全称"><span>{{ props.row.FullName }}</span></el-form-item>
+                <el-form-item label="用户名称"><span>{{ props.row.UserName }}</span></el-form-item>
+                <el-form-item label="联系方式"><span>{{ props.row.ContactInfo }}</span></el-form-item>
+              </el-form>
+            </template>
+          </el-table-column>
+          <el-table-column prop="CenterID" sortable label="CenterID"></el-table-column>
+          <el-table-column prop="CenterName" label="中心名称" ></el-table-column>
+          <el-table-column prop="UserID" label="UserID"></el-table-column>
+          <el-table-column prop="Name" label="管理员"></el-table-column>
+          <el-table-column prop="ParentID" label="父级ID"></el-table-column>
+          <el-table-column prop="Status" label="状态"></el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">指派管理</el-button>
+              <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-row>
         <el-col :span="12">
           <div style="text-align: left">
             <el-button @click="deleteSelection()">删除选中的项</el-button>
@@ -54,135 +46,166 @@
           </div>
         </el-col>
         <el-col :span="12">
-          <el-pagination
-          background
-          layout="prev, pager, next"
-          :page-size="pageSize"
-          @current-change=this.PageChange
-          :total="allData.length">
-          </el-pagination>
+          <el-pagination background layout="prev, pager, next" :page-size="pageSize" @current-change=this.PageChange :total="allData.length"></el-pagination>
         </el-col>
       </el-row>
-      <el-dialog title="指派/修改中心管理" :show-close="modalClickOther"
-      :visible.sync="addDialogVisible" :closeOnClickModal="modalClickOther">
-        <el-form label-position="right" label-width="80px"
-        :inline="true" class="demo-form-inline"
-        status-icon :rules="rules" :model="ruleForm"
-        ref="classForm">
-          <el-form-item label="中心ID:"><el-input v-model="ruleForm.CenterID"></el-input></el-form-item>
-          <el-form-item label="中心名:"><el-input v-model="ruleForm.CenterName" :disabled="VisibleFlag"></el-input></el-form-item>
-          <el-form-item label="管理员:"><el-input v-model="ruleForm.Name" :disabled="VisibleFlag"></el-input></el-form-item>
-          <el-form-item label="UserID:"><el-input v-model="ruleForm.UserID"></el-input></el-form-item>
-          <el-form-item label="ParentID:"><el-input v-model="ruleForm.ParentID" :disabled="VisibleFlag"></el-input></el-form-item>
-          <el-form-item label="状态:"><el-input v-model="ruleForm.Status"></el-input></el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="MakeSureHandle(alertFlag)">确 定</el-button>
-        </span>
-      </el-dialog>
-      <el-dialog title="添加中心" :show-close="modalClickOther"
-                 :visible.sync="dialogTwoVisible" :closeOnClickModal="modalClickOther">
-        <el-form :model="addForm" status-icon ref="addCenterForm" label-width="80px"
-                  :rules="rules">
-            <el-col :span="24">
-                <el-form-item label="名称:" prop="CenterName">
-                  <el-input type="text" v-model="addForm.CenterName"></el-input>
-                </el-form-item>
-                <el-form-item label="状态:" prop="Status">
-                  <el-switch v-model="Status" active-text="开启" inactive-text="关闭" @change="switchChange"></el-switch>
-                </el-form-item>
-                <el-form-item label="管理员:"prop="Admin">
-                  <el-select v-model="adminDate" placeholder="请选择管理员" clearable @change="chooseAdmin">
-                    <el-option
-                      v-for="(item,index) in adminOptions"
-                      :key="index"
-                      :label="item.UserName"
-                      :value="item">
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="父中心:" prop="ParentID">
-                  <el-input type="number" min="1" max="10" v-if="this.currentIdFlag" v-model="this.ParentID" :disabled="this.currentIdFlag"></el-input>
-                  <el-select v-model="centerDate" placeholder="请选择父中心" @change="chooseCenter" v-if="!this.currentIdFlag">
-                    <el-option
-                      v-for="(item,index) in currentData"
-                      :key="index"
-                      :label="item.CenterID"
-                      :value="item">
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="区域:" prop="DistinctName">
-                  <template style="display: flex;margin-left: 0;">
-                    <el-select v-model="provinceDate" placeholder="请选择省" @change="selectProvince" @visible-change="visibleChangeProvince">
-                      <el-option
-                        v-for="(item,index) in provinceOptions"
-                        :key="index"
-                        :label="item.Name"
-                        :value="item.ID">
-                      </el-option>
-                    </el-select>
-                    <el-select v-model="cityDate" placeholder="请选择市" @change="selectCity" @visible-change="visibleChangeCity">
-                      <el-option
-                        v-for="item in cityOptions"
-                        :key="item.MergerName"
-                        :label="item.Name"
-                        :value="item.ID">
-                      </el-option>
-                    </el-select>
-                    <el-select v-model="areaDate" value-key="ID" placeholder="请选择区" @change="selectArea" >
-                      <el-option v-for="item in areaOptions"
-                                 :key="item.Name" :label="item.Name"
-                                 :value="item">
-                      </el-option>
-                    </el-select>
-                  </template>
-                </el-form-item>
-                <el-form-item label="地址:" prop="Address">
-                  <el-input type="text" v-model="addForm.Address"></el-input>
-                </el-form-item>
-            </el-col>
-            <el-col class="questionStyle" :span="24">
-              <el-form-item label="联系人:" prop="Name"><el-input clearable type="text" v-model="addForm.Name"></el-input></el-form-item>
-              <el-form-item label="联系方式:" prop="contactInfo">
-                <el-form-item label="Tel:" prop="Tel"><el-input clearable size="small" type="text" v-model="contactInfo.Tel"></el-input></el-form-item>
-                <el-form-item label="WeChat:" prop="WeChat"><el-input clearable size="small" type="text" v-model="contactInfo.WeChat"></el-input></el-form-item>
-                <el-form-item label="QQ:" prop="QQ"><el-input clearable size="small" type="text" v-model="contactInfo.QQ"></el-input></el-form-item>
-              </el-form-item>
-            </el-col>
-            <el-col class="questionStyle" :span="24">
-              <el-select v-model="classDate" multiple placeholder="选择课程" @change="chooseClass">
+        <el-dialog title="指派/修改中心管理" :show-close="modalClickOther"
+        :visible.sync="addDialogVisible" :closeOnClickModal="modalClickOther">
+          <el-form label-position="right" label-width="80px"
+          :inline="true" class="demo-form-inline"
+          status-icon :rules="rules" :model="ruleForm"
+          ref="classForm">
+            <el-form-item label="中心ID:"><el-input v-model="ruleForm.CenterID"></el-input></el-form-item>
+            <el-form-item label="中心名:"><el-input v-model="ruleForm.CenterName" :disabled="VisibleFlag"></el-input></el-form-item>
+            <el-form-item label="管理员:"><el-input v-model="ruleForm.Name" :disabled="VisibleFlag"></el-input></el-form-item>
+            <el-form-item label="UserID:">
+              <!--<el-input v-model="ruleForm.UserID"></el-input>-->
+              <el-select v-model="adminDate" placeholder="请选择管理员" clearable @change="chooseAdmin">
                 <el-option
-                  v-for="(item,index) in classOptions"
+                  v-for="(item,index) in adminOptions"
                   :key="index"
-                  :label="item.ProgramName"
-                  :value="item.ProgramCode">
+                  :label="item.UserName"
+                  :value="item">
                 </el-option>
               </el-select>
-            </el-col>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogTwoVisible = false">取 消</el-button>
-          <el-button type="primary" @click="MakeSureHandle2">确 定</el-button>
-        </span>
-      </el-dialog>
+            </el-form-item>
+            <el-form-item label="ParentID:"><el-input v-model="ruleForm.ParentID" :disabled="VisibleFlag"></el-input></el-form-item>
+            <el-form-item label="状态:"><el-input v-model="ruleForm.Status"></el-input></el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="clearDialog">取 消</el-button>
+            <el-button type="primary" @click="MakeSureHandle(alertFlag)">确 定</el-button>
+          </span>
+        </el-dialog>
+        <el-dialog title="添加中心" :show-close="modalClickOther" :visible.sync="dialogTwoVisible" :closeOnClickModal="modalClickOther">
+          <el-form :model="addForm" status-icon ref="addCenterForm" label-width="80px"
+                    :rules="addRules">
+              <el-col :span="24">
+                  <el-form-item label="名称:" prop="CenterName">
+                    <el-input type="text" v-model="addForm.CenterName" placeholder="请输入中心名称"></el-input>
+                  </el-form-item>
+                  <el-form-item label="状态:" prop="Status">
+                    <el-switch v-model="Status" active-text="开启" inactive-text="关闭" @change="switchChange"></el-switch>
+                  </el-form-item>
+                  <el-form-item label="管理员:" prop="Admin">
+                    <el-select v-model="adminDate" placeholder="请选择管理员" clearable @change="chooseAdmin">
+                      <el-option
+                        v-for="(item,index) in adminOptions"
+                        :key="index"
+                        :label="item.UserName"
+                        :value="item">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="父中心:" prop="ParentID">
+                    <el-input type="number" min="1" max="10" v-if="this.currentIdFlag" v-model="this.ParentID" :disabled="this.currentIdFlag"></el-input>
+                    <el-select v-model="centerDate" placeholder="请选择父中心" @change="chooseCenter" v-if="!this.currentIdFlag">
+                      <el-option
+                        v-for="(item,index) in currentData"
+                        :key="index"
+                        :label="item.CenterID"
+                        :value="item">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="区域:" prop="DistinctName">
+                    <template style="display: flex;margin-left: 0;">
+                      <el-select v-model="provinceDate" placeholder="请选择省" @change="selectProvince" @visible-change="visibleChangeProvince">
+                        <el-option
+                          v-for="(item,index) in provinceOptions"
+                          :key="index"
+                          :label="item.Name"
+                          :value="item.ID">
+                        </el-option>
+                      </el-select>
+                      <el-select v-model="cityDate" placeholder="请选择市" @change="selectCity" @visible-change="visibleChangeCity">
+                        <el-option
+                          v-for="item in cityOptions"
+                          :key="item.MergerName"
+                          :label="item.Name"
+                          :value="item.ID">
+                        </el-option>
+                      </el-select>
+                      <el-select v-model="areaDate" value-key="ID" placeholder="请选择区" @change="selectArea" >
+                        <el-option v-for="item in areaOptions"
+                                   :key="item.Name" :label="item.Name"
+                                   :value="item">
+                        </el-option>
+                      </el-select>
+                    </template>
+                  </el-form-item>
+                  <el-form-item label="地址:" prop="Address">
+                    <el-input type="text" v-model="addForm.Address"></el-input>
+                  </el-form-item>
+              </el-col>
+              <el-col class="questionStyle" :span="24">
+                <el-form-item label="联系人:" prop="Name"><el-input clearable type="text" v-model="addForm.Name"></el-input></el-form-item>
+                <el-form-item label="联系方式:" prop="contactInfo">
+                  <el-form-item label="Tel:" prop="Tel"><el-input clearable size="small" type="text" v-model="contactInfo.Tel"></el-input></el-form-item>
+                  <el-form-item label="WeChat:" prop="WeChat"><el-input clearable size="small" type="text" v-model="contactInfo.WeChat"></el-input></el-form-item>
+                  <el-form-item label="QQ:" prop="QQ"><el-input clearable size="small" type="text" v-model="contactInfo.QQ"></el-input></el-form-item>
+                </el-form-item>
+              </el-col>
+              <el-col class="questionStyle" :span="24">
+                <el-select v-model="classDate" prop="Classes" multiple placeholder="选择课程" @change="chooseClass">
+                  <el-option
+                    v-for="(item,index) in classOptions"
+                    :key="index"
+                    :label="item.ProgramName"
+                    :value="item.ProgramCode">
+                  </el-option>
+                </el-select>
+              </el-col>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="clearDialog">取 消</el-button>
+            <el-button type="primary" @click="MakeSureHandle2">确 定</el-button>
+          </span>
+        </el-dialog>
+        <el-dialog title="注册管理员" :show-close="modalClickOther" height="600" :visible.sync="dialogThreeVisible" :closeOnClickModal="modalClickOther">
+            <el-row>
+              <el-col :span="24">
+                <div style="min-height:400px">
+                  <registerRole :msg="msg"></registerRole>
+                </div>
+              </el-col>
+            </el-row>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="clearDialog">关闭窗口</el-button>
+            </span>
+        </el-dialog>
       </section>
-
-      </div>
+    </div>
 
 
   </div>
 </template>
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
+  import registerRole from '../../components/registerCom'
   import {getStore,setStore} from '../../config/publicMethod'
-  import {getAllManagerList,getAllCenter,addClassInfo,deleteClassInfo,changeCenterManager,getCenterProgram,addCenter} from '../../api/manage'
+  import { getDataFromServer } from '../../api/manage'
   import {getMemberList} from '../../api/user'
   import {getAreaList} from '../../api/common'
+  import * as elValudate from '@/assets/js/elValidate' // 引入自定义校验方法
   export default{
     data(){
+      var checkPhone = (rule, value, callback) => {
+        console.log( value )
+        if (!value) {
+          return callback(new Error('手机号不能为空'));
+        } else {
+          const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+          console.log(reg.test(value));
+          if (reg.test(value)) {
+            callback();
+          } else {
+            return callback(new Error('请输入正确的手机号'));
+          }
+        }
+      };
       return{
+        msg:'registerMember',
         cellStyle:{
           textAlign:'center'
         },
@@ -196,7 +219,7 @@
         currentData:[],//当前页面展示的条数
 
         multipleSelection: [],
-        addDialogVisible:false,dialogTwoVisible:false,
+        addDialogVisible:false,dialogTwoVisible:false,dialogThreeVisible:false,
         modalClickOther:false,
         alertFlag:false,VisibleFlag:false,
         provinceDate:[],cityDate:[],areaDate:[],adminDate:[],centerDate:[],
@@ -215,16 +238,20 @@
           Status:'',
           UserID:''
         },
+        addCen:{},
         addForm:{
-          CenterName:'',
-          DistinctName:'',
-          Name:'',
-          Address:'',
-          Status:'',
-          ParentID:'',
-          ContactInfo:'',
-          CenterProgram:'',
-          CenterManager:''
+          CenterName:'', DistinctName:'', Name:'', Address:'', Status:'', ParentID:'', ContactInfo:'', CenterProgram:'', CenterManager:''
+        },
+        addRules:{
+          CenterName: [{ required: true, message: '请输入中心名称', trigger: 'blur' }],
+          //Admin: [{ required: true,  message: '请选择管理员', trigger: 'blur' }],
+          ParentID: [{ required: true,  message: '请输入父级ID', trigger: 'blur' }],
+          DistinctName: [{ required: true,  message: '请输入父级ID', trigger: 'blur' }],
+          Address: [{ required: true,  message: '请输入父级ID', trigger: 'blur' }],
+          Name: [{ required: true,  message: '请输入联系人姓名', trigger: 'blur' }],
+          Classes: [{ required: true,  message: '请选择课程', trigger: 'blur' }],
+       //   contactInfo: [{ required: true,  message: '请选择至少一种联系方式', trigger: 'blur', }],
+          //Tel: [{ validator:elValudate.elValidatePhone,trigger:'blur'}]
         },
         ParentID:'',
         rules: {
@@ -241,7 +268,7 @@
       }
     },
     components:{
-      headTop
+      headTop,registerRole
     },
     watch:{
 
@@ -254,16 +281,22 @@
     mounted(){
       this.getUserInfo();
       this.getAllProvince();
-      this.getclass();
+     // this.clearValidate('addCen') // 清除整个表单的校验
+     // this.$refs["addCen"].resetFields();
     },
     methods:{
+      clearValidate(formName) {
+        this.$refs[formName].clearValidate();
+      },
       async chooseAdmin(row){
         this.adminDate=row.UserName;
-        this.addForm.CenterManager = row.UserID;
+        this.ruleForm.UserID = row.UserId;
+        this.addForm.CenterManager = row.UserId;
       },
       async chooseCenter(row){
         this.centerDate = row.CenterID;
         this.addForm.ParentID =  row.CenterID;
+        this.getclass( row )
         console.log( this.addForm.ParentID)
       },
       async chooseClass(row){//选择课程
@@ -321,22 +354,26 @@
         let userInfo = JSON.parse( getStore('manageUser') );
        // name:'', adminName:'',Area:'',Status:"",
         this.adminName = userInfo.userName
-        let result = await getAllCenter();
+        let result = await getDataFromServer({},'getAllCenter')
+        //let result = await getAllCenter();
         this.allData = result.data;
         this.currentData = this.allData.slice(0,this.pageSize);
         console.log("所有的中心列表",result,this.allData)
       },
-      async getclass (){
-          var inputJson = {
-            CenterID:'000'
+      async getclass (row){
+          if( row!=null ){
+            var inputJson = { CenterID:row.CenterID }
+          }else{
+            var inputJson = { CenterID:'000' }
           }
-          let result = await getCenterProgram(inputJson);
+          let result = await getDataFromServer(inputJson,'getCenterProgram')
           console.log("-----",result.data);
           setStore('programList',result.data)
         this.classOptions = result.data;
         /*** getMemberList---获取未分配为管理员的会员列表信息* */
         var inputJson = {}
-        let result2 = await getMemberList(inputJson);
+        //let result2 = await getMemberList(inputJson);
+        let result2 = await getDataFromServer(inputJson,'getCenterFreeManager');
         this.adminOptions = result2.data;
         console.log("getMemberList---",result2.data);
       },
@@ -345,16 +382,22 @@
         let userInfo = JSON.parse(getStore('manageUser'));
         let centerId= JSON.parse(getStore('manageUser')).centerId;//中心号
         console.log( centerId )
-        let result = await getAllCenter();
+        //let result = await getAllCenter();
+        let result = await getDataFromServer({},'getAllCenter');
 
         this.allData = result.data;
         this.currentData = this.allData.slice(0,this.pageSize);
         console.log("-----******------",result,this.allData)
       },
       async handleEdit(index, row) {
+        if( row.UserID!=null ){
+          this.$message({message: '您已经指派过了，无需重复指派！',type:'warning'});
+          return false;
+        }
         this.alertFlag = false;
         console.log(index, row);
         this.addDialogVisible = true;
+        this.getclass();
         this.VisibleFlag = true;
         this.ruleForm = {
           CenterID:row.CenterID,
@@ -396,7 +439,7 @@
                 UserID: params.UserID,
                 Status: params.Status
               }
-              let result = await changeCenterManager(inputJson);
+              let result = await getDataFromServer(inputJson,'changeCenterManager');
               console.log("指派管理员----",result.data);
               if(result.code==200){
                 this.$message({message: '指派成功！',type:'success'});
@@ -416,34 +459,56 @@
         })
       },
       MakeSureHandle2(){
+        if( this.contactInfo.QQ == ''){
+          delete eval(this.contactInfo).QQ;
+        }
+        if( this.contactInfo.WeChat == ''){
+          delete eval(this.contactInfo).WeChat;
+        }
+        if( this.contactInfo.Tel == ''){
+          delete eval(this.contactInfo).Tel;
+        }
         let aa = JSON.stringify(this.contactInfo);
             aa = aa.replace(/":"/g,':');
             aa = aa.replace(/","/g,',');
             aa=aa.replace(/{"/g,'');
-        this.addForm.ContactInfo =aa.replace(/"}/g,'');
+
+        this.addForm.ContactInfo = aa.replace(/"}/g,'');
         this.$refs.addCenterForm.validate(async(valid)=>{
           if(valid){
             let params = this.addForm;
-            let result = await addCenter(params);
+            debugger
+            let result = await getDataFromServer(params,'addCenter');
             if(result.code == 200){
               this.$message({message: '添加成功！',type:'success'});
+              this.clearDialog();
             }
           }else{
-            alert('error')
+            alert('信息填写不完善')
             return false;
           }
         })
+      },
+      clearDialog(){
+        this.addDialogVisible = false;
+        this.dialogTwoVisible = false;
+        this.dialogThreeVisible = false;
+        this.getAllClasses()
       },
       addGeneralCenter(){
         this.alertFlag = true;
         this.VisibleFlag = false;
         this.dialogTwoVisible = true;
+        this.getclass();
         this.addForm={  CenterName:'',
           DistinctName:'',
           Name:'',
           Address:'',
           Status:'',
           ParentID:''};
+      },
+      registerMember(){
+        this.dialogThreeVisible = true;
       },
       deleteSelection() {
         console.log("选择的行：：---》》》",this.$refs.multipleTable.selection);

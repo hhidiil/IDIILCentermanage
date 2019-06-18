@@ -65,11 +65,6 @@ const routes = [
         component:(resolve) => require(['../page/manageCenter/subCenterList.vue'], resolve),
         meta:['分中心列表']
       },{
-        path:'adminList',
-        name:'adminList',
-        component:(resolve) => require(['../page/manageCenter/adminList.vue'], resolve),
-        meta:['管理员列表']
-      },{
         path:'schoolList',
         name:'schoolList',
         component:(resolve) => require(['../page/manageCenter/SchoolList.vue'], resolve),
@@ -83,7 +78,7 @@ const routes = [
         path:'schoolUserManage',
         name:'schoolUserManage',
         component:(resolve) => require(['../page/manageCenter/schoolUserManage.vue'], resolve),
-        meta:['教务管理']
+        meta:['学校用户管理']
       },{
         path:'reportManage',
         name:'reportManage',

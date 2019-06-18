@@ -7,7 +7,8 @@ import { baseUrl } from './env'
 
 export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
   type = type.toUpperCase();
-  url = baseUrl + url;
+ // url = 'http://nwprodsub.idiil.com.cn:9999'+url;
+  //url = baseUrl + url;
 
   if (type == 'GET') {
     let dataStr = ''; //数据拼接字符串

@@ -4,22 +4,35 @@
       <section class="form_contianer_register">
         <div class="senctionblock">
         <!--  :rules="rules"-->
-          <el-form :model="ruleForm" status-icon  ref="registerForm" label-width="80px" class="demo-ruleForm">
-
-            <!--<el-form-item label="角色类型:" prop="role">
+          <el-form :model="ruleForm"  status-icon  ref="registerForm" label-width="80px" class="demo-ruleForm">
+            <div>{{msg}}--{{msg1}}</div>
+            <el-form-item v-if="this.chooseRole" label="角色类型:" prop="role">
               <el-radio-group v-model="ruleForm.role" @change="changeRole">
-                <el-radio label="0">普通会员</el-radio>
                 <el-radio label="1">学生</el-radio>
                 <el-radio label="2">教师</el-radio>
-                <el-radio label="3">管理员</el-radio>
               </el-radio-group>
-            </el-form-item>-->
-            <el-radio-group v-model="ruleForm.Status">
-              <el-radio label="1">开启</el-radio>
-              <el-radio label="0">关闭</el-radio>
-            </el-radio-group>
+            </el-form-item>
+            <el-form-item label="学科类型:" prop="subject" v-if="showChooseSubject">
+              <el-radio-group v-model="ruleForm.subject" @change="changeSubject">
+                <el-radio label="EE">英语</el-radio>
+                <el-radio label="MM">数学</el-radio>
+              </el-radio-group>
+            </el-form-item>
             <el-form-item label="用户名:" prop="UserName">
               <el-input type="text" v-model="ruleForm.UserName"></el-input>
+            </el-form-item>
+            <el-form-item label="性别:" prop="sex">
+              <el-radio-group v-model="ruleForm.Sex" >
+                <el-radio label="男">男</el-radio>
+                <el-radio label="女">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="出生日期:" prop="Birthday">
+              <el-date-picker
+                v-model="ruleForm.Birthday"
+                type="date"
+                placeholder="出生日期" value-format="yyyy/MM/dd">
+              </el-date-picker>
             </el-form-item>
             <el-form-item class="area" label="区域:" prop="DistinctName">
               <template style="display: flex;margin-left: 0;">
@@ -64,24 +77,28 @@
             <hr>
             <div class="massage_append">
               <el-form-item class="AddInput AddInput_show" label="Tel:" prop="ContactInfo.Tel">
-                <el-input v-model="classInfo.Tel">
+                <el-input v-model="contactInfo.Tel">
                   <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(1)"></el-button>
                   <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(1)"></el-button>
                 </el-input>
               </el-form-item>
               <el-form-item class="AddInput" label="WeChat:" prop="ContactInfo.WeChat">
-                <el-input v-model="classInfo.WeChat">
+                <el-input v-model="contactInfo.WeChat">
                   <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(2)"></el-button>
                   <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(2)"></el-button>
                 </el-input>
               </el-form-item>
               <el-form-item class="AddInput" label="QQ:" prop="ContactInfo.QQ">
-                <el-input v-model="classInfo.QQ">
+                <el-input v-model="contactInfo.QQ">
                   <el-button slot="append" icon="el-icon-circle-plus-outline" @click="appendClass(3)"></el-button>
                   <el-button slot="append" icon="el-icon-remove-outline" @click="removeClass(3)"></el-button>
                 </el-input>
               </el-form-item>
             </div>
+            <el-radio-group v-model="ruleForm.Status">
+              <el-radio label="1">开启</el-radio>
+              <el-radio label="0">关闭</el-radio>
+            </el-radio-group>
           <hr>
     <!--        <el-form-item
               prop="email"
@@ -116,38 +133,41 @@
   import {registerMember} from '../api/user'
   import {getClassInfo} from '../api/classes'
   import {setStore,getStore,clearStore} from '../config/publicMethod'
-  import {addCenterSchoolUser } from '../api/manage'
+  import {addCenterSchoolUser ,addCenterClassUser} from '../api/manage'
   import {getAreaList} from '../api/common'
 
   export default {
     name: 'door',
     data () {
-      var validatePass = (rule, value, callback) => {
-        if (value === '' || value.length>12 || value<8) {
-          callback(new Error('请输入正确手机号'));
+      var checkPhone = (rule, value, callback) => {
+
+        if (!value) {
+          return callback(new Error('手机号不能为空'));
+          this.$refs["registerForm"].clearValidate()
         } else {
-          callback();
+          const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+          console.log(reg.test(value));
+          if (reg.test(value)) {
+            callback();
+          } else {
+            return callback(new Error('请输入正确的手机号'));
+          }
         }
       };
       return {
         DistinctName:'',
         provinceDate:[],cityDate:[],areaDate:[],
         provinceOptions:[],cityOptions:[],areaOptions:[],
-        ContactInfo:[],
+        contactInfo:{Tel:'',WeChat:'',QQ:''},
+        showChooseSubject:false,
         ruleForm: {
-          UserName:'',
-          NickName:'',
-          ActualName:'',
-          Password:'',
-          DistinctID:'',
-          DistinctName:'',
-          Address:'',
-          ContactInfo:'',
-          UserType:''
-         /* domains: [{
+          UserName:'', NickName:'', ActualName:'', Password:'', DistinctID:'',
+          DistinctName:'', Address:'', contactInfo:'',Sex:'', UserType:'',Birthday:'',
+          /* domains: [{
             value: ''
           }],
           email: ''*/
+          ContactInfo:{Tel:""}
         },
         rules: {
           UserName: [
@@ -174,53 +194,122 @@
           Address: [
             {required: true,  message: '请选择用户学科', trigger: 'blur' }
           ],
-          ContactInfo: [
-            {required: true,  validator: validatePass, trigger: 'blur' }
-          ],
+          ContactInfo:{
+            Tel: [
+              {required: false,  validator: checkPhone, trigger: 'blur' }
+            ],
+          }
         },
         show_len:1,
-        classInfo:{
-          Tel:'',WeChat:'',Email:''
-        },
+        chooseRole:false,
+        aparams:{}
       }
     },
-    props:['msg'],
+    props:['msg','msg1'],
     mounted(){
       this.getAllProvince();
+      this.getRole();
     },
     methods:{
+      getRole(){
+        if( this.msg1=='SandT'|| this.msg1=='addClassUser'){
+         this.chooseRole=true;
+        }
+        if(this.msg=='RoleA'|| this.msg == 'registerMember'){
+          this.chooseRole=false;
+        }
+      },
+      async tel_keyup(){
+        debugger
+        this.$refs["registerForm"].clearValidate()
+      },
       async Register(formName){
-        this.ruleForm.ContactInfo ='QQ:5648696568'
+        if( this.contactInfo.QQ == ''){
+          delete eval(this.contactInfo).QQ;
+        }
+        if( this.contactInfo.WeChat == ''){
+          delete eval(this.contactInfo).WeChat;
+        }
+        if( this.contactInfo.Tel == ''){
+          delete eval(this.contactInfo).Tel;
+        }
+        let aa = JSON.stringify(this.contactInfo);
+        aa = aa.replace(/":"/g,':');
+        aa = aa.replace(/","/g,',');
+        aa=aa.replace(/{"/g,'');
+
+        this.ruleForm.ContactInfo =aa.replace(/"}/g,'');
+        //this.ruleForm.ContactInfo =this.contactInfo;
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
-            if( this.msg == 'RoleA'){
+            if( this.msg == 'RoleA'){//学校列表-指派管理员
               this.ruleForm.UserType='A';
-
               let params = this.ruleForm;
               let getAddForm = JSON.parse( getStore('addForm') )
               params.CenterID=getAddForm.CenterID;
               params.SchoolID = getAddForm.SchoolID;
+              console.log(params.Birthday)
               let result = await registerMember(params);
               if(result.code == 200){
                 this.$message({message: '注册成功，请关闭！',type:'success'});
                 console.log( result.data )
                 setStore('SchoolUserID',result.data.UserID)
               }
+            }else if( this.msg == 'registerMember'){
+              this.ruleForm.UserType='A';
+              let params = this.ruleForm;
+              let result = await registerMember(params);
+              if(result.code == 200){
+                this.$message({message: '注册成功，请关闭！',type:'success'});
+                console.log( result.data )
+              }
             }
-            /*  let params =JSON.parse( JSON.stringify( this.ruleForm ) ) ;
-           let result = await registerMember(params);
-            console.log("所有的列表",result.data.UserID);
-            setStore('UserID',result.data.UserID)
-            if(result.code == 200){
-              this.$router.push('/');
-            }else {
-              alert('注册信息出错')
-            }*/
+            if( this.msg1=='SandT' ||this.msg1=='addClassUser'){
+              this.aparams={
+                SchoolID:getStore('SchoolID'),
+                ClassID:getStore('ClassID'),
+                UserType: this.ruleForm.UserType,
+                Status: this.ruleForm.Status,
+              };
+              let bparams = this.ruleForm;
+              bparams.CenterID=getStore('CenterID');
+              bparams.SchoolID=getStore('SchoolID');
+              let result = await registerMember(bparams);
+              if(result.code == 200){
+                console.log( result.data )
+                if( this.msg1=='SandT' ){
+                  this.$message({message: '添加成功！',type:'success'});
+//                  let input1=this.aparams;
+//                  input1.SchoolID=getStore('SchoolID');
+//                  input1.UserID=result.data.UserID;
+                  //this.Risigter2(input1)
+                }else if( this.msg1=='addClassUser'){
+                  let input2=this.aparams;
+                  input2.ClassID=getStore('ClassID'),
+                  input2.UserID=result.data.UserID;
+                  this.registerClassUser(input2);
+                }
+              }
+            }
           } else {
             console.error('error register submit!!');
             return false;
           }
         });
+      },
+      async registerClassUser(input2){
+        let result2 = await addCenterClassUser(input2);
+        if(result2.code == 200){
+          this.$message({message: '注册成功，请关闭！',type:'success'});
+          console.log( result2.data )
+        }
+      },
+      async Risigter2(input1){
+        let result2 = await addCenterSchoolUser(input1);
+        if(result2.code == 200){
+          this.$message({message: '注册成功，请关闭！',type:'success'});
+          console.log( result2.data )
+        }
       },
       BackHandle(){
         this.$router.back();
@@ -276,9 +365,11 @@
             break;
           case '1':
             this.ruleForm.UserType = 'S';
+            this.showChooseSubject=false;
             break;
           case '2':
             this.ruleForm.UserType = 'T';
+            this.showChooseSubject=true;
             break;
           case '3':
             this.ruleForm.UserType = 'A';
@@ -287,6 +378,10 @@
             return false;
         }
         console.log( this.ruleForm.UserType)
+      },
+      changeSubject(row){
+        this.ruleForm.CurseType= row;
+        console.log( row )
       },
       appendClass(i){
         var add_len=$('.AddInput').length;

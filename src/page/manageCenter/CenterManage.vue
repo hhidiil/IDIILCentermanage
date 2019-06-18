@@ -5,12 +5,21 @@
       <header>
         <el-row>
           <el-col :span="12" class="grid-content titleSetion"><h2>各中心的管理员列表</h2></el-col>
-         <!-- <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addUser">新增中心</el-button></el-col>-->
+          <el-col :span="12" class="grid-content editSetion">
+            <el-select v-model="chooseCenterListData" placeholder="选择中心" @change="chooseCenterList">
+              <el-option
+                v-for="(item,index) in chooseCenterOption"
+                :key="index"
+                :label="item.CenterID"
+                :value="item">
+              </el-option>
+            </el-select>
+          </el-col>
         </el-row>
       </header>
       <section class="section_table">
         <el-table
-          ref="multipleTable"
+          ref="multipleTable" :row-class-name="tableRowClassName"
           :data="currentData"
           border
           height="450"
@@ -28,9 +37,8 @@
             width="50">
           </el-table-column>
           <el-table-column prop="CenterID" sortable label="中心ID"></el-table-column>
-          <el-table-column prop="ProgramName" label="课程"></el-table-column>
-          <el-table-column prop="CourseType" label="课程类型" width="150"></el-table-column>
-
+          <el-table-column prop="UserId" label="UserId"></el-table-column>
+          <el-table-column prop="UserName" label="UserName" width="150"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
@@ -191,6 +199,8 @@
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
   import {getAllCenter,updateCenter,addCenter,deleteCenter,getCenterProgram} from '../../api/manage'
+
+  import {getDataFromServer } from '../../api/manage'
   import {getAreaList} from '../../api/common'
 
   import adminDate_Test from '../../data/admin.json'
@@ -233,6 +243,7 @@
           CenterProgram:''
         },
         show_len:1,
+        chooseCenterOption:[], chooseCenterListData:[],
         //验证form表单：
         /*rules: {
           CenterName: [
@@ -267,17 +278,37 @@
       this.getAllProvince();
     },
     methods:{
-      async getAllUserList(){
-        var inputJson = {
-          CenterID:'000'
+      tableRowClassName({row, rowIndex}) {
+        if ( row.CenterID == '---') {
+          return 'warning-row';
         }
-        let result = await getCenterProgram(inputJson);
-
-        //let result = await getAllCenter();
+        return '';
+      },
+      async getAllUserList(){
+        var inp={ }
+        let result = await getDataFromServer(inp,"getAllCenter");
+        this.chooseCenterOption = result.data;
+      },
+      async chooseCenterList(row){
+        console.log(row)
+        this.chooseCenterListData = row.CenterID;
+        var inputJson = {
+          CenterID: row.CenterID
+        }
+        let result = await getDataFromServer(inputJson,'getCenterAllManager');
         this.allData = result.data;
         this.currentData = this.allData.slice(0,this.pageSize);
         console.log("所有的管理员",result,this.allData)
       },
+    /*  async getAllUserList(){
+        var inputJson = {
+          CenterID:'003'
+        }
+        let result = await getDataFromServer(inputJson,'getCenterAllManager');
+        this.allData = result.data;
+        this.currentData = this.allData.slice(0,this.pageSize);
+        console.log("所有的管理员",result,this.allData)
+      },*/
       handleEdit(index, row) {
         console.log(index, row);
         alert('还没做')
@@ -489,5 +520,12 @@
   }
   .AddInput:first-child{
     display:inline-table;
+  }
+  .el-table .warning-row {
+       background: oldlace;
+     }
+
+  .el-table .success-row {
+    background: #f0f9eb;
   }
 </style>

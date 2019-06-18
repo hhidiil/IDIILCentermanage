@@ -29,7 +29,7 @@ export default {
     text-align: center;
   }
   .el-submenu .el-menu-item{
-    min-width: 100px !important;
+    min-width: 100% !important;
   }
   .el-dialog__body{
     max-height: 400px;

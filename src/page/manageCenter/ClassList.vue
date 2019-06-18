@@ -5,6 +5,9 @@
       <header>
         <el-row>
           <el-col :span="12" class="grid-content titleSetion"><h2>班级管理</h2></el-col>
+          <el-col :span="12" style="text-align: right">
+            选择中心 - 选择学校 - 选择班级 - 选择班级角色
+          </el-col>
         </el-row>
       </header>
       <!--选择中心-->
@@ -26,64 +29,19 @@
                 :value="item">
               </el-option>
             </el-select>
-
         </el-col>
-        <el-col :span="12">
-          <el-button type="primary" @click="addClass">添加班级</el-button>
+        <el-col :span="6" v-if="choosedClass">
+          <uploadFile :msg="msg"></uploadFile>
+        </el-col>
+        <el-col :span="6">
+          <el-button type="primary" v-if="choosedSchool" @click="addClass">添加班级</el-button>
+          <el-button v-if="choosedClass" type="primary" @click="adduser">添加用户</el-button>
         </el-col>
         <el-col :span="24" class="TwoTable">
           <section>
-         <!--   <el-table
-              ref="multipleTable" :data="currentData" border height="450" :header-row-style="headerStyle" :highlight-current-row="true" :cell-style="cellStyle"
-              @selection-change="handleSelectionChange">
-              <el-table-column type="selection" width="50"></el-table-column>
-              <el-table-column type="index" width="50"></el-table-column>
-              <el-table-column prop="SchoolID" label="SchoolID"></el-table-column>
-              <el-table-column prop="ClassID" label="ClassID"></el-table-column>
-              <el-table-column prop="ClassCode" label="ClassCode"></el-table-column>
-              <el-table-column prop="ClassName" label="ClassName"></el-table-column>
-              <el-table-column prop="ClassGrade" label="ClassGrade"></el-table-column>
-              <el-table-column prop="ClassMaster" label="ClassMaster"></el-table-column>
-              <el-table-column prop="ClassProgram" label="ClassProgram"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-                  <el-button
-                    size="mini"
-                    type="danger"
-                    @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                  <el-button
-                    size="mini"
-                    @click="handleAdd(scope.$index, scope.row)">添加</el-button>
-                  <el-button
-                    size="mini"
-                    @click="handleGetRoleList(scope.$index, scope.row)">查看班级人员</el-button>
-                </template>
-              </el-table-column>
-            </el-table>-->
-           <!-- <el-row>
-              <el-col :span="12">
-                <div style="text-align: left">
-                  <el-button @click="deleteSelection()">删除选中的项</el-button>
-                  <el-button @click="cancelSelection()">取消选择</el-button>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <el-pagination
-                  background
-                  layout="prev, pager, next"
-                  :page-size="pageSize"
-                  @current-change=this.PageChange
-                  :total="allData.length">
-                </el-pagination>
-              </el-col>
-            </el-row>-->
             <el-dialog
-              :title="alertFlag ? '中心管理信息':'修改中心管理信息'"
-              :show-close="modalClickOther" :visible.sync="dialogVisible" :closeOnClickModal="modalClickOther"
-            >
+              :title="alertFlag ? '添加班级':'修改中心管理信息'"
+              :show-close="modalClickOther" :visible.sync="dialogVisible" :closeOnClickModal="modalClickOther">
               <el-row>
                 <el-col :span="24">
                   <el-form :model="ruleForm" status-icon  ref="alterForm" label-width="80px" class="demo-ruleForm">
@@ -137,6 +95,28 @@
             <el-dialog title="添加班级用户" :show-close="modalClickOther"
                        :visible.sync="dialogTwoVisible" :closeOnClickModal="modalClickOther">
               <el-row>
+                <el-col :span="24">
+                  <div style="min-height:400px">
+                    <registerRole :msg1="msg1"></registerRole>
+                  </div>
+                  <!--<el-form :model="addForm" status-icon  ref="alterFormTwo" label-width="80px" class="demo-ruleForm">
+                    <el-form-item>
+                      <el-radio-group v-model="addForm.UserType">
+                        <el-radio label="A">班主任</el-radio>
+                        <el-radio label="T">教师</el-radio>
+                        <el-radio label="S">学生</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="状态:" prop="bStatus">
+                      <el-switch v-model="bStatus" active-text="开启" inactive-text="关闭" @change="switchChangeStatus"></el-switch>
+                    </el-form-item>
+                  </el-form>-->
+                </el-col>
+              </el-row>
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="clearDialog">关闭窗口</el-button>
+              </span>
+              <!--<el-row>
                 <el-col :span="20">
                   <el-form :model="addForm" status-icon  ref="alterFormTwo" label-width="80px" class="demo-ruleForm">
                     <el-form-item>
@@ -147,7 +127,7 @@
                       </el-radio-group>
                     </el-form-item>
                     <el-form-item label="ClassID:" prop="ClassID">
-                      <el-input type="text" v-model="addForm.ClassID" placeholder="请输入ClassID"></el-input>
+                      <el-input type="text" v-model="addForm.ClassID" placeholder="请输入ClassID" disabled></el-input>
                     </el-form-item>
                     <el-form-item label="状态:" prop="bStatus">
                       <el-switch v-model="bStatus" active-text="开启" inactive-text="关闭" @change="switchChangeStatus"></el-switch>
@@ -158,7 +138,7 @@
               <span slot="footer" class="dialog-footer">
                 <el-button @click="clearDialog">取 消</el-button>
                 <el-button type="primary" @click="MakeSureHandleTwo(alertFlag)">确 定</el-button>
-              </span>
+              </span>-->
             </el-dialog>
             <el-dialog title="班级列表" :show-close="modalClickOther" height="450" :header-row-style="headerStyle" :highlight-current-row="true" :cell-style="cellStyle"
                        :visible.sync="dialogThreeVisible" :closeOnClickModal="modalClickOther" center>
@@ -168,12 +148,12 @@
                     <el-table  ref="multipleTable" :data="gridData"
                                @selection-change="handleSelectionChange3"
                     @row-click="ClassRowClick">
-                      <el-table-column property="SchoolID" label="学校ID"></el-table-column>
-                      <el-table-column property="ClassName" label="名称"></el-table-column>
-                      <el-table-column property="ClassGrade" label="年级"></el-table-column>
-                      <el-table-column property="ClassMaster" label="班主任"></el-table-column>
-                      <el-table-column property="ClassProgram" label="课程"></el-table-column>
-                      <el-table-column property="Status" label="状态"></el-table-column>
+                      <el-table-column property="SchoolID" label="学校ID" align="center"></el-table-column>
+                      <el-table-column property="ClassName" label="名称" align="center"></el-table-column>
+                      <el-table-column property="ClassGrade" label="年级" align="center"></el-table-column>
+                      <el-table-column property="ClassMaster" label="班主任" align="center"></el-table-column>
+                      <el-table-column property="ClassProgram" label="课程" align="center"></el-table-column>
+                      <el-table-column property="Status" label="状态" align="center"></el-table-column>
                     </el-table>
                   </el-form>
                 </el-col>
@@ -183,7 +163,7 @@
               </span>
             </el-dialog>
           </section>
-          <section class="section_table" v-if="sectionTable2Vis">
+          <section class="section_table">
             <el-radio-group v-model="getListForm.UserType" @change="choosedRole">
               <el-radio label="A" border>班主任</el-radio>
               <el-radio label="T" border>教师</el-radio>
@@ -199,25 +179,49 @@
               <el-table-column prop="UserCode" label="UserCode"></el-table-column>
               <el-table-column prop="UserID" label="UserID"></el-table-column>
               <el-table-column prop="UserName" label="UserName"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini" type="primary" @click="handleAdd(scope.$index, scope.row)">添加</el-button>
+                  <el-button size="mini" v-if="zhipai" @click="handleZhipai(scope.$index, scope.row)">指派班主任</el-button>
+                </template>
+              </el-table-column>
             </el-table>
+            <el-row>
+              <el-col :span="12">
+                <!--   <div style="text-align: left">
+                     <el-button @click="deleteSelection()">删除选中的项</el-button>
+                     <el-button @click="cancelSelection()">取消选择</el-button>
+                   </div>-->
+              </el-col>
+              <el-col :span="12">
+                <el-pagination
+                  background
+                  layout="prev, pager, next"
+                  :page-size="pageSize"
+                  @current-change=this.PageChange
+                  :total="allData.length">
+                </el-pagination>
+              </el-col>
+            </el-row>
           </section>
         </el-col>
       </el-row>
-
-
     </div>
   </div>
 </template>
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
+  import registerRole from '../../components/registerCom'
+  import uploadFile from '../../components/centermanage'
   import {getStore,setStore} from '../../config/publicMethod'
-  import {getAllCenter ,getCenterSchool,getSchoolClasses,addCenterSchoolClass,getCenterProgram,addCenterClassUser,getCenterClassUser} from '../../api/manage'
+  import {getDataFromServer} from '../../api/manage'
   import {getAreaList} from '../../api/common'
 
   import adminDate_Test from '../../data/admin.json'
   export default{
     data(){
       return{
+        msg: 'aa',msg1:'addClassUser',//JSON.parse(getStore('manageUser')).centerId,
         cellStyle:{
           textAlign:'center'
         },
@@ -225,21 +229,19 @@
           backgroundColor:'rgb(117, 203, 214)',
           color: '#4f504b'
         },
-        pageSize:10,
+        pageSize:3,
         allData:[],//所有的数据
         currentData:[],//当前页面展示的条数
         roleListData:[],
         gridData:[],
         multipleSelection: [],
         dialogVisible:false,dialogTwoVisible:false,dialogThreeVisible:false,
-        sectionTable2Vis:false,
         modalClickOther:false,
         alertFlag:false,
         provinceDate:[],cityDate:[],areaDate:[],CenterOfSchoolData:[],
-        provinceOptions:[],cityOptions:[],areaOptions:[],centerOfSchoolOptions:adminDate_Test,
+        provinceOptions:[],cityOptions:[],areaOptions:[],
         DistinctName:'',
         chooseCenterOption:[],chooseSchoolOption:[],
-        chooseCenterListData:[],chooseSchoolListData:[],
         gradeData:[],chooseGradeOption:adminDate_Test[0].msg,
         classAdd:'',classDate:[],classOptions:[],
         classInfo:{
@@ -253,7 +255,7 @@
           ClassProgram:'', ClassMaster:'', Status:''
         },
         addForm:{
-          ClassID:'',UserType:'',Status:''
+          ClassID:'',UserType:'',Status:'',UserID:''
         },
         ListForm:{
 
@@ -263,6 +265,7 @@
           UserType:'',ClassID:''
         },
         chooseCenterListData:[],chooseSchoolListData:[],
+        choosedClass:false,choosedSchool:false,zhipai:false,
         //验证form表单：
         /*rules: {
          SchoolName: [
@@ -281,7 +284,7 @@
       }
     },
     components:{
-      headTop
+      headTop, uploadFile,registerRole
     },
     computed: {
       dialogTitle(){
@@ -289,26 +292,38 @@
       }
     },
     mounted(){
+     // console.log("test store",this.$store.state);
       //进入首页的时候查询
       this.getAllUserList();
       this.getClass();
     },
     methods:{
       ClassRowClick(index,row){
+        this.choosedClass =true;
         console.log(index)
         this.dialogThreeVisible = false;
         this.getListForm.ClassID=index.ClassID;
-        this.sectionTable2Vis=true;
+        setStore('ClassID',index.ClassID)
+        this.msg={
+          "username":'Class'+index.ClassName,
+          "SchoolID": index.SchoolID,
+          "ClassID": index.ClassID
+        }
       },
       async getClass(){
         var inputJson = {
           CenterID:getStore('CenterID')
         }
-        let result = await getCenterProgram(inputJson);
+        let result = await getDataFromServer(inputJson,'getCenterProgram')
         this.classOptions = result.data
       },
       async getAllUserList(){
-        let result = await getAllCenter();
+        if( getStore('permissionLevel')>1 ){
+          var inp = { CenterID:getStore('CenterID') };
+        }else{
+          var inp = { };
+        }
+        let result = await getDataFromServer(inp,'getAllCenter');
         this.allData = result.data;
         this.chooseCenterOption = result.data;
 
@@ -338,19 +353,32 @@
       async handleAdd(index, row){
         this.dialogTwoVisible = true;
         this.addForm.ClassID = row.ClassID;
+        this.addForm.UserID = getStore('UserID');
         console.log(index, row)
+      },
+      async handleZhipai(row){
+        alert('还没有对应接口')
+      },
+      adduser(){
+        this.dialogTwoVisible = true;
+        this.addForm.UserID = getStore('UserID');
+        this.addForm.ClassID = this.getListForm.ClassID;
       },
       handleGetRoleList(index,row){
         console.log( index )
         this.getListForm.ClassID=index.ClassID;
-        this.sectionTable2Vis=true;
       },
       choosedRole(){
+        if(this.getListForm.UserType=='T'){
+          this.zhipai=true
+        }else{
+          this.zhipai=false;
+        }
         this.getRoleList()
       },
       async getRoleList(){
         let parme = this.getListForm;
-        let result = await getCenterClassUser( parme );
+        let result = await getDataFromServer(parme,'getCenterClassUser');
         if( result.code == 200 ){
           console.log('success')
         }
@@ -367,20 +395,27 @@
         setStore('CenterID',row.CenterID);
 
         let inputs={ CenterID:row.CenterID }
-        let result = await getCenterSchool( inputs );
+        let result = await getDataFromServer( inputs ,'getAllSchoolList');
         if( result.code == 200 ){
           console.log('success')// this.$message({message:'查询成功',type:'success'})
         }
         this.chooseSchoolOption=result.data;
       },
       async chooseSchoolList(row){//学校选完了，选班级
+        this.choosedClass =false;
+        this.choosedSchool=true;
         this.chooseSchoolListData = row.SchoolName;
         this.ruleForm.SchoolID = row.SchoolID;
-        let params={ SchoolID:row.SchoolID }
-        setStore('schoolID',row.SchoolID)
-        let result = await getSchoolClasses(params);
+        let params={ SchoolID:row.SchoolID };
+        setStore('schoolID',row.SchoolID);
+        setStore('UserID',row.UserID);
+        let result = await getDataFromServer( params ,'getSchoolClasses')
         if(result.code == 200){
           console.log( result.data )//this.$message({message: '查询成功！',type:'success'});
+        }
+        this.msg={
+          "username":'School'+row.CenterID+row.SchoolName,
+          "SchoolID": row.SchoolID,
         }
         this.gridData = result.data;
         this.dialogThreeVisible = true;
@@ -401,6 +436,8 @@
       },
       visibleChangeCenter(){
         this.chooseSchoolListData=null;
+        this.choosedSchool =false;
+        this.choosedClass = false;
       },
       PageChange(page){
         console.log("PageChange",page)
@@ -418,7 +455,7 @@
           if (valid) {
             let params = this.ruleForm;
             if(flag){//添加用户
-              let result = await addCenterSchoolClass(params);
+              let result = await getDataFromServer( params ,'addCenterSchoolClass')
               if(result.code == 200){
                 this.$message({message: '添加成功！',type:'success'});
               }
@@ -428,7 +465,7 @@
                this.$message({message: '修改成功！',type:'success'});
                }*/
             }
-
+            this.choosedClass =false;
             this.clearDialog()
             this.getAllUserList();
           } else {
@@ -440,9 +477,8 @@
       MakeSureHandleTwo(flag){
         this.$refs.alterFormTwo.validate( async(valid) => {
           if (valid) {
-            this.addForm.UserID = getStore('UserID');
             let params = this.addForm;
-            let result = await addCenterClassUser(params);
+            let result = await getDataFromServer( params ,'addCenterClassUser')
             if(result.code == 200){
               this.$message({message: '添加成功！',type:'success'});
             }

@@ -8,7 +8,9 @@ import store from '../../store/index.js';
 import '../../../node_modules/element-ui/lib/theme-chalk/index.css'
 import VueQuillEditor from 'vue-quill-editor'
 import '../../assets/font/iconfont.css'
+import VueTouch from 'vue-touch'
 
+Vue.use(VueTouch, {name: 'v-touch'})
 Vue.prototype.fromFlag = false;//本地或者数据库标志,//true为真实数据，false为本地数据
 Vue.config.debug = true;
 Vue.config.productionTip = false;

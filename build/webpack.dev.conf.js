@@ -80,6 +80,13 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       inject: true,
       chunks:['manage']
     }),
+    new HtmlWebpackPlugin({
+      filename: 'test.html',
+      template: 'test.html',
+      favicon: path.resolve('favicon.ico'),
+      inject: true,
+      chunks:['test']
+    }),
     new FriendlyErrorsPlugin(),
     //new webpack.HotModuleReplacementPlugin(),
     // copy custom static assets

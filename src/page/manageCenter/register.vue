@@ -15,14 +15,30 @@
             <el-form-item label="角色类型:" prop="role">
               <el-radio-group v-model="ruleForm.role" @change="changeRole">
                 <el-radio label="0">普通会员</el-radio>
-                <el-radio label="1">学生</el-radio>
-                <el-radio label="2">教师</el-radio>
+                <!--<el-radio label="1">学生</el-radio>
+                <el-radio label="2">教师</el-radio>-->
                 <el-radio label="3">管理员</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="用户名:" prop="UserName">
               <el-input type="text" v-model="ruleForm.UserName"></el-input>
             </el-form-item>
+            <el-form-item label="性别:" prop="sex">
+              <el-radio-group v-model="ruleForm.Sex" >
+                <el-radio label="男">男</el-radio>
+                <el-radio label="女">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="出生日期:" prop="Birthday">
+              <el-date-picker
+                v-model="ruleForm.Birthday"
+                type="date"
+                placeholder="出生日期">
+              </el-date-picker>
+              <!--<el-input placeholder="出生日期" type="text" v-model="ruleForm.Birthday"></el-input>-->
+            </el-form-item>
+
+
             <el-form-item class="area" label="区域:" prop="DistinctName">
               <template style="display: flex;margin-left: 0;">
                 <el-select v-model="provinceDate" placeholder="请选择省" @change="selectProvince" @visible-change="visibleChangeProvince">
@@ -113,17 +129,10 @@
         DistinctName:'',
         provinceDate:[],cityDate:[],areaDate:[],
         provinceOptions:[],cityOptions:[],areaOptions:[],
-        ContactInfo:[],
+        contactInfo:{Tel:'',WeChat:'',QQ:''},
         ruleForm: {
-          UserName:'',
-          NickName:'',
-          ActualName:'',
-          Password:'',
-          DistinctID:'',
-          DistinctName:'',
-          Address:'',
-          ContactInfo:'',
-          UserType:''
+          UserName:'', NickName:'', ActualName:'', Password:'', DistinctID:'',
+          DistinctName:'', Address:'', ContactInfo:'',Sex:'', UserType:'',Birthday:''
          /* domains: [{
             value: ''
           }],
@@ -170,7 +179,21 @@
     },
     methods:{
       async Register(formName){
-        this.ruleForm.ContactInfo ='QQ:5648696568'// JSON.stringify(this.classInfo);
+        if( this.contactInfo.QQ == ''){
+          delete eval(this.contactInfo).QQ;
+        }
+        if( this.contactInfo.WeChat == ''){
+          delete eval(this.contactInfo).WeChat;
+        }
+        if( this.contactInfo.Tel == ''){
+          delete eval(this.contactInfo).Tel;
+        }
+        let aa = JSON.stringify(this.contactInfo);
+        aa = aa.replace(/":"/g,':');
+        aa = aa.replace(/","/g,',');
+        aa=aa.replace(/{"/g,'');
+        this.ruleForm.ContactInfo =aa.replace(/"}/g,'');
+        //this.ruleForm.ContactInfo ='QQ:5648696568'// JSON.stringify(this.classInfo);
         this.$refs[formName].validate(async(valid) => {
           if (valid) {
             let params =JSON.parse( JSON.stringify( this.ruleForm ) ) ;

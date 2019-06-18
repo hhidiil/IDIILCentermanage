@@ -1,7 +1,12 @@
 import fetch_requset from '../config/fetch'
 
-const API_CONFIG = '/api/user';
+//const API_CONFIG = '/api/user';
+const API_CONFIG = 'https://nwprodsub.idiil.com.cn:9999/api/user';
 
+export const getDataFromServer_User=(jsondata,functionName)=>{
+  const url = `${API_CONFIG}/${functionName}`;
+  return fetch_requset(url,jsondata,'POST')
+}
 /**
  * [注册新会员]
  */

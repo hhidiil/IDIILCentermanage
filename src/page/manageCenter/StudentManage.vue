@@ -1,133 +1,139 @@
 <template>
   <div>
-    <head-top></head-top>
-    <div class="studentManage_section">
-      <header>
-        <el-row>
-          <el-col :span="12" class="grid-content titleSetion"><h2>学生管理</h2></el-col>
-          <el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addHandle">新增用户</el-button></el-col>
-        </el-row>
-      </header>
-      <section class="select_section">
-        <el-row>
-          <span style="font-weight: bold">中心号：</span><span>{{centerName}}</span>
-          <span style="margin-left: 20px;font-weight: bold">班级：</span>
-          <el-select v-model="classValue" placeholder="请选择" @change="selectChange">
-            <el-option
-              v-for="(item,index) in classOptions"
-              :key="index"
-              :label="item.className"
-              :value="item.classId">
-            </el-option>
-          </el-select>
-        </el-row>
-      </section>
-      <section class="section_table">
-        <el-table
-          ref="multipleTable"
-          :data="currentData"
-          border
-          height="450"
-          :header-row-style="headerStyle"
-          :highlight-current-row="true"
-          :cell-style="cellStyle"
-          style="width: 100%"
-          @selection-change="handleSelectionChange">
-          <el-table-column
-            type="selection"
-            width="50">
-          </el-table-column>
-          <el-table-column
-            type="index"
-            width="50">
-          </el-table-column>
-          <el-table-column
-            prop="centerId"
-            sortable
-            label="中心号">
-          </el-table-column>
-          <el-table-column
-            prop="classId"
-            label="班级">
-          </el-table-column>
-          <el-table-column
-            prop="userName"
-            label="姓名">
-          </el-table-column>
-          <el-table-column
-            prop="grade"
-            label="年级">
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-row>
-          <el-col :span="12">
-            <div style="text-align: left">
-              <el-button @click="deleteSelection()">删除选中的项</el-button>
-              <el-button @click="cancelSelection()">取消选择</el-button>
-            </div>
-          </el-col>
-          <el-col :span="12">
-            <el-pagination
-              background
-              layout="prev, pager, next"
-              :page-size="pageSize"
-              @current-change=this.PageChange
-              :total="allData.length">
-            </el-pagination>
-          </el-col>
-        </el-row>
-        <el-dialog
-          :title="alterFlag ? '添加用户':'修改信息' "
-          :show-close="modalClickOther"
-          :visible.sync="dialogVisible"
-          :closeOnClickModal="modalClickOther"
-          width="40%">
-          <el-form :model="ruleForm" status-icon :rules="rules" ref="alterForm" label-width="80px" class="demo-ruleForm">
-            <el-form-item label="中心号:" prop="centerId">
-              <el-input type="text" v-model="ruleForm.centerId" :value="centerId" :disabled="true"></el-input>
-            </el-form-item>
-            <el-form-item label="用户名:" prop="userName">
-              <el-input type="text" v-model="ruleForm.userName"></el-input>
-            </el-form-item>
-            <el-form-item label="班级:" prop="classId">
-              <el-select v-model="ruleForm.classId" placeholder="请选择" style="float: left;">
-                <el-option
-                  v-for="(item,index) in classOptions"
-                  :key="index"
-                  :label="item.className"
-                  :value="item.classId">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="MakeSureHandle(alterFlag)">确 定</el-button>
-          </span>
-        </el-dialog>
-      </section>
+    <!--<head-top></head-top>-->
+    <div>
+      <!--<div class="studentManage_section">-->
+        <!--<header>-->
+          <!--<el-row>-->
+            <!--<el-col :span="12" class="grid-content titleSetion"><h2>学生管理</h2></el-col>-->
+            <!--<el-col :span="12" class="grid-content editSetion"><el-button type="primary" @click="addHandle">新增用户</el-button></el-col>-->
+          <!--</el-row>-->
+        <!--</header>-->
+        <!--<section class="select_section">-->
+          <!--<el-row>-->
+            <!--<span style="font-weight: bold">中心号：</span><span>{{centerId}}</span>-->
+            <!--<span style="margin-left: 20px;font-weight: bold">班级：</span>-->
+            <!--<el-select v-model="classValue" placeholder="请选择" @change="selectChange">-->
+              <!--<el-option-->
+                <!--v-for="(item,index) in classOptions"-->
+                <!--:key="index"-->
+                <!--:label="item.className"-->
+                <!--:value="item.classId">-->
+              <!--</el-option>-->
+            <!--</el-select>-->
+          <!--</el-row>-->
+        <!--</section>-->
+        <!--<section class="section_table">-->
+          <!--<el-table-->
+            <!--ref="multipleTable"-->
+            <!--:data="currentData"-->
+            <!--border-->
+            <!--height="450"-->
+            <!--:header-row-style="headerStyle"-->
+            <!--:highlight-current-row="true"-->
+            <!--:cell-style="cellStyle"-->
+            <!--style="width: 100%"-->
+            <!--@selection-change="handleSelectionChange">-->
+            <!--<el-table-column-->
+              <!--type="selection"-->
+              <!--width="50">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--type="index"-->
+              <!--width="50">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--prop="centerId"-->
+              <!--sortable-->
+              <!--label="中心号">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--prop="classId"-->
+              <!--label="班级">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--prop="userName"-->
+              <!--label="姓名">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column-->
+              <!--prop="grade"-->
+              <!--label="年级">-->
+            <!--</el-table-column>-->
+            <!--<el-table-column label="操作">-->
+              <!--<template slot-scope="scope">-->
+                <!--<el-button-->
+                  <!--size="mini"-->
+                  <!--@click="handleEdit(scope.$index, scope.row)">修改</el-button>-->
+                <!--<el-button-->
+                  <!--size="mini"-->
+                  <!--type="danger"-->
+                  <!--@click="handleDelete(scope.$index, scope.row)">删除</el-button>-->
+              <!--</template>-->
+            <!--</el-table-column>-->
+          <!--</el-table>-->
+          <!--<el-row>-->
+            <!--<el-col :span="12">-->
+              <!--<div style="text-align: left">-->
+                <!--<el-button @click="deleteSelection()">删除选中的项</el-button>-->
+                <!--<el-button @click="cancelSelection()">取消选择</el-button>-->
+              <!--</div>-->
+            <!--</el-col>-->
+            <!--<el-col :span="12">-->
+              <!--<el-pagination-->
+                <!--background-->
+                <!--layout="prev, pager, next"-->
+                <!--:page-size="pageSize"-->
+                <!--@current-change=this.PageChange-->
+                <!--:total="allData.length">-->
+              <!--</el-pagination>-->
+            <!--</el-col>-->
+          <!--</el-row>-->
+          <!--<el-dialog-->
+            <!--:title="alterFlag ? '添加用户':'修改信息' "-->
+            <!--:show-close="modalClickOther"-->
+            <!--:visible.sync="dialogVisible"-->
+            <!--:closeOnClickModal="modalClickOther"-->
+            <!--width="40%">-->
+            <!--<el-form :model="ruleForm" status-icon :rules="rules" ref="alterForm" label-width="80px" class="demo-ruleForm">-->
+              <!--<el-form-item label="中心号:" prop="centerId">-->
+                <!--<el-input type="text" v-model="ruleForm.centerId" :value="centerId" :disabled="true"></el-input>-->
+              <!--</el-form-item>-->
+              <!--</el-form-item>-->
+              <!--<el-form-item label="用户名:" prop="userName">-->
+                <!--<el-input type="text" v-model="ruleForm.userName"></el-input>-->
+              <!--</el-form-item>-->
+              <!--<el-form-item label="班级:" prop="classId">-->
+                <!--<el-select v-model="ruleForm.classId" placeholder="请选择" style="float: left;">-->
+                  <!--<el-option-->
+                    <!--v-for="(item,index) in classOptions"-->
+                    <!--:key="index"-->
+                    <!--:label="item.className"-->
+                    <!--:value="item.classId">-->
+                  <!--</el-option>-->
+                <!--</el-select>-->
+              <!--</el-form-item>-->
+            <!--</el-form>-->
+            <!--<span slot="footer" class="dialog-footer">-->
+              <!--<el-button @click="dialogVisible = false">取 消</el-button>-->
+              <!--<el-button type="primary" @click="MakeSureHandle(alterFlag)">确 定</el-button>-->
+            <!--</span>-->
+          <!--</el-dialog>-->
+        <!--</section>-->
+      <!--</div>-->
     </div>
+    <manageS :msg="msg"></manageS>
   </div>
 </template>
 <script type="text/ecmascript-6">
   import headTop from '../../components/headTop'
+  import manageS from '../../components/manageS'
   import {getAllClassesOfCenter,getAllStudentOfClass} from '../../api/manage'
   import {addStudentUser,updateStudentUser,deleteStudentUser} from '../../api/user'
   import {getStore} from '../../config/publicMethod'
   export default{
     data(){
       return{
+        msg: JSON.parse(getStore('manageUser')).centerId,
         cellStyle:{
           textAlign:'center'
         },
@@ -142,8 +148,8 @@
         multipleSelection: [],
         dialogVisible:false,
         modalClickOther:false,
-        centerName:'上地中心',
-        centerId:'',
+        centerName:'万柳中心',
+        centerId:'003',
         classValue:'',
         classOptions:[],
         alterFlag:false,//true为新增，false为修改
@@ -168,7 +174,7 @@
       }
     },
     components:{
-      headTop
+      headTop,manageS
     },
     computed: {
       dialogTitle(){
@@ -182,8 +188,9 @@
     methods:{
       async getAllUserList(){
         let centerId= JSON.parse(getStore('manageUser')).centerId;//中心号
+        console.log( centerId )
         this.ruleForm.centerId = centerId;
-        let result1 = await getAllClassesOfCenter({centerId:'002'});
+        let result1 = await getAllClassesOfCenter({centerId:centerId});
         console.log("班级列表",result1)
         if(result1.code == 200){
           this.classOptions = result1.data;

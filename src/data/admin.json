@@ -1,0 +1,58 @@
+[{
+  "resultMsg":"zong",
+  "centerId":"000",
+  "msg":[
+    {
+      "path": "FXS",
+      "name": "1",
+      "component": "(resolve) => require(['../components/classTeam.vue'], resolve)"
+    },{
+      "path" : "ZK",
+      "name": "2",
+      "component":"(resolve) => require(['../components/classTeam.vue'], resolve)"
+    },{
+      "path" : "QKC",
+      "name": "3",
+      "component":"(resolve) => require(['../components/classTeam.vue'], resolve)"
+    }]
+},{
+  "resultMsg":"fen1",
+  "centerId":"004",
+  "rootList":[{
+    "id":1,
+    "name":"教师管理",
+    "router":[{
+      "path" : "/teacherManage",
+      "name": "teacherManage",
+      "component":"(resolve) => require(['../components/manageT.vue'], resolve)"
+    }]
+  },{
+    "id":2,
+    "name":"学生管理",
+    "router":[{
+      "path" : "/studentManage",
+      "name": "studentManage",
+      "component":"(resolve) => require(['../components/manageS.vue'], resolve)"
+    }]
+  }]
+},{
+  "resultMsg":"fen2",
+  "centerId":"002",
+  "rootList":[{
+    "id":1,
+    "name":"教师管理",
+    "router":[{
+      "path" : "/teacherManage",
+      "name": "teacherManage",
+      "component":"(resolve) => require(['../components/manageT.vue'], resolve)"
+    }]
+  },{
+    "id":2,
+    "name":"学生管理",
+    "router":[{
+      "path" : "/studentManage",
+      "name": "studentManage",
+      "component":"(resolve) => require(['../components/manageS.vue'], resolve)"
+    }]
+  }]
+}]

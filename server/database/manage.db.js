@@ -2,9 +2,13 @@
  * 查询用户信息基本信息
  * Created by gaoju on 2017/11/15.
  */
+var Helper = require('../util/helper');
 
-const query_db = require('./dbconfig')
+const db = require('./dbconfig')
+let query_db=db.query_db;
+
 /*管理员用户模块 构造方法*/
+
 var Manage = function(manage) {
   this.props = manage.props
 };
@@ -17,22 +21,167 @@ Manage.prototype.selectCenter = function() {
   })
   return res
 };
-/*添加新的中心*/
-Manage.prototype.addCenter = function() {
-  var _sql = `INSERT INTO tblCenter (centerId,centerName,address) VALUES ('${this.props.centerId}','${this.props.centerName}','${this.props.address}');`;
-  const res = query_db({sql: _sql, name: 'addCenter'}).catch((err)=>{
+
+
+/**
+ * author: hhu
+ * detail: 查询某个中心的授权应用
+ * function: getCenterProgram
+ * input: CenterId
+ * */
+Manage.prototype.getCenterProgram = function() {
+  var sCenterID=this.props.CenterID||'000';
+  var _sql = `select * from tblCenterProgram where centerid='${sCenterID}';`;
+  console.log("getCenterProgram --------------",_sql);
+  const res = query_db({sql: _sql, name: 'getCenterProgram'}).catch((err)=>{
     console.log("服务端查询出错了。。。",err)
   })
   return res
 };
+
+
+/**
+ * author: hhu
+ * detail: 添加新的中心
+ * function: addCenter
+ * input: CenterName,Address,sParentID,DistinctID,DistinctName,Name,ContactInfo,sStatus
+ * */
+Manage.prototype.addCenter = async function() {
+  var sParentID=this.props.ParentID||"000";
+  var sCenterID=Helper.getUUID();
+  var sStatus=_this.props.Status||'1';
+  var _this=this;
+  var resTemp=await getLastCenterCode(sParentID);
+
+  var sLastCenterCode=resTemp.LastCenterCode;
+
+  let sTable="tblCenter";
+  let arrData={};
+  arrData.CenterId=sCenterID;
+  arrData.CenterCode=sLastCenterCode;
+  arrData.CenterName=_this.props.CenterName;
+  arrData.Address=_this.props.Address;
+  arrData.ParentID=sParentID;
+  arrData.DistinctID=_this.props.DistinctID;
+  arrData.DistinctName=_this.props.DistinctName;
+  arrData.Name=_this.props.Name;
+  arrData.ContactInfo=_this.props.ContactInfo;
+  arrData.Status=sStatus;
+  arrData.LastUpdateTime=Helper.getDateTime("FULL");
+
+  var res = await db.insertData(sTable,arrData,"addCenter").catch((err)=>{
+      console.log("服务端查询出错了。。。",err)
+  })
+
+  res={};
+  res.CenterID=sCenterID;
+  return res
+};
+
+/**
+ * author: hhu
+ * detail: 添加中心用户
+ * function: addCenterUser
+ * input: CenterID,UserID,UserType,Status
+ **/
+Manage.prototype.addCenterUser =async function() {
+  var _this=this;
+  let sTable="tblCenterUser";
+  let arrData={};
+  arrData.CenterId=_this.props.CenterID;
+  arrData.UserID=_this.props.UserId;
+  arrData.UserType=_this.props.UserType;
+  arrData.Status=_this.props.Status;
+  arrData.LastUpdateTime=Helper.getDateTime("FULL");
+//现在假定一个中心中一个用户只能有一个角色
+  _sql="delete from  tblCenterUser  where  CenterID='"+_props.CenterID+"' and  UserID='" + _this.props.UserId + "'";
+
+  var res1= await db.query_db(_sql).catch((err)=>{
+    console.log("delete CenterManager  服务端出错了。。。",err)
+  });
+
+  var res = await db.insertData(sTable,arrData,"addCenterUser").catch((err)=>{
+    console.log("服务端查询出错了。。。",err)
+  })
+
+  return res
+};
+
+
+/**
+ * author: hhu
+ * detail:修改用户数据
+ * */
+Manage.prototype.changeCenterManager =async function() {
+  let _sql = '';
+  let _props=this.props;
+  let res={code:500,message:'undealed error!'};
+
+  let strTable="tblCenterUser";
+  let arrData={};
+  arrData.UserID=_props.UserID;
+  arrData.CenterID=_props.CenterID;
+  arrData.UserType='A';
+  arrData.Status=_props.Status||'1';
+  arrData.LastUpdateTime=Helper.getDateTime("FULL");
+  //现在假定一个中心只能有一个管理员  所以添加
+  let strWhere=" CenterID='"+_props.CenterID+"' and Usertype='A'";
+ console.log("changeCenterManager =======",_sql);
+  var res1= await db.deleteData(strTable,strWhere,'deleteCenterManager').catch((err)=>{
+    console.log("delete CenterManager  服务端出错了。。。",err)
+    return err;
+  });
+
+  res = await db.insertData(strTable, arrData, 'changeCenterManager').catch((err) => {
+    console.log("updateMemberInfo  服务端出错了。。。", err)
+  });
+
+  return res
+}
+
+
+/**
+ * author: hhu
+ * detail: 添加中心用户
+ * function: addCenterProgram
+ * input:  CenterID,CenterProgram=[,...]
+ **/
+Manage.prototype.addCenterProgram =async function() {
+  var _this=this;
+  let sTable="tblCenterProgram";
+  var res=null;
+  var sCenterID=_this.props.CenterID||'';
+  _this.props.CenterProgram.forEach(async function(ProgramCode){
+    let strWhere="CenterID='"+sCenterID+"' and ProgramCode='"+ProgramCode+"'";
+    res = await db.deleteData(sTable,strWhere,"deleteCenterProgram").catch((err)=>{
+      console.log("服务端查询出错了。。。",err)
+    })
+    let arrData={};
+    arrData.CenterId=sCenterID;
+    arrData.ProgramCode=ProgramCode;
+    res = await db.insertData(sTable,arrData,"addCenterProgram").catch((err)=>{
+      console.log("服务端查询出错了。。。",err)
+    })
+  })
+
+  return res;
+};
+
+
+
+
+
+
 /*给中心添加管理员*/
-Manage.prototype.addManagerToCenter = function() {
+Manage.prototype.addManagerToCenter= function() {
   var _sql = `INSERT INTO tblManage (userId,userName,pwd,centerId,phone) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.password}','${this.props.centerId}','${this.props.phone}');`;
   const res = query_db({sql: _sql, name: 'addManagerToCenter'}).catch((err)=>{
     console.log("服务端查询出错了。。。",err)
   })
   return res
 };
+
+
 /*修改中心信息*/
 Manage.prototype.updateCenterInfo = function() {
   //var _sql = `update tblManage (userId,userName,pwd,centerId,phone) VALUES ('${this.props.userId}','${this.props.userName}','${this.props.password}','${this.props.centerId}','${this.props.phone}');`;
@@ -107,4 +256,23 @@ Manage.prototype.deleteClass = function() {
   })
   return res
 };
+
 module.exports = Manage
+
+
+/////////////////////////////////////////////////////////  private  function    //////////////////////////////
+
+function getLastCenterCode(sParentID){
+  return new Promise((resolve, reject) => {
+    var sLastCenterCode='';
+    var _sql=`select ifnull(max(CenterCode),'000') as CenterCode from tblCenter where ParentID='${sParentID}'`;
+    query_db({sql: _sql, name: 'addCenter'}).then((res1)=>{
+      sCenterCode=((parseInt(res1[0].CenterCode)+1)+'').padStart(3,'0');
+      resolve({LastCenterCode:sCenterCode});
+    }).catch((err)=>{
+      reject(err);
+    });
+  });
+}
+
+

@@ -6,24 +6,24 @@
         <el-col :span="20"><div class="loginButton"></div></el-col>
       </el-row>
     </el-header>
-    <el-main>
-      <img src="../../../static/images/homeBanner_manage.jpg" class="HomeBanner" />
+    <el-main class="main">
+      <div class="HomeBanner" ></div>
       <section class="form_contianer">
         <div class="senctionblock">
           <el-row>
             <el-col :span="24"><div class="loginButton">管理员登录</div></el-col>
           </el-row>
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
-            <el-form-item label="用户名" prop="name">
-              <el-input type="text" v-model="ruleForm.name"></el-input>
+            <el-form-item label="用户名:" prop="name">
+              <el-input type="text" v-model="ruleForm.name" class="inputs"></el-input>
             </el-form-item>
-            <el-form-item label="密码" prop="pass">
-              <el-input type="password" v-model="ruleForm.pass"></el-input>
+            <el-form-item label="密码:" prop="pass">
+              <el-input type="password" v-model="ruleForm.pass" class="inputs"></el-input>
             </el-form-item>
-            <el-button @click="loginEnter('ruleForm')" class="enterButton" >登 录</el-button>
+            <el-button type="primary" plain @click="loginEnter('ruleForm')" class="enterButton" >登 录</el-button>
             <!--<router-link :to="{path:'/home',query:{name:'children'}}" class="enterButton"  tag="button" @click="loginEnter('ruleForm')">登录</router-link>-->
-            <el-button @click="register()" class="registerButton">注 册</el-button>
-            <div>忘记密码？点击 <span @click="linkToEdit()">修改密码</span></div>
+            <el-button type="success" plain @click="register()" class="registerButton">注 册</el-button>
+            <div class="forgetPwd">忘记密码？点击 <span class="linkToEdit" @click="linkToEdit()">修改密码</span></div>
           </el-form>
         </div>
       </section>
@@ -79,6 +79,7 @@
               if(result.data[0]){
                 setSession('accessToken',true);//登录标志
                 setStore('manageUser',result.data[0])
+                setStore('CenterID',result.data[0].centerId)
                 setStore('permissionLevel',result.data[0].permissionLevel)
 //                this.$router.addRoutes( routes[0].rootList[0].router ) //动态添加路由
 //                this.$router.push({path:'/'});
@@ -121,10 +122,14 @@
     width: 100%;
     background-color: white;
   }
+  .main{
+    background: url("../../../static/images/homeBanner_manage.jpg") no-repeat;
+    background-size: cover;
+  }
   .HomeBanner{
     width: 100%;
     height: -webkit-fill-available;
-    background-size: cover;
+    background: rgba(0, 0, 0, 0.2);
   }
   .form_contianer{
     width: 320px;
@@ -143,19 +148,29 @@
       font-weight: 400;
     }
     .enterButton{
-      background-color: #00c1de;
-      font-size: 20px;
-      width: 100%;
-      cursor: pointer;
-      color: white;
+     /* background-color: #00c1de;
+      font-size: 20px;*/
+      width: 35%;
+      /*cursor: pointer;
+      color: white;*/
     }
     .registerButton{
-      background-color: #7bbf10;
-      font-size: 20px;
-      width: 100%;
-      cursor: pointer;
+      /*background-color: #7bbf10;
+      font-size: 20px;*/
+      width: 35%;
+   /*   cursor: pointer;
       color: white;
-      margin: 0 !important;
+      margin: 0 !important;*/
+    }
+    .inputs{
+      width:auto;
+    }
+    .forgetPwd{
+      height: 50px;
+      line-height:50px;
+    }
+    .linkToEdit{
+      color: #409eff;
     }
     .editPwdButton{
       background-color: #3cacab;

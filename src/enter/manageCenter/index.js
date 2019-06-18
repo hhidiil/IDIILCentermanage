@@ -9,6 +9,12 @@ import ElementUI from 'element-ui'
 import '../../../node_modules/element-ui/lib/theme-chalk/index.css'
 import VueQuillEditor from 'vue-quill-editor'
 
+import routes from '../../data/routes.json'
+
+
+sessionStorage.setItem('routes',JSON.stringify(routes)); //存储路由到localStorage
+console.log( routes )
+
 Vue.config.debug = true
 Vue.config.productionTip = false;
 Vue.use(ElementUI);

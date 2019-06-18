@@ -16,20 +16,21 @@ manageRouter.post('/addCenter',async (req,res)=>{
   var manage = new Manage({props: props});
   const result = await manage.addCenter();
   console.log("11111111111-->",result)
+  console.log("222-->",result.CenterID)
   if(result){
-    let id = Helper.randomString(false,8);//创建唯一ID号
+   /* let id = Helper.randomString(false,8);//创建唯一ID号
     let props2 = req.body;
-    props2.userId = id;
+    props2.CenterID=result.CenterID;
+    props2.UserId = id;
     props2.password = Helper.getMD5('123456');//默认密码
     let manage2 = new Manage({props: props2});
     const result2 = await manage2.addManagerToCenter();
     console.log("222222222-->",result2)
-    if(result2){
+    */
       res.json({
         code:200,
-        data:result2
+        data:result
       })
-    }
   }else {
     res.json({
       code:500,

@@ -22,6 +22,10 @@ const routes = [
     path: '/homeStudent',
     name: 'homeStudent',
     component:HomeStudent,
+  },
+  {
+    path:'/test/test/:id',//动态路由信息
+    component:(resolve) => require(['./../page/test/door.vue'], resolve)
   }
 ]
 export default new Router({
