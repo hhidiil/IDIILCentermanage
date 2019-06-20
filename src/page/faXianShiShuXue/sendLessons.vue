@@ -275,12 +275,17 @@
           };
           let result2 = await getClassCenterUser(parameters);
           let originalResult2 = result2.data;
-          originalResult2.forEach((item, index)=>{
-            item.label = item.UserName;
-            item.key = index+1;
-          });
-        this.sendLessonsLists.subgroupData = originalResult2;
-        this.setLessonsStore();
+          if(originalResult2.length>0){
+            originalResult2.forEach((item, index)=>{
+              item.label = item.UserName;
+              item.key = index+1;
+            });
+            this.sendLessonsLists.subgroupData = originalResult2;
+            this.setLessonsStore();
+          }else{
+            this.promptMessage('该班级没有学生哦^o^', 'warning');
+          }
+
       },
       //取消课程选择
       setCurrent(row) {
